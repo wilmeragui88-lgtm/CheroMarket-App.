@@ -1,71 +1,180 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CheroMarket SV</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheroMarket SV | Catálogo Pro</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --azul: #0047AB; --naranja: #FF8C00; --fondo: #f0f2f5; --verde: #25D366; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--fondo); padding-bottom: 80px; }
+        
+        header { background: white; padding: 1rem; text-align: center; border-bottom: 2px solid var(--azul); position: sticky; top: 0; z-index: 100; }
+        h1 { color: var(--azul); margin: 0; font-size: 1.3rem; font-weight: 800; }
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/styles.css">
+        /* Feed Principal */
+        .feed { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; padding: 15px; }
+        .tarjeta { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; border: 1px solid #eee; }
+        
+        .info { padding: 10px; }
+        .precio { color: var(--naranja); font-weight: 800; font-size: 1.1rem; margin: 0; }
+        .titulo { font-size: 0.9rem; font-weight: 600; margin: 4px 0; height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        
+        .vendedor-tag { font-size: 0.7rem; color: var(--azul); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold; margin-bottom: 8px; }
+
+        /* MODAL PERFIL PROFESIONAL */
+        #modal-perfil { position: fixed; inset: 0; background: white; z-index: 300; display: none; overflow-y: auto; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .perfil-hero { background: linear-gradient(135deg, var(--azul), #002e6e); color: white; padding: 40px 20px; text-align: center; }
+        .avatar-grande { width: 70px; height: 70px; background: white; color: var(--azul); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 30px; font-weight: 800; }
+        
+        .stats-vendedor { font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; display: inline-block; margin-top: 10px; }
+        
+        .btn-compartir { background: white; color: var(--azul); border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; margin-top: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: auto; }
+
+        .btn-contactar { display: block; background: var(--verde); color: white; text-align: center; text-decoration: none; padding: 10px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; }
+        .btn-vender { position: fixed; bottom: 20px; right: 20px; background: var(--naranja); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; text-decoration: none; box-shadow: 0 4px 12px rgba(255,140,0,0.4); z-index: 150; }
+
+        /* Formulario */
+        #modal-vender { position: fixed; inset: 0; background: white; z-index: 200; display: none; overflow-y: auto; }
+        form { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
+    </style>
 </head>
 <body>
 
 <header>
-  <h1>🇸🇻 CHEROMARKET</h1>
+    <h1>🇸🇻 CHEROMARKET</h1>
 </header>
 
-<div class="feed" id="main-feed">
-  <p style="text-align:center;grid-column:span 2;padding:40px;color:#999;">
-    Cargando productos...
-  </p>
+<main class="feed" id="main-feed"></main>
+
+<div id="modal-perfil">
+    <div class="perfil-hero">
+        <span onclick="cerrarPerfil()" style="position:absolute; top:20px; left:20px; font-size:25px; cursor:pointer;">←</span>
+        <div class="avatar-grande" id="p-avatar">C</div>
+        <h2 id="p-nombre" style="margin:0;">Chero Vendedor</h2>
+        <div class="stats-vendedor" id="p-antiguedad">En CheroMarket desde hoy</div>
+        
+        <button class="btn-compartir" id="btn-share-catalogo">
+            🔗 Compartir mi catálogo
+        </button>
+    </div>
+    <div style="padding: 20px 15px 5px;">
+        <h3 style="font-size: 0.9rem; color: #666; text-transform: uppercase;">Productos de este chero</h3>
+    </div>
+    <div class="feed" id="perfil-feed"></div>
 </div>
 
-<!-- MODAL VENDER -->
 <div id="modal-vender">
-  <div class="form-header">
-    <span style="font-size:20px;">¿Qué vas a vender, chero?</span>
-    <span onclick="cerrarVender()" style="font-size:28px;cursor:pointer;">&times;</span>
-  </div>
-
-  <form>
-    <label>Nombre del producto</label>
-    <input id="titulo" type="text" placeholder="Ej. Zapatos Nike" required>
-
-    <label>Precio ($)</label>
-    <input id="precio" type="number" required>
-
-    <label>Departamento</label>
-    <select id="depto">
-      <option>San Salvador</option>
-      <option>La Libertad</option>
-      <option>Santa Ana</option>
-      <option>San Miguel</option>
-      <option>Sonsonate</option>
-      <option>Ahuachapán</option>
-      <option>La Paz</option>
-      <option>Usulután</option>
-      <option>Cuscatlán</option>
-      <option>Chalatenango</option>
-      <option>La Unión</option>
-      <option>Morazán</option>
-      <option>San Vicente</option>
-      <option>Cabañas</option>
-    </select>
-
-    <label>Descripción</label>
-    <textarea id="desc" rows="3"></textarea>
-
-    <button type="button" id="btn-subir" class="btn-publicar">
-      Publicar venta
-    </button>
-  </form>
+    <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+        <h2 style="margin:0; font-size: 1.1rem;">Publicar Venta</h2>
+        <span onclick="toggleModal(false)" style="font-size:30px; cursor:pointer;">&times;</span>
+    </div>
+    <form id="form-producto">
+        <input type="text" id="titulo" placeholder="¿Qué vendes?" required>
+        <input type="number" id="precio" placeholder="Precio $" step="0.01" required>
+        <input type="tel" id="whatsapp" placeholder="Tu WhatsApp (Ej: 77112233)" required>
+        <select id="depto">
+            <option>San Salvador</option><option>La Libertad</option><option>Santa Ana</option><option>San Miguel</option>
+        </select>
+        <button type="submit" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:10px; font-weight:bold;">Publicar Venta</button>
+    </form>
 </div>
 
-<!-- BOTÓN FLOTANTE -->
-<a class="btn-vender" onclick="abrirVender()">+</a>
+<a href="javascript:void(0)" class="btn-vender" onclick="toggleModal(true)">+</a>
 
-<!-- JS -->
-<script type="module" src="js/app.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
+        authDomain: "cheromarket.firebaseapp.com",
+        projectId: "cheromarket",
+        storageBucket: "cheromarket.firebasestorage.app",
+        messagingSenderId: "777368646513",
+        appId: "1:777368646513:web:42b49dad96c2dcf76b7cd0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let cache = [];
+
+    async function cargar() {
+        const q = query(collection(db, "productos"), orderBy("fecha", "desc"));
+        const snap = await getDocs(q);
+        cache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        render(cache, 'main-feed');
+    }
+
+    function render(lista, containerId) {
+        const feed = document.getElementById(containerId);
+        feed.innerHTML = lista.map(p => `
+            <div class="tarjeta">
+                <div style="width:100%; aspect-ratio:1/1; background:#f0f2f5; display:flex; align-items:center; justify-content:center; font-size:40px;">📦</div>
+                <div class="info">
+                    <p class="precio">$${p.precio}</p>
+                    <p class="titulo">${p.titulo}</p>
+                    <div class="vendedor-tag" onclick="verPerfil('${p.whatsapp}')">
+                        👤 Chero #${p.whatsapp.substring(4)}
+                    </div>
+                    <a href="https://wa.me/503${p.whatsapp}" target="_blank" class="btn-contactar">WhatsApp</a>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // LÓGICA DE PERFIL Y COMPARTIR
+    window.verPerfil = (tel) => {
+        const productos = cache.filter(p => p.whatsapp === tel);
+        
+        // Calcular antigüedad (Basado en la fecha más antigua de sus productos)
+        const fechas = productos.map(p => p.fecha.toDate());
+        const masAntigua = new Date(Math.min(...fechas));
+        const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+        
+        document.getElementById('p-nombre').innerText = "Chero #" + tel.substring(4);
+        document.getElementById('p-avatar').innerText = tel.substring(0,1);
+        document.getElementById('p-antiguedad').innerText = `En CheroMarket desde ${meses[masAntigua.getMonth()]} ${masAntigua.getFullYear()}`;
+        
+        // Botón compartir catálogo
+        document.getElementById('btn-share-catalogo').onclick = () => {
+            const texto = `¡Ey chero! Mira mi catálogo de productos en CheroMarket SV: https://cheromarket.com/perfil?tel=${tel}`;
+            if (navigator.share) {
+                navigator.share({ title: 'Mi Catálogo', text: texto, url: window.location.href });
+            } else {
+                alert("Copiado al portapapeles: " + texto);
+            }
+        };
+
+        render(productos, 'perfil-feed');
+        document.getElementById('modal-perfil').style.display = 'block';
+    };
+
+    window.cerrarPerfil = () => document.getElementById('modal-perfil').style.display = 'none';
+
+    document.getElementById('form-producto').onsubmit = async (e) => {
+        e.preventDefault();
+        await addDoc(collection(db, "productos"), {
+            titulo: document.getElementById('titulo').value,
+            precio: document.getElementById('precio').value,
+            whatsapp: document.getElementById('whatsapp').value,
+            depto: document.getElementById('depto').value,
+            fecha: new Date()
+        });
+        Toastify({ text: "¡Publicado exitosamente!", backgroundColor: "#0047AB" }).showToast();
+        toggleModal(false);
+        cargar();
+    };
+
+    window.toggleModal = (s) => document.getElementById('modal-vender').style.display = s ? 'block' : 'none';
+
+    cargar();
+</script>
 </body>
 </html>
