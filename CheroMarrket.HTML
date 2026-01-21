@@ -1,0 +1,162 @@
+Código Chero 
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheroMarket SV</title>
+    <style>
+        :root { --azul: #0047AB; --naranja: #FF8C00; --fondo: #f0f2f5; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--fondo); padding-bottom: 90px; }
+        
+        /* Header */
+        header { background: white; padding: 15px; text-align: center; border-bottom: 3px solid var(--azul); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: var(--azul); margin: 0; font-size: 22px; font-weight: 800; }
+
+        /* Feed de Productos */
+        .feed { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
+        .tarjeta { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .foto-placeholder { width: 100%; height: 150px; background: #eef2f7; color: var(--azul); display: flex; align-items: center; justify-content: center; font-size: 40px; }
+        .info { padding: 12px; }
+        .precio { color: var(--naranja); font-weight: bold; font-size: 19px; margin: 0; }
+        .titulo { font-size: 14px; margin: 5px 0; color: #333; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lugar { font-size: 11px; color: #777; font-weight: 500; }
+
+        /* Formulario Modal (Vender) */
+        #modal-vender { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; display: none; overflow-y: auto; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .form-header { padding: 20px; background: var(--azul); color: white; display: flex; justify-content: space-between; align-items: center; }
+        form { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        label { font-size: 14px; font-weight: bold; color: #444; margin-bottom: -10px; }
+        input, select, textarea { padding: 14px; border: 2px solid #eee; border-radius: 12px; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--azul); }
+        
+        .btn-publicar { background: var(--naranja); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: 10px; }
+        
+        /* Botón Flotante + */
+        .btn-vender { position: fixed; bottom: 25px; right: 25px; background: var(--naranja); color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; text-decoration: none; box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4); z-index: 150; border: 3px solid white; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🇸🇻 CHEROMARKET</h1>
+</header>
+
+<div class="feed" id="main-feed">
+    <p style="text-align: center; grid-column: span 2; padding: 50px; color: #999;">Buscando gangas...</p>
+</div>
+
+<div id="modal-vender">
+    <div class="form-header">
+        <span style="font-size: 20px;">¿Qué vas a vender, chero?</span>
+        <span onclick="cerrarVender()" style="font-size: 28px; cursor: pointer;">&times;</span>
+    </div>
+    <form id="form-producto">
+        <label>Nombre del producto</label>
+        <input type="text" id="titulo" placeholder="Ej. Zapatos Nike originales" required>
+        
+        <label>Precio en Dólares ($)</label>
+        <input type="number" id="precio" placeholder="0.00" required>
+        
+        <label>¿En qué departamento estás?</label>
+        <select id="depto">
+            <option>San Salvador</option><option>La Libertad</option><option>Santa Ana</option>
+            <option>San Miguel</option><option>Sonsonate</option><option>Ahuachapán</option>
+            <option>La Paz</option><option>Usulután</option><option>Cuscatlán</option>
+            <option>Chalatenango</option><option>La Unión</option><option>Morazán</option>
+            <option>San Vicente</option><option>Cabañas</option>
+        </select>
+        
+        <label>Descripción (opcional)</label>
+        <textarea id="desc" rows="3" placeholder="Contale a los demás cheros detalles de tu producto..."></textarea>
+        
+        <button type="button" class="btn-publicar" id="btn-subir">Publicar Venta</button>
+    </form>
+</div>
+
+<a href="javascript:void(0)" class="btn-vender" onclick="abrirVender()">+</a>
+
+<script type="module">
+    // Importamos las herramientas necesarias de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Tu configuración oficial
+    const firebaseConfig = {
+        apiKey: "AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
+        authDomain: "cheromarket.firebaseapp.com",
+        projectId: "cheromarket",
+        storageBucket: "cheromarket.firebasestorage.app",
+        messagingSenderId: "777368646513",
+        appId: "1:777368646513:web:42b49dad96c2dcf76b7cd0"
+    };
+
+    // Inicializamos la app
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // FUNCIÓN PARA PUBLICAR
+    document.getElementById('btn-subir').onclick = async () => {
+        const tit = document.getElementById('titulo').value;
+        const pre = document.getElementById('precio').value;
+        const dep = document.getElementById('depto').value;
+        const des = document.getElementById('desc').value;
+
+        if(!tit || !pre) return alert("¡Hey chero! Olvidaste poner el nombre o el precio.");
+
+        try {
+            await addDoc(collection(db, "productos"), {
+                titulo: tit,
+                precio: pre,
+                departamento: dep,
+                descripcion: des,
+                fecha: new Date()
+            });
+            alert("¡Excelente! Tu producto ya está en el mercado.");
+            cerrarVender();
+            location.reload(); 
+        } catch (e) { 
+            alert("Huy, hubo un error: " + e.message); 
+        }
+    };
+
+    // FUNCIÓN PARA CARGAR PRODUCTOS
+    async function cargarProductos() {
+        const q = query(collection(db, "productos"), orderBy("fecha", "desc"));
+        const snapshot = await getDocs(q);
+        const feed = document.getElementById('main-feed');
+        feed.innerHTML = "";
+        
+        if(snapshot.empty) {
+            feed.innerHTML = "<p style='grid-column: span 2; text-align:center;'>Aún no hay ventas. ¡Sé el primero!</p>";
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            const p = doc.data();
+            feed.innerHTML += `
+                <div class="tarjeta">
+                    <div class="foto-placeholder">🛒</div>
+                    <div class="info">
+                        <p class="precio">$${p.precio}</p>
+                        <p class="titulo">${p.titulo}</p>
+                        <p class="lugar">📍 ${p.departamento}</p>
+                    </div>
+                </div>`;
+        });
+    }
+    
+    cargarProductos();
+</script>
+
+<script>
+    // Funciones visuales del Modal
+    function abrirVender() { document.getElementById('modal-vender').style.display = 'block'; }
+    function cerrarVender() { document.getElementById('modal-vender').style.display = 'none'; }
+</script>
+
+</body>
+</html>
