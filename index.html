@@ -3,263 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CheroMarket SV | Tienda Oficial</title>
+<title>CheroMarketApp · Demo</title>
 
 <style>
-:root {
-    --azul:#0047AB;
-    --naranja:#FF8C00;
-    --verde-wa:#25D366;
-    --fondo:#f0f2f5;
-    --tarjeta-bg:#ffffff;
-    --texto:#333;
-    --texto-sec:#777;
-    --borde:#ddd;
+:root{
+--azul:#0047AB;--naranja:#FF8C00;--verde:#25D366;
+--fondo:#f0f2f5;--card:#fff;--txt:#333;--mut:#777;--b:#ddd
 }
-
-[data-theme="dark"] {
-    --fondo:#121212;
-    --tarjeta-bg:#1e1e1e;
-    --texto:#e0e0e0;
-    --texto-sec:#aaa;
-    --borde:#333;
-    --azul:#4c8cff;
+[data-theme=dark]{
+--fondo:#121212;--card:#1e1e1e;--txt:#eee;--mut:#aaa;--b:#333;--azul:#4c8cff
 }
-
-body {
-    font-family:'Segoe UI',sans-serif;
-    margin:0;
-    background:var(--fondo);
-    color:var(--texto);
-    padding-bottom:80px;
-}
-
-header {
-    background:var(--tarjeta-bg);
-    padding:15px 10px;
-    text-align:center;
-    border-bottom:3px solid var(--azul);
-    position:sticky;
-    top:0;
-    z-index:100;
-}
-
-h1 {
-    margin:0;
-    color:var(--azul);
-    font-size:22px;
-}
-
-.sub {
-    font-size:13px;
-    color:var(--texto-sec);
-    margin-top:3px;
-}
-
-.buscador-cont {
-    max-width:500px;
-    margin:10px auto 0;
-    display:flex;
-    gap:8px;
-}
-
-.buscador {
-    flex:1;
-    padding:12px;
-    border-radius:25px;
-    border:1px solid var(--borde);
-    background:var(--fondo);
-    color:var(--texto);
-}
-
-.btn-theme {
-    width:40px;
-    height:40px;
-    border:none;
-    border-radius:50%;
-    cursor:pointer;
-}
-
-.categorias-bar {
-    display:flex;
-    gap:10px;
-    overflow-x:auto;
-    padding:12px 10px;
-    max-width:500px;
-    margin:auto;
-}
-
-.cat-btn {
-    padding:8px 15px;
-    border:none;
-    border-radius:20px;
-    font-size:13px;
-    font-weight:600;
-    background:var(--borde);
-    cursor:pointer;
-}
-
-.cat-btn.active {
-    background:var(--azul);
-    color:white;
-}
-
-.feed {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    padding:12px;
-    max-width:900px;
-    margin:auto;
-}
-
-.tarjeta {
-    background:var(--tarjeta-bg);
-    border-radius:12px;
-    overflow:hidden;
-    border:1px solid var(--borde);
-    display:flex;
-    flex-direction:column;
-}
-
-.foto {
-    height:180px;
-    object-fit:contain;
-    background:#f8f8f8;
-    padding:10px;
-}
-
-.info {
-    padding:12px;
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    flex-grow:1;
-}
-
-.tag-cat {
-    font-size:10px;
-    border:1px solid var(--azul);
-    color:var(--azul);
-    padding:2px 8px;
-    border-radius:6px;
-    font-weight:600;
-    align-self:flex-start;
-}
-
-.titulo {
-    font-size:15px;
-    font-weight:600;
-    line-height:1.3;
-}
-
-.precio {
-    font-size:20px;
-    font-weight:700;
-    color:var(--naranja);
-}
-
-.moneda {
-    font-size:12px;
-    color:var(--texto-sec);
-    margin-right:4px;
-}
-
-.lugar {
-    font-size:12px;
-    color:var(--texto-sec);
-}
-
-.btn-contacto {
-    background:var(--verde-wa);
-    color:white;
-    text-decoration:none;
-    text-align:center;
-    padding:11px;
-    border-radius:8px;
-    font-weight:600;
-    margin-top:auto;
-}
-
-.btn-vender {
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    width:65px;
-    height:65px;
-    border-radius:50%;
-    background:var(--naranja);
-    color:white;
-    border:none;
-    font-size:32px;
-    cursor:pointer;
-}
-
-/* Modal */
-#modal {
-    position:fixed;
-    inset:0;
-    background:var(--fondo);
-    display:none;
-    z-index:200;
-}
-
-form {
-    max-width:500px;
-    margin:auto;
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-}
-
-input,select {
-    padding:12px;
-    border-radius:8px;
-    border:1px solid var(--borde);
-}
-
-.btn-publicar {
-    background:var(--naranja);
-    color:white;
-    padding:15px;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-}
+body{margin:0;font-family:Segoe UI;background:var(--fondo);color:var(--txt);padding-bottom:80px}
+header{background:var(--card);border-bottom:3px solid var(--azul);padding:15px;text-align:center;position:sticky;top:0;z-index:9}
+h1{margin:0;color:var(--azul)}
+.sub{font-size:13px;color:var(--mut)}
+.buscador-cont{max-width:500px;margin:10px auto;display:flex;gap:8px}
+.buscador{flex:1;padding:12px;border-radius:25px;border:1px solid var(--b);background:var(--fondo)}
+.btn-theme{width:40px;height:40px;border:none;border-radius:50%;cursor:pointer}
+.categorias{display:flex;gap:8px;overflow-x:auto;padding:10px;max-width:500px;margin:auto}
+.cat{padding:8px 14px;border:none;border-radius:20px;font-weight:600;background:var(--b);cursor:pointer}
+.cat.active{background:var(--azul);color:white}
+.feed{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;max-width:900px;margin:auto}
+.card{background:var(--card);border-radius:12px;border:1px solid var(--b);overflow:hidden;display:flex;flex-direction:column}
+.foto{height:180px;object-fit:contain;background:#fafafa;padding:10px}
+.info{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.tag{font-size:10px;border:1px solid var(--azul);color:var(--azul);padding:2px 8px;border-radius:6px;align-self:flex-start}
+.titulo{font-weight:600}
+.precio{color:var(--naranja);font-size:20px;font-weight:700}
+.mut{font-size:12px;color:var(--mut)}
+.btn-wa{margin-top:auto;background:var(--verde);color:white;text-decoration:none;text-align:center;padding:10px;border-radius:8px;font-weight:600}
+.btn-del{background:#c62828;color:white;border:none;padding:8px;border-radius:6px;margin-top:6px}
+.btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none}
+#modal{position:fixed;inset:0;background:var(--fondo);display:none;z-index:99}
+form{max-width:500px;margin:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+input,select{padding:12px;border-radius:8px;border:1px solid var(--b)}
 </style>
 </head>
 
 <body data-theme="light">
 
 <header>
-<h1>🇸🇻 CheroMarket SV</h1>
-<div class="sub">Tienda oficial · Productos verificados</div>
+<h1>🇸🇻 CheroMarketApp</h1>
+<div class="sub">Demo · Productos persistentes</div>
 
 <div class="buscador-cont">
 <input id="buscar" class="buscador" placeholder="Buscar productos…" oninput="filtrar()">
 <button class="btn-theme" onclick="toggleTheme()">🌓</button>
 </div>
 
-<div class="categorias-bar">
-<button class="cat-btn active" onclick="setCat('Todos',this)">Todos</button>
-<button class="cat-btn" onclick="setCat('Tecnología',this)">Tecnología</button>
-<button class="cat-btn" onclick="setCat('Ropa',this)">Ropa</button>
-<button class="cat-btn" onclick="setCat('Comida',this)">Comida</button>
+<div class="categorias">
+<button class="cat active" onclick="setCat('Todos',this)">Todos</button>
+<button class="cat" onclick="setCat('Tecnología',this)">Tecnología</button>
+<button class="cat" onclick="setCat('Ropa',this)">Ropa</button>
+<button class="cat" onclick="setCat('Comida',this)">Comida</button>
 </div>
 </header>
 
 <div id="feed" class="feed"></div>
-
-<button class="btn-vender" onclick="abrir()">+</button>
+<button class="btn-add" onclick="abrir()">+</button>
 
 <div id="modal">
 <form>
 <h3>Publicar producto</h3>
-
-<input id="titulo" placeholder="Nombre del producto" required>
+<input id="titulo" placeholder="Nombre del producto">
 <input id="precio" type="number" step="0.01" placeholder="Precio USD">
 <select id="categoria">
 <option>Tecnología</option>
@@ -271,93 +77,105 @@ input,select {
 <option>La Libertad</option>
 <option>Santa Ana</option>
 </select>
-<input type="file" id="foto" accept="image/*" onchange="preview(event)">
-<img id="prev" style="display:none;border-radius:10px">
-
-<button type="button" class="btn-publicar" onclick="publicar()">Publicar</button>
+<button type="button" onclick="publicar()">Publicar</button>
 <button type="button" onclick="cerrar()">Cancelar</button>
 </form>
 </div>
 
-<script>
-const VENDEDOR = {
-    nombre:"CheroMarket SV",
-    whatsapp:"77771234"
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
+authDomain:"cheromarket.firebaseapp.com",
+projectId:"cheromarket",
+storageBucket:"cheromarket.firebasestorage.app",
+messagingSenderId:"777368646513",
+appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 };
 
-let imagen="";
-let categoria="Todos";
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-function toggleTheme(){
-    document.body.dataset.theme =
-    document.body.dataset.theme === "dark" ? "light":"dark";
+const VENDEDOR = {
+nombre:"CheroMarket SV",
+telefono:"77771234"
+};
+
+const state = { categoria:"Todos" };
+
+window.toggleTheme=()=>document.body.dataset.theme=
+document.body.dataset.theme==="dark"?"light":"dark";
+
+window.abrir=()=>modal.style.display="block";
+window.cerrar=()=>modal.style.display="none";
+
+window.publicar = async () => {
+if(!titulo.value || !precio.value) return alert("Completa los campos");
+await addDoc(collection(db,"productos"),{
+titulo:titulo.value,
+precio:Number(precio.value).toFixed(2),
+categoria:categoria.value,
+depto:depto.value,
+vendedor:VENDEDOR.nombre,
+telefono:VENDEDOR.telefono,
+creado:Date.now()
+});
+cerrar();
+cargar();
+};
+
+window.eliminar = async id => {
+if(confirm("¿Eliminar producto?")){
+await deleteDoc(doc(db,"productos",id));
+cargar();
 }
+};
 
-function abrir(){ modal.style.display="block"; }
-function cerrar(){ modal.style.display="none"; }
+window.setCat=(c,b)=>{
+state.categoria=c;
+document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+b.classList.add("active");
+filtrar();
+};
 
-function preview(e){
-    const r=new FileReader();
-    r.onload=()=>{ prev.src=r.result; prev.style.display="block"; imagen=r.result; }
-    r.readAsDataURL(e.target.files[0]);
-}
+window.filtrar=()=>{
+const t=buscar.value.toLowerCase();
+document.querySelectorAll(".card").forEach(c=>{
+c.style.display=
+c.dataset.t.includes(t) &&
+(state.categoria==="Todos"||c.dataset.c===state.categoria)
+?"flex":"none";
+});
+};
 
-function publicar(){
-    const p={
-        id:Date.now(),
-        titulo:titulo.value,
-        precio:parseFloat(precio.value).toFixed(2),
-        categoria:categoria.value,
-        depto:depto.value,
-        telefono:VENDEDOR.whatsapp,
-        vendedor:VENDEDOR.nombre,
-        foto:imagen||"https://via.placeholder.com/400"
-    };
-
-    const db=JSON.parse(localStorage.getItem("db"))||[];
-    db.unshift(p);
-    localStorage.setItem("db",JSON.stringify(db));
-    cerrar();
-    render(db);
-}
-
-function setCat(c,b){
-    categoria=c;
-    document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    filtrar();
-}
-
-function filtrar(){
-    const t=buscar.value.toLowerCase();
-    const db=JSON.parse(localStorage.getItem("db"))||[];
-    render(db.filter(p=>
-        p.titulo.toLowerCase().includes(t) &&
-        (categoria==="Todos"||p.categoria===categoria)
-    ));
+async function cargar(){
+const q=query(collection(db,"productos"),orderBy("creado","desc"));
+const snap=await getDocs(q);
+render(snap.docs.map(d=>({id:d.id,...d.data()})));
 }
 
 function render(lista){
-    feed.innerHTML="";
-    lista.forEach(p=>{
-        feed.innerHTML+=`
-        <div class="tarjeta">
-            <img src="${p.foto}" class="foto">
-            <div class="info">
-                <span class="tag-cat">${p.categoria}</span>
-                <div class="titulo">${p.titulo}</div>
-                <div class="precio"><span class="moneda">USD</span>$${p.precio}</div>
-                <div class="lugar">Vendedor: ${p.vendedor}</div>
-                <div class="lugar">Ubicación: ${p.depto}</div>
-                <a class="btn-contacto" target="_blank"
-                href="https://wa.me/503${p.telefono}?text=Hola, estoy interesado en el producto '${p.titulo}'.">
-                Contactar vendedor</a>
-            </div>
-        </div>`;
-    });
+feed.innerHTML="";
+lista.forEach(p=>{
+feed.innerHTML+=`
+<div class="card" data-t="${p.titulo.toLowerCase()}" data-c="${p.categoria}">
+<img class="foto" src="https://via.placeholder.com/400">
+<div class="info">
+<span class="tag">${p.categoria}</span>
+<div class="titulo">${p.titulo}</div>
+<div class="precio">$${p.precio}</div>
+<div class="mut">📍 ${p.depto}</div>
+<a class="btn-wa" target="_blank"
+href="https://wa.me/503${p.telefono}?text=Hola, me interesa ${p.titulo}">
+WhatsApp</a>
+<button class="btn-del" onclick="eliminar('${p.id}')">Eliminar</button>
+</div></div>`;
+});
 }
 
-render(JSON.parse(localStorage.getItem("db"))||[]);
+cargar();
 </script>
 
 </body>
