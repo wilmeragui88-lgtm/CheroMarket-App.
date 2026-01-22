@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CheroMarketApp · Demo</title>
+<title>CheroMarketApp · Pro</title>
 
 <style>
 :root{
@@ -24,19 +24,23 @@ h1{margin:0;color:var(--azul)}
 .cat{padding:8px 14px;border:none;border-radius:20px;font-weight:600;background:var(--b);cursor:pointer}
 .cat.active{background:var(--azul);color:white}
 .feed{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;max-width:900px;margin:auto}
-.card{background:var(--card);border-radius:12px;border:1px solid var(--b);overflow:hidden;display:flex;flex-direction:column}
-.foto{height:180px;object-fit:contain;background:#fafafa;padding:10px}
-.info{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
-.tag{font-size:10px;border:1px solid var(--azul);color:var(--azul);padding:2px 8px;border-radius:6px;align-self:flex-start}
-.titulo{font-weight:600}
+.card{background:var(--card);border-radius:12px;border:1px solid var(--b);overflow:hidden;display:flex;flex-direction:column;transition: 0.3s}
+.foto{height:180px;width:100%;object-fit:cover;background:#eee}
+.info{padding:12px;display:flex;flex-direction:column;gap:5px;flex:1}
+.tag-row{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:10px;border:1px solid var(--azul);color:var(--azul);padding:2px 8px;border-radius:6px}
+.tag-estado{background:var(--azul);color:white}
+.titulo{font-weight:600;font-size:16px;margin-top:5px}
 .precio{color:var(--naranja);font-size:20px;font-weight:700}
-.mut{font-size:12px;color:var(--mut)}
+.desc{font-size:12px;color:var(--txt);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mut{font-size:11px;color:var(--mut)}
 .btn-wa{margin-top:auto;background:var(--verde);color:white;text-decoration:none;text-align:center;padding:10px;border-radius:8px;font-weight:600}
-.btn-del{background:#c62828;color:white;border:none;padding:8px;border-radius:6px;margin-top:6px}
-.btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none}
-#modal{position:fixed;inset:0;background:var(--fondo);display:none;z-index:99}
-form{max-width:500px;margin:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-input,select{padding:12px;border-radius:8px;border:1px solid var(--b)}
+.btn-del{background:transparent;color:#c62828;border:none;padding:5px;font-size:11px;cursor:pointer;text-decoration:underline}
+.btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none;box-shadow: 0 4px 10px rgba(0,0,0,0.3);z-index:10}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:99;overflow-y:auto;padding:20px}
+.modal-content{background:var(--card);max-width:500px;margin:auto;padding:20px;border-radius:15px;display:flex;flex-direction:column;gap:12px}
+input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
+textarea{resize:none;height:80px}
 </style>
 </head>
 
@@ -44,10 +48,10 @@ input,select{padding:12px;border-radius:8px;border:1px solid var(--b)}
 
 <header>
 <h1>🇸🇻 CheroMarketApp</h1>
-<div class="sub">Demo · Productos persistentes</div>
+<div class="sub">Vende y compra en todo El Salvador</div>
 
 <div class="buscador-cont">
-<input id="buscar" class="buscador" placeholder="Buscar productos…" oninput="filtrar()">
+<input id="buscar" class="buscador" placeholder="Buscar por nombre o lugar…" oninput="filtrar()">
 <button class="btn-theme" onclick="toggleTheme()">🌓</button>
 </div>
 
@@ -63,23 +67,33 @@ input,select{padding:12px;border-radius:8px;border:1px solid var(--b)}
 <button class="btn-add" onclick="abrir()">+</button>
 
 <div id="modal">
-<form>
-<h3>Publicar producto</h3>
-<input id="titulo" placeholder="Nombre del producto">
-<input id="precio" type="number" step="0.01" placeholder="Precio USD">
-<select id="categoria">
-<option>Tecnología</option>
-<option>Ropa</option>
-<option>Comida</option>
-</select>
-<select id="depto">
-<option>San Salvador</option>
-<option>La Libertad</option>
-<option>Santa Ana</option>
-</select>
-<button type="button" onclick="publicar()">Publicar</button>
-<button type="button" onclick="cerrar()">Cancelar</button>
-</form>
+    <div class="modal-content">
+        <h3 style="margin:0">Nuevo Anuncio</h3>
+        <input id="titulo" placeholder="¿Qué vendes?">
+        <textarea id="descripcion" placeholder="Describe tu producto (detalles, fallas, etc.)"></textarea>
+        <div style="display:flex;gap:10px">
+            <input id="precio" type="number" step="0.01" placeholder="Precio $" style="flex:1">
+            <select id="estado" style="flex:1">
+                <option value="Nuevo">Nuevo</option>
+                <option value="Usado">Usado</option>
+            </select>
+        </div>
+        <input id="fotoUrl" placeholder="URL de la imagen (ej: https://...)">
+        <select id="categoria">
+            <option>Tecnología</option>
+            <option>Ropa</option>
+            <option>Comida</option>
+            <option>Otros</option>
+        </select>
+        <select id="depto" onchange="actualizarMunicipios()">
+            <option value="">Selecciona Departamento</option>
+        </select>
+        <select id="muni">
+            <option value="">Selecciona Municipio</option>
+        </select>
+        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
+        <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
+    </div>
 </div>
 
 <script type="module">
@@ -98,12 +112,47 @@ appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const VENDEDOR = {
-nombre:"CheroMarket SV",
-telefono:"77771234"
+const svData = {
+"Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
+"Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
+"Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
+"Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+"La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+"San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
+"Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
+"La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
+"Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
+"San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+"Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
+"San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
+"Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+"La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
 };
 
+const VENDEDOR = { nombre:"CheroMarket SV", telefono:"77771234" };
 const state = { categoria:"Todos" };
+
+function initUbicaciones() {
+    const deptoSelect = document.getElementById('depto');
+    Object.keys(svData).forEach(d => {
+        let opt = document.createElement('option');
+        opt.value = d; opt.innerText = d;
+        deptoSelect.appendChild(opt);
+    });
+}
+
+window.actualizarMunicipios = () => {
+    const deptoVal = document.getElementById('depto').value;
+    const muniSelect = document.getElementById('muni');
+    muniSelect.innerHTML = '<option value="">Selecciona Municipio</option>';
+    if(deptoVal) {
+        svData[deptoVal].forEach(m => {
+            let opt = document.createElement('option');
+            opt.value = m; opt.innerText = m;
+            muniSelect.appendChild(opt);
+        });
+    }
+};
 
 window.toggleTheme=()=>document.body.dataset.theme=
 document.body.dataset.theme==="dark"?"light":"dark";
@@ -112,69 +161,86 @@ window.abrir=()=>modal.style.display="block";
 window.cerrar=()=>modal.style.display="none";
 
 window.publicar = async () => {
-if(!titulo.value || !precio.value) return alert("Completa los campos");
-await addDoc(collection(db,"productos"),{
-titulo:titulo.value,
-precio:Number(precio.value).toFixed(2),
-categoria:categoria.value,
-depto:depto.value,
-vendedor:VENDEDOR.nombre,
-telefono:VENDEDOR.telefono,
-creado:Date.now()
-});
-cerrar();
-cargar();
+    if(!titulo.value || !precio.value || !depto.value || !muni.value) return alert("Completa los campos obligatorios");
+    
+    // Si no ponen URL de foto, usamos una por defecto
+    const imagenFinal = fotoUrl.value || "https://via.placeholder.com/400?text=Sin+Foto";
+
+    await addDoc(collection(db,"productos"),{
+        titulo: titulo.value,
+        descripcion: descripcion.value || "Sin descripción adicional",
+        precio: Number(precio.value).toFixed(2),
+        estado: estado.value,
+        foto: imagenFinal,
+        categoria: categoria.value,
+        depto: depto.value,
+        muni: muni.value,
+        vendedor: VENDEDOR.nombre,
+        telefono: VENDEDOR.telefono,
+        creado: Date.now()
+    });
+    
+    // Limpiar campos
+    titulo.value = ""; descripcion.value = ""; precio.value = ""; fotoUrl.value = "";
+    cerrar();
+    cargar();
 };
 
 window.eliminar = async id => {
-if(confirm("¿Eliminar producto?")){
-await deleteDoc(doc(db,"productos",id));
-cargar();
-}
+    if(confirm("¿Eliminar este anuncio permanentemente?")){
+        await deleteDoc(doc(db,"productos",id));
+        cargar();
+    }
 };
 
 window.setCat=(c,b)=>{
-state.categoria=c;
-document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
-b.classList.add("active");
-filtrar();
+    state.categoria=c;
+    document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    filtrar();
 };
 
 window.filtrar=()=>{
-const t=buscar.value.toLowerCase();
-document.querySelectorAll(".card").forEach(c=>{
-c.style.display=
-c.dataset.t.includes(t) &&
-(state.categoria==="Todos"||c.dataset.c===state.categoria)
-?"flex":"none";
-});
+    const t=buscar.value.toLowerCase();
+    document.querySelectorAll(".card").forEach(c=>{
+        c.style.display=
+        (c.dataset.t.includes(t) || c.dataset.l.includes(t)) &&
+        (state.categoria==="Todos"||c.dataset.c===state.categoria)
+        ?"flex":"none";
+    });
 };
 
 async function cargar(){
-const q=query(collection(db,"productos"),orderBy("creado","desc"));
-const snap=await getDocs(q);
-render(snap.docs.map(d=>({id:d.id,...d.data()})));
+    const q=query(collection(db,"productos"),orderBy("creado","desc"));
+    const snap=await getDocs(q);
+    render(snap.docs.map(d=>({id:d.id,...d.data()})));
 }
 
 function render(lista){
-feed.innerHTML="";
-lista.forEach(p=>{
-feed.innerHTML+=`
-<div class="card" data-t="${p.titulo.toLowerCase()}" data-c="${p.categoria}">
-<img class="foto" src="https://via.placeholder.com/400">
-<div class="info">
-<span class="tag">${p.categoria}</span>
-<div class="titulo">${p.titulo}</div>
-<div class="precio">$${p.precio}</div>
-<div class="mut">📍 ${p.depto}</div>
-<a class="btn-wa" target="_blank"
-href="https://wa.me/503${p.telefono}?text=Hola, me interesa ${p.titulo}">
-WhatsApp</a>
-<button class="btn-del" onclick="eliminar('${p.id}')">Eliminar</button>
-</div></div>`;
-});
+    feed.innerHTML="";
+    lista.forEach(p=>{
+        feed.innerHTML+=`
+        <div class="card" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
+            <img class="foto" src="${p.foto}" alt="producto">
+            <div class="info">
+                <div class="tag-row">
+                    <span class="tag">${p.categoria}</span>
+                    <span class="tag tag-estado">${p.estado}</span>
+                </div>
+                <div class="titulo">${p.titulo}</div>
+                <div class="precio">$${p.precio}</div>
+                <div class="desc">${p.descripcion}</div>
+                <div class="mut">📍 ${p.muni}, ${p.depto}</div>
+                <a class="btn-wa" target="_blank"
+                href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket.">
+                Contactar</a>
+                <button class="btn-del" onclick="eliminar('${p.id}')">Eliminar anuncio</button>
+            </div>
+        </div>`;
+    });
 }
 
+initUbicaciones();
 cargar();
 </script>
 
