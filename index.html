@@ -17,6 +17,17 @@ body{margin:0;font-family:Segoe UI;background:var(--fondo);color:var(--txt);padd
 header{background:var(--card);border-bottom:3px solid var(--azul);padding:15px;text-align:center;position:sticky;top:0;z-index:9}
 h1{margin:0;color:var(--azul)}
 .sub{font-size:13px;color:var(--mut)}
+
+/* Botón Menú Hamburguesa */
+.btn-menu{position:absolute;right:15px;top:20px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--azul)}
+
+/* Sidebar / Menú Lateral */
+.sidebar{position:fixed;top:0;right:-280px;width:280px;height:100%;background:var(--card);box-shadow:-2px 0 10px rgba(0,0,0,0.2);z-index:100;transition:0.3s;padding:20px;box-sizing:border-box;overflow-y:auto}
+.sidebar.active{right:0}
+.sidebar h2{color:var(--azul);font-size:18px;margin-top:0}
+.sidebar-item{margin-bottom:20px;font-size:14px;line-height:1.4;border-bottom:1px solid var(--b);padding-bottom:10px}
+.close-sidebar{background:var(--b);border:none;padding:8px;width:100%;border-radius:8px;cursor:pointer;margin-bottom:20px}
+
 .buscador-cont{max-width:500px;margin:10px auto;display:flex;gap:8px}
 .buscador{flex:1;padding:12px;border-radius:25px;border:1px solid var(--b);background:var(--fondo)}
 .btn-theme{width:40px;height:40px;border:none;border-radius:50%;cursor:pointer}
@@ -50,22 +61,48 @@ textarea{resize:none;height:80px}
 <body data-theme="light">
 
 <header>
-<h1>🇸🇻 CheroMarketApp</h1>
-<div class="sub">Vende y compra en todo El Salvador</div>
+    <button class="btn-menu" onclick="toggleMenu()">☰</button>
+    <h1>🇸🇻 CheroMarketApp</h1>
+    <div class="sub">Vende y compra en todo El Salvador</div>
 
-<div class="buscador-cont">
-<input id="buscar" class="buscador" placeholder="Buscar por nombre o lugar…" oninput="filtrar()">
-<button class="btn-theme" onclick="toggleTheme()">🌓</button>
-</div>
+    <div class="buscador-cont">
+        <input id="buscar" class="buscador" placeholder="Buscar por nombre o lugar…" oninput="filtrar()">
+        <button class="btn-theme" onclick="toggleTheme()">🌓</button>
+    </div>
 
-<div class="categorias">
-<button class="cat active" onclick="setCat('Todos',this)">Todos</button>
-<button class="cat" onclick="setCat('Tecnología',this)">Tecnología</button>
-<button class="cat" onclick="setCat('Ropa',this)">Ropa</button>
-<button class="cat" onclick="setCat('Comida',this)">Comida</button>
-<button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()">👤 Mi Perfil</button>
-</div>
+    <div class="categorias">
+        <button class="cat active" onclick="setCat('Todos',this)">Todos</button>
+        <button class="cat" onclick="setCat('Tecnología',this)">Tecnología</button>
+        <button class="cat" onclick="setCat('Ropa',this)">Ropa</button>
+        <button class="cat" onclick="setCat('Comida',this)">Comida</button>
+        <button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()">👤 Mi Perfil</button>
+    </div>
 </header>
+
+<div id="sidebar" class="sidebar">
+    <button class="close-sidebar" onclick="toggleMenu()">✕ Cerrar Menú</button>
+    
+    <div class="sidebar-item">
+        <h2>📜 Términos y Condiciones</h2>
+        <p>Al usar CheroMarketApp, aceptas que la plataforma solo facilita el contacto entre usuarios. No nos hacemos responsables por transacciones fallidas.</p>
+    </div>
+
+    <div class="sidebar-item">
+        <h2>⚖️ Avisos Legales</h2>
+        <p>Queda prohibida la venta de artículos ilícitos. Cada usuario es responsable legalmente por lo que publica y vende.</p>
+    </div>
+
+    <div class="sidebar-item" style="color:var(--rojo)">
+        <h2>⚠️ Guía Anti-Estafas</h2>
+        <p><strong>1.</strong> No envíes dinero por adelantado.<br>
+        <strong>2.</strong> Reúnete en lugares públicos y seguros.<br>
+        <strong>3.</strong> Revisa el producto antes de pagar.</p>
+    </div>
+    
+    <div class="sidebar-item">
+        <p class="mut">Versión 1.2 Pro · 2026</p>
+    </div>
+</div>
 
 <div id="feed" class="feed"></div>
 <button class="btn-add" onclick="abrir()">+</button>
@@ -126,6 +163,11 @@ appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// LÓGICA DE MENÚ HAMBURGUESA
+window.toggleMenu = () => {
+    document.getElementById('sidebar').classList.toggle('active');
+};
 
 // --- LÓGICA DE IDENTIDAD Y PERFIL ---
 if(!localStorage.getItem("mi_id_usuario")) {
