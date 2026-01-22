@@ -21,7 +21,7 @@ h1{margin:0;color:var(--azul)}
 .buscador{flex:1;padding:12px;border-radius:25px;border:1px solid var(--b);background:var(--fondo)}
 .btn-theme{width:40px;height:40px;border:none;border-radius:50%;cursor:pointer}
 .categorias{display:flex;gap:8px;overflow-x:auto;padding:10px;max-width:500px;margin:auto}
-.cat{padding:8px 14px;border:none;border-radius:20px;font-weight:600;background:var(--b);cursor:pointer}
+.cat{padding:8px 14px;border:none;border-radius:20px;font-weight:600;background:var(--b);cursor:pointer;white-space:nowrap}
 .cat.active{background:var(--azul);color:white}
 .feed{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;max-width:900px;margin:auto}
 .card{background:var(--card);border-radius:12px;border:1px solid var(--b);overflow:hidden;display:flex;flex-direction:column;transition: 0.3s}
@@ -35,9 +35,9 @@ h1{margin:0;color:var(--azul)}
 .desc{font-size:12px;color:var(--txt);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mut{font-size:11px;color:var(--mut)}
 .btn-wa{margin-top:auto;background:var(--verde);color:white;text-decoration:none;text-align:center;padding:10px;border-radius:8px;font-weight:600}
-.btn-del{background:transparent;color:#c62828;border:none;padding:5px;font-size:11px;cursor:pointer;text-decoration:underline}
+.btn-del{background:transparent;color:#c62828;border:none;padding:5px;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:5px}
 .btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none;box-shadow: 0 4px 10px rgba(0,0,0,0.3);z-index:10}
-#modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:99;overflow-y:auto;padding:20px}
+#modal, #modalPerfil{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:99;overflow-y:auto;padding:20px}
 .modal-content{background:var(--card);max-width:500px;margin:auto;padding:20px;border-radius:15px;display:flex;flex-direction:column;gap:12px}
 input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
 textarea{resize:none;height:80px}
@@ -60,11 +60,23 @@ textarea{resize:none;height:80px}
 <button class="cat" onclick="setCat('Tecnología',this)">Tecnología</button>
 <button class="cat" onclick="setCat('Ropa',this)">Ropa</button>
 <button class="cat" onclick="setCat('Comida',this)">Comida</button>
+<button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()">👤 Mi Perfil</button>
 </div>
 </header>
 
 <div id="feed" class="feed"></div>
 <button class="btn-add" onclick="abrir()">+</button>
+
+<div id="modalPerfil">
+    <div class="modal-content">
+        <h3 style="margin:0">Configurar mi Perfil</h3>
+        <p class="mut">Estos datos aparecerán en tus anuncios para que te contacten.</p>
+        <input id="perfilNombre" placeholder="Tu nombre o negocio">
+        <input id="perfilTelefono" type="number" placeholder="Tu WhatsApp (ej: 77771234)">
+        <button type="button" onclick="guardarPerfil()" style="background:var(--verde);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Guardar Cambios</button>
+        <button type="button" onclick="cerrarPerfil()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cerrar</button>
+    </div>
+</div>
 
 <div id="modal">
     <div class="modal-content">
@@ -112,6 +124,38 @@ appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// --- LÓGICA DE IDENTIDAD Y PERFIL ---
+if(!localStorage.getItem("mi_id_usuario")) {
+    localStorage.setItem("mi_id_usuario", "user_" + Math.random().toString(36).substr(2, 9));
+}
+const MI_ID = localStorage.getItem("mi_id_usuario");
+
+// Cargar datos de perfil guardados
+const obtenerPerfil = () => ({
+    nombre: localStorage.getItem("perfil_nombre") || "Vendedor Anónimo",
+    telefono: localStorage.getItem("perfil_telefono") || "77771234"
+});
+
+window.abrirPerfil = () => {
+    const p = obtenerPerfil();
+    document.getElementById('perfilNombre').value = p.nombre === "Vendedor Anónimo" ? "" : p.nombre;
+    document.getElementById('perfilTelefono').value = p.telefono === "77771234" ? "" : p.telefono;
+    document.getElementById('modalPerfil').style.display = "block";
+};
+
+window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
+
+window.guardarPerfil = () => {
+    const nom = document.getElementById('perfilNombre').value.trim();
+    const tel = document.getElementById('perfilTelefono').value.trim();
+    if(!nom || !tel) return alert("Por favor completa tu nombre y teléfono");
+    localStorage.setItem("perfil_nombre", nom);
+    localStorage.setItem("perfil_telefono", tel);
+    alert("Perfil actualizado correctamente");
+    cerrarPerfil();
+};
+// -----------------------
+
 const svData = {
 "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
 "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
@@ -129,7 +173,6 @@ const svData = {
 "La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
 };
 
-const VENDEDOR = { nombre:"CheroMarket SV", telefono:"77771234" };
 const state = { categoria:"Todos" };
 
 function initUbicaciones() {
@@ -163,7 +206,7 @@ window.cerrar=()=>modal.style.display="none";
 window.publicar = async () => {
     if(!titulo.value || !precio.value || !depto.value || !muni.value) return alert("Completa los campos obligatorios");
     
-    // Si no ponen URL de foto, usamos una por defecto
+    const perfil = obtenerPerfil();
     const imagenFinal = fotoUrl.value || "https://via.placeholder.com/400?text=Sin+Foto";
 
     await addDoc(collection(db,"productos"),{
@@ -175,12 +218,12 @@ window.publicar = async () => {
         categoria: categoria.value,
         depto: depto.value,
         muni: muni.value,
-        vendedor: VENDEDOR.nombre,
-        telefono: VENDEDOR.telefono,
-        creado: Date.now()
+        vendedor: perfil.nombre,
+        telefono: perfil.telefono,
+        creado: Date.now(),
+        duenoId: MI_ID
     });
     
-    // Limpiar campos
     titulo.value = ""; descripcion.value = ""; precio.value = ""; fotoUrl.value = "";
     cerrar();
     cargar();
@@ -219,6 +262,10 @@ async function cargar(){
 function render(lista){
     feed.innerHTML="";
     lista.forEach(p=>{
+        const botonEliminar = (p.duenoId === MI_ID) 
+            ? `<button class="btn-del" onclick="eliminar('${p.id}')">Eliminar mi anuncio</button>` 
+            : '';
+
         feed.innerHTML+=`
         <div class="card" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
             <img class="foto" src="${p.foto}" alt="producto">
@@ -230,11 +277,11 @@ function render(lista){
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
                 <div class="desc">${p.descripcion}</div>
-                <div class="mut">📍 ${p.muni}, ${p.depto}</div>
+                <div class="mut">📍 ${p.muni}, ${p.depto} <br>👤 ${p.vendedor}</div>
                 <a class="btn-wa" target="_blank"
                 href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket.">
                 Contactar</a>
-                <button class="btn-del" onclick="eliminar('${p.id}')">Eliminar anuncio</button>
+                ${botonEliminar}
             </div>
         </div>`;
     });
