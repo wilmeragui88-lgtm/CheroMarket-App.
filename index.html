@@ -263,7 +263,7 @@ function render(lista){
     feed.innerHTML="";
     lista.forEach(p=>{
         const botonEliminar = (p.duenoId === MI_ID) 
-            ? `<button class="btn-del" onclick="eliminar('${p.id}')">Marcar como Vendido / Eliminar</button>` 
+            ? `<button class="btn-del" onclick="eliminar('${p.id}')">Eliminar mi anuncio</button>` 
             : '';
 
         feed.innerHTML+=`
@@ -289,20 +289,6 @@ function render(lista){
 
 initUbicaciones();
 cargar();
-
-// --- LO QUE AGREGO: Solo usuarios registrados pueden publicar ---
-const publicarOriginal = window.publicar;
-window.publicar = async () => {
-    const p = obtenerPerfil();
-    if (p.nombre === "Vendedor Anónimo" || !localStorage.getItem("perfil_nombre")) {
-        alert("¡Atención! Solo usuarios registrados pueden publicar. Por favor, completa tu perfil primero.");
-        cerrar(); 
-        abrirPerfil();
-        return;
-    }
-    await publicarOriginal();
-};
-// ----------------------------------------------------------------
 </script>
 
 </body>
