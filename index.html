@@ -103,7 +103,7 @@ textarea{resize:none;height:80px}
         <select id="muni">
             <option value="">Selecciona Municipio</option>
         </select>
-        <button type="button" id="btnPublicarOriginal" onclick="publicarConValidacion()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
+        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
         <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
     </div>
 </div>
@@ -263,7 +263,7 @@ function render(lista){
     feed.innerHTML="";
     lista.forEach(p=>{
         const botonEliminar = (p.duenoId === MI_ID) 
-            ? `<button class="btn-del" onclick="eliminar('${p.id}')">Eliminar mi anuncio</button>` 
+            ? `<button class="btn-del" onclick="eliminar('${p.id}')">Marcar como Vendido / Eliminar</button>` 
             : '';
 
         feed.innerHTML+=`
@@ -287,23 +287,22 @@ function render(lista){
     });
 }
 
-// --- ADICIÓN DE SEGURIDAD (SIN MODIFICAR LO ANTERIOR) ---
-window.publicarConValidacion = () => {
-    const nom = localStorage.getItem("perfil_nombre");
-    const tel = localStorage.getItem("perfil_telefono");
-    
-    if(!nom || !tel || nom === "Vendedor Anónimo") {
-        alert("¡Atención! Para poder publicar, primero debes completar tu perfil con tu nombre y WhatsApp.");
-        cerrar(); // Cierra el modal de anuncio
-        abrirPerfil(); // Abre el modal de perfil
-    } else {
-        // Si tiene perfil, ejecuta la función original que ya existía
-        publicar();
-    }
-};
-
 initUbicaciones();
 cargar();
+
+// --- LO QUE AGREGO: Solo usuarios registrados pueden publicar ---
+const publicarOriginal = window.publicar;
+window.publicar = async () => {
+    const p = obtenerPerfil();
+    if (p.nombre === "Vendedor Anónimo" || !localStorage.getItem("perfil_nombre")) {
+        alert("¡Atención! Solo usuarios registrados pueden publicar. Por favor, completa tu perfil primero.");
+        cerrar(); 
+        abrirPerfil();
+        return;
+    }
+    await publicarOriginal();
+};
+// ----------------------------------------------------------------
 </script>
 
 </body>
