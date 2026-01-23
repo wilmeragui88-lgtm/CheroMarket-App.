@@ -1,3 +1,5 @@
+Actual Chero 1.0
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -60,26 +62,6 @@ textarea{resize:none;height:80px}
 </head>
 
 <body data-theme="light">
-<div id="capa-legal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; overflow-y: auto; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-      
-      <div style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; max-width: 500px; width: 90%; margin: 20px; border-radius: 15px; overflow: hidden; background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-        
-        <div style="padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee; text-align: center;">
-          <h2 style="margin: 0; color: #333; font-size: 1.4em;">🛡️ Seguridad CheroMarket</h2>
-          <p style="font-size: 0.9em; color: #666;">Para continuar, debes aceptar nuestras políticas.</p>
-        </div>
-    
-        <div style="max-height: 400px; overflow-y: auto; padding: 10px;">
-            </div>
-    
-        <div style="padding: 20px; background: white;">
-          <button id="btn-aceptar-terminos" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;">
-            Acepto y deseo continuar
-          </button>
-        </div>
-      </div>
-    </div>
-    
 
 <header>
     <button class="btn-menu" onclick="toggleMenu()">☰</button>
@@ -216,29 +198,7 @@ textarea{resize:none;height:80px}
         <select id="muni">
             <option value="">Selecciona Municipio</option>
         </select>
-        <button 
-async function alIntentarPublicar() {
-            const user = auth.currentUser;
-            
-            if (!user) {
-                alert("Debes estar registrado");
-                return;
-            }
-        
-            const docSnap = await getDoc(doc(db, "usuarios_seguros", user.uid));
-            
-            if (!docSnap.exists()) {
-                capaLegal.style.display = 'flex'; // Le mostramos los términos si no los tiene
-                alert("Debes aceptar los términos de seguridad antes de vender.");
-            } else {
-                // AQUÍ ABRES TU FORMULARIO DE PUBLICACIÓN
-                abrirFormularioPublicar();
-            }
-        }
-        
-        type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight
-            :bold;cursor:pointer">Publicar Ahora
-          </button>
+        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
         <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
     </div>
 </div>
@@ -443,61 +403,6 @@ function render(lista){
         </div>`;
     });
 }
-// 1. Referencias de la UI
-const capaLegal = document.getElementById('capa-legal');
-const btnAceptar = document.getElementById('btn-aceptar-terminos');
-
-// 2. Función para verificar si ya aceptó al entrar a la app
-function verificarEstatusLegal(user) {
-    if (!user) return; // Si no hay usuario, no hacemos nada todavía
-
-    const docRef = doc(db, "usuarios_seguros", user.uid);
-    getDoc(docRef).then((docSnap) => {
-        if (!docSnap.exists()) {
-            // SI NO EXISTE EL DOCUMENTO, BLOQUEAMOS LA PANTALLA
-            capaLegal.style.display = 'flex';
-        }
-    });
-}
-
-// 3. Evento de Clic en el botón Aceptar
-btnAceptar.addEventListener('click', async () => {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("Inicia sesión primero");
-        return;
-    }
-
-    try {
-        btnAceptar.disabled = true;
-        btnAceptar.innerText = "Guardando seguridad...";
-
-        // Guardamos en Firebase (Usando la info de su perfil de Google/Email)
-        await setDoc(doc(db, "usuarios_seguros", user.uid), {
-            nombre: user.displayName,
-            email: user.email,
-            uid: user.uid,
-            fechaAceptacion: serverTimestamp(),
-            terminosAceptados: true
-        });
-
-        // Cerramos el menú
-        capaLegal.style.display = 'none';
-        alert("¡Todo listo! Ahora puedes publicar.");
-
-    } catch (e) {
-        console.error(e);
-        alert("Error al guardar. Revisa tu conexión.");
-        btnAceptar.disabled = false;
-    }
-});
-
-// 4. Escuchar cuando el usuario inicia sesión para verificar su estatus
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        verificarEstatusLegal(user);
-    }
-});
 
 initUbicaciones();
 cargar();
