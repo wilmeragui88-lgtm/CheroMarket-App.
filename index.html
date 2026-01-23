@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CheroMarketApp · Pro</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
 <style>
 :root{
 --azul:#0047AB;--naranja:#FF8C00;--verde:#25D366;
@@ -28,12 +30,15 @@ h1{margin:0;color:var(--azul)}
 .sidebar-item{margin-bottom:20px;font-size:14px;line-height:1.4;border-bottom:1px solid var(--b);padding-bottom:10px}
 .close-sidebar{background:var(--b);border:none;padding:8px;width:100%;border-radius:8px;cursor:pointer;margin-bottom:20px}
 
-.buscador-cont{max-width:500px;margin:10px auto;display:flex;gap:8px}
-.buscador{flex:1;padding:12px;border-radius:25px;border:1px solid var(--b);background:var(--fondo)}
-.btn-theme{width:40px;height:40px;border:none;border-radius:50%;cursor:pointer}
+.buscador-cont{max-width:500px;margin:10px auto;display:flex;gap:8px;position:relative}
+.buscador{flex:1;padding:12px;padding-left:40px;border-radius:25px;border:1px solid var(--b);background:var(--fondo)}
+.search-icon{position:absolute;left:15px;top:15px;color:var(--mut)}
+.btn-theme{width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
 .categorias{display:flex;gap:8px;overflow-x:auto;padding:10px;max-width:500px;margin:auto}
-.cat{padding:8px 14px;border:none;border-radius:20px;font-weight:600;background:var(--b);cursor:pointer;white-space:nowrap}
+.cat{padding:8px 14px;border:none;border-radius:20px;font-weight:600;background:var(--b);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .cat.active{background:var(--azul);color:white}
+
 .feed{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;max-width:900px;margin:auto}
 .card{background:var(--card);border-radius:12px;border:1px solid var(--b);overflow:hidden;display:flex;flex-direction:column;transition: 0.3s;position:relative}
 .foto{height:180px;width:100%;object-fit:cover;background:#eee}
@@ -46,10 +51,12 @@ h1{margin:0;color:var(--azul)}
 .precio{color:var(--naranja);font-size:20px;font-weight:700}
 .desc{font-size:12px;color:var(--txt);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mut{font-size:11px;color:var(--mut)}
-.btn-wa{margin-top:auto;background:var(--verde);color:white;text-decoration:none;text-align:center;padding:10px;border-radius:8px;font-weight:600}
+
+.btn-wa{margin-top:auto;background:var(--verde);color:white;text-decoration:none;text-align:center;padding:10px;border-radius:8px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-del{background:transparent;color:var(--rojo);border:none;padding:5px;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:5px}
 .btn-sold{background:var(--txt);color:var(--card);border:none;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;font-weight:bold}
-.btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none;box-shadow: 0 4px 10px rgba(0,0,0,0.3);z-index:10}
+.btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none;box-shadow: 0 4px 10px rgba(0,0,0,0.3);z-index:10;cursor:pointer}
+
 #modal, #modalPerfil{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:99;overflow-y:auto;padding:20px}
 .modal-content{background:var(--card);max-width:500px;margin:auto;padding:20px;border-radius:15px;display:flex;flex-direction:column;gap:12px}
 input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
@@ -61,39 +68,40 @@ textarea{resize:none;height:80px}
 <body data-theme="light">
 
 <header>
-    <button class="btn-menu" onclick="toggleMenu()">☰</button>
+    <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     <h1>🇸🇻 CheroMarketApp</h1>
     <div class="sub">Vende y compra en todo El Salvador</div>
 
     <div class="buscador-cont">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input id="buscar" class="buscador" placeholder="Buscar por nombre o lugar…" oninput="filtrar()">
-        <button class="btn-theme" onclick="toggleTheme()">🌓</button>
+        <button class="btn-theme" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
     </div>
 
     <div class="categorias">
-        <button class="cat active" onclick="setCat('Todos',this)">Todos</button>
-        <button class="cat" onclick="setCat('Tecnología',this)">Tecnología</button>
-        <button class="cat" onclick="setCat('Ropa',this)">Ropa</button>
-        <button class="cat" onclick="setCat('Comida',this)">Comida</button>
-        <button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()">👤 Mi Perfil</button>
+        <button class="cat active" onclick="setCat('Todos',this)"><i class="fa-solid fa-border-all"></i> Todos</button>
+        <button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tecnología</button>
+        <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
+        <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
+        <button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user"></i> Mi Perfil</button>
     </div>
 </header>
 
 <div id="sidebar" class="sidebar">
-    <button class="close-sidebar" onclick="toggleMenu()">✕ Cerrar Menú</button>
+    <button class="close-sidebar" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i> Cerrar Menú</button>
     
     <div class="sidebar-item">
-        <h2>📜 Términos y Condiciones</h2>
+        <h2><i class="fa-solid fa-file-contract"></i> Términos y Condiciones</h2>
         <p>Al usar CheroMarketApp, aceptas que la plataforma solo facilita el contacto entre usuarios. No nos hacemos responsables por transacciones fallidas.</p>
     </div>
 
     <div class="sidebar-item">
-        <h2>⚖️ Avisos Legales</h2>
+        <h2><i class="fa-solid fa-gavel"></i> Avisos Legales</h2>
         <p>Queda prohibida la venta de artículos ilícitos. Cada usuario es responsable legalmente por lo que publica y vende.</p>
     </div>
 
     <div class="sidebar-item" style="color:var(--rojo)">
-        <h2>⚠️ Guía Anti-Estafas</h2>
+        <h2><i class="fa-solid fa-shield-halved"></i> Guía Anti-Estafas</h2>
         <p><strong>1.</strong> No envíes dinero por adelantado.<br>
         <strong>2.</strong> Reúnete en lugares públicos y seguros.<br>
         <strong>3.</strong> Revisa el producto antes de pagar.</p>
@@ -105,11 +113,11 @@ textarea{resize:none;height:80px}
 </div>
 
 <div id="feed" class="feed"></div>
-<button class="btn-add" onclick="abrir()">+</button>
+<button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
 
 <div id="modalPerfil">
     <div class="modal-content">
-        <h3 style="margin:0">Configurar mi Perfil</h3>
+        <h3 style="margin:0"><i class="fa-solid fa-user-gear"></i> Configurar mi Perfil</h3>
         <p class="mut">Estos datos aparecerán en tus anuncios para que te contacten.</p>
         <input id="perfilNombre" placeholder="Tu nombre o negocio">
         <input id="perfilTelefono" type="number" placeholder="Tu WhatsApp (ej: 77771234)">
@@ -120,7 +128,7 @@ textarea{resize:none;height:80px}
 
 <div id="modal">
     <div class="modal-content">
-        <h3 style="margin:0">Nuevo Anuncio</h3>
+        <h3 style="margin:0"><i class="fa-solid fa-tag"></i> Nuevo Anuncio</h3>
         <input id="titulo" placeholder="¿Qué vendes?">
         <textarea id="descripcion" placeholder="Describe tu producto (detalles, fallas, etc.)"></textarea>
         <div style="display:flex;gap:10px">
@@ -321,13 +329,13 @@ function render(lista){
             botonesPrivados = `
                 <div style="display:flex;gap:10px;margin-top:5px">
                     ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('${p.id}')">Marcar Vendido</button>` : ''}
-                    <button class="btn-del" onclick="eliminar('${p.id}')">Eliminar</button>
+                    <button class="btn-del" onclick="eliminar('${p.id}')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
                 </div>`;
         }
 
         const botonContacto = estaVendido 
             ? `<div style="text-align:center;color:var(--rojo);font-weight:bold;padding:10px;border:1px solid var(--rojo);border-radius:8px">NO DISPONIBLE</div>`
-            : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket.">Contactar</a>`;
+            : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket."><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
 
         feed.innerHTML+=`
         <div class="card" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
@@ -341,7 +349,7 @@ function render(lista){
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
                 <div class="desc">${p.descripcion}</div>
-                <div class="mut">📍 ${p.muni}, ${p.depto} <br>👤 ${p.vendedor}</div>
+                <div class="mut"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto} <br><i class="fa-solid fa-user-tag"></i> ${p.vendedor}</div>
                 ${botonContacto}
                 ${botonesPrivados}
             </div>
