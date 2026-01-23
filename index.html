@@ -212,11 +212,22 @@ let IMAGEN_BASE64 = "";
 window.registrar = () => {
     const n = document.getElementById('regNombre').value.trim();
     const t = document.getElementById('regTelefono').value.trim();
+
     if(!n || !t) return alert("Por favor, llena los datos");
+
     localStorage.setItem("perfil_nombre", n);
     localStorage.setItem("perfil_telefono", t);
-    localStorage.setItem("mi_id_usuario", "user_" + Math.random().toString(36).substr(2, 9));
-    location.reload();
+    localStorage.setItem(
+        "mi_id_usuario",
+        "user_" + Math.random().toString(36).substr(2, 9)
+    );
+
+    // 👇 ocultar login
+    document.getElementById('auth-screen').style.display = "none";
+
+    // 👇 cargar datos en sidebar
+    document.getElementById('sideUserName').innerText = n;
+    document.getElementById('sideUserPhone').innerText = "Tel: " + t;
 };
 
 window.cerrarSesion = () => {
@@ -228,14 +239,16 @@ window.cerrarSesion = () => {
 
 const verificarSesion = () => {
     const n = localStorage.getItem("perfil_nombre");
+
     if(!n) {
         document.getElementById('auth-screen').style.display = "flex";
     } else {
+        document.getElementById('auth-screen').style.display = "none";
         document.getElementById('sideUserName').innerText = n;
-        document.getElementById('sideUserPhone').innerText = "Tel: " + localStorage.getItem("perfil_telefono");
+        document.getElementById('sideUserPhone').innerText =
+            "Tel: " + localStorage.getItem("perfil_telefono");
     }
 };
-
 // --- PREVIEW DE IMAGEN ---
 window.previewImagen = (input) => {
     const file = input.files[0];
@@ -407,30 +420,30 @@ function render(lista){
         if(esDueno){
             botonesPrivados = `
                 <div style="display:flex;gap:10px;margin-top:5px">
-                    ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('${p.id}')">Marcar Vendido</button>` : ''}
-                    <button class="btn-del" onclick="eliminar('${p.id}')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
+                    ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('')">Marcar Vendido</button>` : ''}
+                    <button class="btn-del" onclick="eliminar('')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
                 </div>`;
         }
 
         const botonContacto = estaVendido 
             ? `<div style="text-align:center;color:var(--rojo);font-weight:bold;padding:10px;border:1px solid var(--rojo);border-radius:8px">NO DISPONIBLE</div>`
-            : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa: ${p.titulo} ($${p.precio})"><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
+            : `<a class="btn-wa" target="_blank" href="https://wa.me/503?text=Hola! Me interesa:  ($)"><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
 
         feed.innerHTML+=`
-        <div class="card" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
-            ${estaVendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
-            <img class="foto" src="${p.foto}" alt="producto" style="${estaVendido ? 'filter:grayscale(1);opacity:0.6' : ''}">
+        <div class="card" data-t="" data-l="" data-c="">
+             ''
+            <img class="foto" src="" alt="producto" style="grayscale(1);opacity:0.6' : ''">
             <div class="info">
                 <div class="tag-row">
-                    <span class="tag">${p.categoria}</span>
-                    <span class="tag tag-estado ${estaVendido ? 'tag-vendido' : ''}">${estaVendido ? 'Vendido' : p.estado}</span>
+                    <span class="tag"></span>
+                    <span class="tag tag-estado  ''"> p.estado</span>
                 </div>
-                <div class="titulo">${p.titulo}</div>
-                <div class="precio">$${p.precio}</div>
-                <div class="desc">${p.descripcion}</div>
-                <div class="mut"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto} <br><i class="fa-solid fa-user-tag"></i> ${p.vendedor}</div>
-                ${botonContacto}
-                ${botonesPrivados}
+                <div class="titulo"></div>
+                <div class="precio">$</div>
+                <div class="desc"></div>
+                <div class="mut"><i class="fa-solid fa-location-dot"></i> ,  <br><i class="fa-solid fa-user-tag"></i> </div>
+                
+                
             </div>
         </div>`;
     });
