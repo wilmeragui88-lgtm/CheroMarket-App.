@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -20,10 +20,6 @@ header{background:var(--card);border-bottom:3px solid var(--azul);padding:15px;t
 h1{margin:0;color:var(--azul)}
 .sub{font-size:13px;color:var(--mut)}
 
-/* Pantalla de Registro Inicial */
-#auth-screen{position:fixed;inset:0;background:var(--fondo);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
-.auth-card{background:var(--card);padding:30px;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,0.1);width:100%;max-width:400px;text-align:center}
-
 /* Botón Menú Hamburguesa */
 .btn-menu{position:absolute;right:15px;top:20px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--azul)}
 
@@ -33,10 +29,6 @@ h1{margin:0;color:var(--azul)}
 .sidebar h2{color:var(--azul);font-size:18px;margin-top:0}
 .sidebar-item{margin-bottom:20px;font-size:14px;line-height:1.4;border-bottom:1px solid var(--b);padding-bottom:10px}
 .close-sidebar{background:var(--b);border:none;padding:8px;width:100%;border-radius:8px;cursor:pointer;margin-bottom:20px}
-
-/* Info de Perfil en Sidebar */
-.user-profile-info{background:var(--azul);color:white;padding:15px;border-radius:12px;margin-bottom:20px;text-align:center}
-.user-profile-info i{font-size:35px;margin-bottom:8px}
 
 .buscador-cont{max-width:500px;margin:10px auto;display:flex;gap:8px;position:relative}
 .buscador{flex:1;padding:12px;padding-left:40px;border-radius:25px;border:1px solid var(--b);background:var(--fondo)}
@@ -70,24 +62,10 @@ h1{margin:0;color:var(--azul)}
 input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
 textarea{resize:none;height:80px}
 .sold-overlay{position:absolute;top:10px;right:10px;background:var(--rojo);color:white;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:12px;z-index:1}
-
-/* Estilos para el input de cámara */
-.cam-btn{background:var(--b);padding:15px;border-radius:8px;text-align:center;cursor:pointer;border:2px dashed var(--mut);color:var(--mut)}
-.preview-img{width:100%;height:150px;object-fit:cover;border-radius:8px;display:none;margin-top:10px}
 </style>
 </head>
 
 <body data-theme="light">
-
-<div id="auth-screen" style="display:none;">
-    <div class="auth-card">
-        <h2>🇸🇻 Bienvenido Cher@</h2>
-        <p class="mut">Regístrate para ver ofertas, publicar y contactar vendedores.</p>
-        <input id="regNombre" placeholder="Tu Nombre o Negocio" style="width:90%; margin-bottom:10px">
-        <input id="regTelefono" type="number" placeholder="WhatsApp (ej: 77771234)" style="width:90%; margin-bottom:15px">
-        <button onclick="registrar()" style="background:var(--azul);color:white;width:100%;padding:15px;border:none;border-radius:8px;font-weight:bold">Entrar a CheroMarket</button>
-    </div>
-</div>
 
 <header>
     <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
@@ -112,31 +90,25 @@ textarea{resize:none;height:80px}
 <div id="sidebar" class="sidebar">
     <button class="close-sidebar" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i> Cerrar Menú</button>
     
-    <div class="user-profile-info">
-        <i class="fa-solid fa-circle-user"></i>
-        <div id="sideUserName" style="font-weight:bold">Cargando...</div>
-        <div id="sideUserPhone" style="font-size:12px; opacity:0.8">...</div>
-    </div>
-
     <div class="sidebar-item">
         <h2><i class="fa-solid fa-file-contract"></i> Términos y Condiciones</h2>
-        <p>Al usar CheroMarketApp, aceptas que la plataforma solo facilita el contacto entre usuarios.</p>
+        <p>Al usar CheroMarketApp, aceptas que la plataforma solo facilita el contacto entre usuarios. No nos hacemos responsables por transacciones fallidas.</p>
     </div>
 
     <div class="sidebar-item">
         <h2><i class="fa-solid fa-gavel"></i> Avisos Legales</h2>
-        <p>Queda prohibida la venta de artículos ilícitos. Cada usuario es responsable legalmente.</p>
+        <p>Queda prohibida la venta de artículos ilícitos. Cada usuario es responsable legalmente por lo que publica y vende.</p>
     </div>
 
     <div class="sidebar-item" style="color:var(--rojo)">
         <h2><i class="fa-solid fa-shield-halved"></i> Guía Anti-Estafas</h2>
         <p><strong>1.</strong> No envíes dinero por adelantado.<br>
-        <strong>2.</strong> Reúnete en lugares públicos.</p>
+        <strong>2.</strong> Reúnete en lugares públicos y seguros.<br>
+        <strong>3.</strong> Revisa el producto antes de pagar.</p>
     </div>
     
     <div class="sidebar-item">
         <p class="mut">Versión 1.2 Pro · 2026</p>
-        <button onclick="cerrarSesion()" style="background:none; border:none; color:var(--rojo); cursor:pointer">Cerrar Sesión</button>
     </div>
 </div>
 
@@ -146,10 +118,11 @@ textarea{resize:none;height:80px}
 <div id="modalPerfil">
     <div class="modal-content">
         <h3 style="margin:0"><i class="fa-solid fa-user-gear"></i> Configurar mi Perfil</h3>
+        <p class="mut">Estos datos aparecerán en tus anuncios para que te contacten.</p>
         <input id="perfilNombre" placeholder="Tu nombre o negocio">
-        <input id="perfilTelefono" type="number" placeholder="Tu WhatsApp">
-        <button type="button" onclick="guardarPerfil()" style="background:var(--verde);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold">Guardar Cambios</button>
-        <button type="button" onclick="cerrarPerfil()" style="background:transparent;color:var(--mut);border:none">Cerrar</button>
+        <input id="perfilTelefono" type="number" placeholder="Tu WhatsApp (ej: 77771234)">
+        <button type="button" onclick="guardarPerfil()" style="background:var(--verde);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Guardar Cambios</button>
+        <button type="button" onclick="cerrarPerfil()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cerrar</button>
     </div>
 </div>
 
@@ -157,7 +130,7 @@ textarea{resize:none;height:80px}
     <div class="modal-content">
         <h3 style="margin:0"><i class="fa-solid fa-tag"></i> Nuevo Anuncio</h3>
         <input id="titulo" placeholder="¿Qué vendes?">
-        <textarea id="descripcion" placeholder="Describe tu producto..."></textarea>
+        <textarea id="descripcion" placeholder="Describe tu producto (detalles, fallas, etc.)"></textarea>
         <div style="display:flex;gap:10px">
             <input id="precio" type="number" step="0.01" placeholder="Precio $" style="flex:1">
             <select id="estado" style="flex:1">
@@ -165,14 +138,7 @@ textarea{resize:none;height:80px}
                 <option value="Usado">Usado</option>
             </select>
         </div>
-        
-        <label class="cam-btn">
-            <i class="fa-solid fa-camera"></i> Tomar Foto o Elegir Imagen
-            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImagen(this)">
-        </label>
-        <img id="imgPreview" class="preview-img">
-        <input id="fotoUrl" placeholder="O pega URL de la imagen (opcional)">
-
+        <input id="fotoUrl" placeholder="URL de la imagen (ej: https://...)">
         <select id="categoria">
             <option>Tecnología</option>
             <option>Ropa</option>
@@ -185,8 +151,8 @@ textarea{resize:none;height:80px}
         <select id="muni">
             <option value="">Selecciona Municipio</option>
         </select>
-        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold">Publicar Ahora</button>
-        <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none">Cancelar</button>
+        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
+        <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
     </div>
 </div>
 
@@ -206,80 +172,26 @@ appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let IMAGEN_BASE64 = "";
-
-// --- LÓGICA DE REGISTRO ---
-window.registrar = () => {
-    const n = document.getElementById('regNombre').value.trim();
-    const t = document.getElementById('regTelefono').value.trim();
-
-    if(!n || !t) return alert("Por favor, llena los datos");
-
-    localStorage.setItem("perfil_nombre", n);
-    localStorage.setItem("perfil_telefono", t);
-    localStorage.setItem(
-        "mi_id_usuario",
-        "user_" + Math.random().toString(36).substr(2, 9)
-    );
-
-    // 👇 ocultar login
-    document.getElementById('auth-screen').style.display = "none";
-
-    // 👇 cargar datos en sidebar
-    document.getElementById('sideUserName').innerText = n;
-    document.getElementById('sideUserPhone').innerText = "Tel: " + t;
-};
-
-window.cerrarSesion = () => {
-    if(confirm("¿Cerrar tu sesión?")) {
-        localStorage.clear();
-        location.reload();
-    }
-};
-
-const verificarSesion = () => {
-    const n = localStorage.getItem("perfil_nombre");
-
-    if(!n) {
-        document.getElementById('auth-screen').style.display = "flex";
-    } else {
-        document.getElementById('auth-screen').style.display = "none";
-        document.getElementById('sideUserName').innerText = n;
-        document.getElementById('sideUserPhone').innerText =
-            "Tel: " + localStorage.getItem("perfil_telefono");
-    }
-};
-// --- PREVIEW DE IMAGEN ---
-window.previewImagen = (input) => {
-    const file = input.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            IMAGEN_BASE64 = e.target.result;
-            const preview = document.getElementById('imgPreview');
-            preview.src = IMAGEN_BASE64;
-            preview.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
 // LÓGICA DE MENÚ HAMBURGUESA
 window.toggleMenu = () => {
     document.getElementById('sidebar').classList.toggle('active');
 };
 
+// --- LÓGICA DE IDENTIDAD Y PERFIL ---
+if(!localStorage.getItem("mi_id_usuario")) {
+    localStorage.setItem("mi_id_usuario", "user_" + Math.random().toString(36).substr(2, 9));
+}
 const MI_ID = localStorage.getItem("mi_id_usuario");
 
 const obtenerPerfil = () => ({
-    nombre: localStorage.getItem("perfil_nombre") || "Anónimo",
+    nombre: localStorage.getItem("perfil_nombre") || "Vendedor Anónimo",
     telefono: localStorage.getItem("perfil_telefono") || "77771234"
 });
 
 window.abrirPerfil = () => {
     const p = obtenerPerfil();
-    document.getElementById('perfilNombre').value = p.nombre;
-    document.getElementById('perfilTelefono').value = p.telefono;
+    document.getElementById('perfilNombre').value = p.nombre === "Vendedor Anónimo" ? "" : p.nombre;
+    document.getElementById('perfilTelefono').value = p.telefono === "77771234" ? "" : p.telefono;
     document.getElementById('modalPerfil').style.display = "block";
 };
 
@@ -288,11 +200,11 @@ window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display
 window.guardarPerfil = () => {
     const nom = document.getElementById('perfilNombre').value.trim();
     const tel = document.getElementById('perfilTelefono').value.trim();
-    if(!nom || !tel) return alert("Completa los datos");
+    if(!nom || !tel) return alert("Por favor completa tu nombre y teléfono");
     localStorage.setItem("perfil_nombre", nom);
     localStorage.setItem("perfil_telefono", tel);
-    alert("Perfil actualizado");
-    location.reload();
+    alert("Perfil actualizado correctamente");
+    cerrarPerfil();
 };
 
 const svData = {
@@ -316,7 +228,6 @@ const state = { categoria:"Todos" };
 
 function initUbicaciones() {
     const deptoSelect = document.getElementById('depto');
-    deptoSelect.innerHTML = '<option value="">Selecciona Departamento</option>';
     Object.keys(svData).forEach(d => {
         let opt = document.createElement('option');
         opt.value = d; opt.innerText = d;
@@ -347,8 +258,7 @@ window.publicar = async () => {
     if(!titulo.value || !precio.value || !depto.value || !muni.value) return alert("Completa los campos obligatorios");
     
     const perfil = obtenerPerfil();
-    // Priorizamos la imagen cargada, sino la URL, sino el placeholder
-    const imagenFinal = IMAGEN_BASE64 || fotoUrl.value || "https://via.placeholder.com/400?text=Sin+Foto";
+    const imagenFinal = fotoUrl.value || "https://via.placeholder.com/400?text=Sin+Foto";
 
     await addDoc(collection(db,"productos"),{
         titulo: titulo.value,
@@ -366,22 +276,20 @@ window.publicar = async () => {
         vendido: false
     });
     
-    // Limpieza
     titulo.value = ""; descripcion.value = ""; precio.value = ""; fotoUrl.value = "";
-    IMAGEN_BASE64 = ""; document.getElementById('imgPreview').style.display="none";
     cerrar();
     cargar();
 };
 
 window.eliminar = async id => {
-    if(confirm("¿Eliminar este anuncio?")){
+    if(confirm("¿Eliminar este anuncio permanentemente?")){
         await deleteDoc(doc(db,"productos",id));
         cargar();
     }
 };
 
 window.marcarVendido = async id => {
-    if(confirm("¿Marcar como vendido?")){
+    if(confirm("¿Marcar este producto como vendido? Ya no se podrá contactar.")){
         await updateDoc(doc(db,"productos",id), { vendido: true });
         cargar();
     }
@@ -420,39 +328,39 @@ function render(lista){
         if(esDueno){
             botonesPrivados = `
                 <div style="display:flex;gap:10px;margin-top:5px">
-                    ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('')">Marcar Vendido</button>` : ''}
-                    <button class="btn-del" onclick="eliminar('')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
+                    ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('${p.id}')">Marcar Vendido</button>` : ''}
+                    <button class="btn-del" onclick="eliminar('${p.id}')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
                 </div>`;
         }
 
         const botonContacto = estaVendido 
             ? `<div style="text-align:center;color:var(--rojo);font-weight:bold;padding:10px;border:1px solid var(--rojo);border-radius:8px">NO DISPONIBLE</div>`
-            : `<a class="btn-wa" target="_blank" href="https://wa.me/503?text=Hola! Me interesa:  ($)"><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
+            : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket."><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
 
         feed.innerHTML+=`
-        <div class="card" data-t="" data-l="" data-c="">
-             ''
-            <img class="foto" src="" alt="producto" style="grayscale(1);opacity:0.6' : ''">
+        <div class="card" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
+            ${estaVendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
+            <img class="foto" src="${p.foto}" alt="producto" style="${estaVendido ? 'filter:grayscale(1);opacity:0.6' : ''}">
             <div class="info">
                 <div class="tag-row">
-                    <span class="tag"></span>
-                    <span class="tag tag-estado  ''"> p.estado</span>
+                    <span class="tag">${p.categoria}</span>
+                    <span class="tag tag-estado ${estaVendido ? 'tag-vendido' : ''}">${estaVendido ? 'Vendido' : p.estado}</span>
                 </div>
-                <div class="titulo"></div>
-                <div class="precio">$</div>
-                <div class="desc"></div>
-                <div class="mut"><i class="fa-solid fa-location-dot"></i> ,  <br><i class="fa-solid fa-user-tag"></i> </div>
-                
-                
+                <div class="titulo">${p.titulo}</div>
+                <div class="precio">$${p.precio}</div>
+                <div class="desc">${p.descripcion}</div>
+                <div class="mut"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto} <br><i class="fa-solid fa-user-tag"></i> ${p.vendedor}</div>
+                ${botonContacto}
+                ${botonesPrivados}
             </div>
         </div>`;
     });
 }
 
-verificarSesion();
 initUbicaciones();
 cargar();
 </script>
 
 </body>
 </html>
+
