@@ -137,8 +137,21 @@ textarea{resize:none;height:80px}
                 <option value="Nuevo">Nuevo</option>
                 <option value="Usado">Usado</option>
             </select>
-        </div>
-        <input id="fotoUrl" placeholder="URL de la imagen (ej: https://...)">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+    <label style="font-size:12px; font-weight:bold; color:var(--azul)">
+        <i class="fa-solid fa-camera"></i> Subir Foto del Producto
+    </label>
+    <input type="file" id="archivoFoto" accept="image/*" style="display:none" onchange="procesarImagen(this)">
+    <button type="button" onclick="document.getElementById('archivoFoto').click()" style="background:var(--b); border:2px dashed var(--azul); padding:10px; border-radius:8px; cursor:pointer">
+        Seleccionar o Tomar Foto
+    </button>
+    <div id="previsualizacion" style="display:none; text-align:center">
+        <img id="imgPreview" src="" style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:2px solid var(--verde)">
+        <p style="font-size:10px; color:var(--verde)">¡Imagen optimizada con éxito!</p>
+    </div>
+    <input type="hidden" id="fotoFinal">
+</div>
+
         <select id="categoria">
             <option>Tecnología</option>
             <option>Ropa</option>
@@ -184,7 +197,46 @@ if(!localStorage.getItem("mi_id_usuario")) {
 const MI_ID = localStorage.getItem("mi_id_usuario");
 
 const obtenerPerfil = () => ({
-    nombre: localStorage.getItem("perfil_nombre") || "Vendedor Anónimo",
+ // Variable global para guardar la foto comprimida
+let imagenOptimizada = ""; 
+
+window.procesarImagen = (input) => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            // Reducimos a 600px máximo para que vuele en el celular
+            const MAX_WIDTH = 600; 
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+                if (height > MAX_WIDTH) { width *= MAX_WIDTH / height; height = MAX_WIDTH; }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Calidad 0.5 (50%) - Es el equilibrio perfecto entre nitidez y peso pluma
+            imagenOptimizada = canvas.toDataURL('image/jpeg', 0.5); 
+            
+            document.getElementById('previsualizacion').style.display = "block";
+            document.getElementById('imgPreview').src = imagenOptimizada;
+        };
+    };
+    reader.readAsDataURL(file);
+};
+
+ nombre: localStorage.getItem("perfil_nombre") || "Vendedor Anónimo",
     telefono: localStorage.getItem("perfil_telefono") || "77771234"
 });
 
