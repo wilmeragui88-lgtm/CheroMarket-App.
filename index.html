@@ -6,6 +6,8 @@
 <title>CheroMarketApp · Pro</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<!-- Librería para compresión de imágenes en el navegador -->
+<script src="https://unpkg.com/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 
 <style>
 :root{
@@ -63,6 +65,15 @@ h1{margin:0;color:var(--azul)}
 input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
 textarea{resize:none;height:80px}
 .sold-overlay{position:absolute;top:10px;right:10px;background:var(--rojo);color:white;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:12px;z-index:1}
+
+/* Estilo para input file */
+input[type="file"] {
+    padding: 8px;
+    border: 1px dashed var(--mut);
+    border-radius: 8px;
+    background: var(--card);
+    cursor: pointer;
+}
 </style>
 </head>
 
@@ -109,7 +120,7 @@ textarea{resize:none;height:80px}
     </div>
     
     <div class="sidebar-item">
-        <p class="mut">Versión 1.2 Pro · 2026</p>
+        <p class="mut">Versión 1.3 Pro · 2026 (con compresión de fotos)</p>
     </div>
 </div>
 
@@ -139,7 +150,9 @@ textarea{resize:none;height:80px}
                 <option value="Usado">Usado</option>
             </select>
         </div>
-        <input id="fotoUrl" placeholder="URL de la imagen (ej: https://...)">
+        <input type="file" id="fotoFile" accept="image/*" capture="environment">
+        <small class="mut">Sube foto desde cámara o galería (se comprime automáticamente)</small>
+        <input id="fotoUrl" placeholder="O pega URL de imagen si no quieres subir archivo">
         <select id="categoria">
             <option>Tecnología</option>
             <option>Ropa</option>
@@ -152,7 +165,7 @@ textarea{resize:none;height:80px}
         <select id="muni">
             <option value="">Selecciona Municipio</option>
         </select>
-        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
+        <button type="button" id="btnPublicar" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
         <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
     </div>
 </div>
@@ -160,6 +173,7 @@ textarea{resize:none;height:80px}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
 apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -172,6 +186,7 @@ appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // LÓGICA DE MENÚ HAMBURGUESA
 window.toggleMenu = () => {
@@ -253,34 +268,77 @@ window.actualizarMunicipios = () => {
 window.toggleTheme=()=>document.body.dataset.theme=
 document.body.dataset.theme==="dark"?"light":"dark";
 
-window.abrir=()=>modal.style.display="block";
-window.cerrar=()=>modal.style.display="none";
+window.abrir=()=> {
+    document.getElementById('modal').style.display="block";
+    // Limpiar inputs al abrir
+    document.getElementById('fotoFile').value = "";
+    document.getElementById('fotoUrl').value = "";
+}
+window.cerrar=()=>document.getElementById('modal').style.display="none";
 
 window.publicar = async () => {
-    if(!titulo.value || !precio.value || !depto.value || !muni.value) return alert("Completa los campos obligatorios");
+    if(!titulo.value || !precio.value || !depto.value || !muni.value) {
+        return alert("Completa los campos obligatorios");
+    }
     
-    const perfil = obtenerPerfil();
-    const imagenFinal = fotoUrl.value || "https://via.placeholder.com/400?text=Sin+Foto";
+    const btn = document.getElementById('btnPublicar');
+    btn.disabled = true;
+    btn.innerText = "Procesando...";
 
-    await addDoc(collection(db,"productos"),{
-        titulo: titulo.value,
-        descripcion: descripcion.value || "Sin descripción adicional",
-        precio: Number(precio.value).toFixed(2),
-        estado: estado.value,
-        foto: imagenFinal,
-        categoria: categoria.value,
-        depto: depto.value,
-        muni: muni.value,
-        vendedor: perfil.nombre,
-        telefono: perfil.telefono,
-        creado: Date.now(),
-        duenoId: MI_ID,
-        vendido: false
-    });
-    
-    titulo.value = ""; descripcion.value = ""; precio.value = ""; fotoUrl.value = "";
-    cerrar();
-    cargar();
+    try {
+        const perfil = obtenerPerfil();
+        let imagenFinal = fotoUrl.value.trim() || "https://via.placeholder.com/400?text=Sin+Foto";
+        
+        if (fotoFile.files && fotoFile.files.length > 0) {
+            const file = fotoFile.files[0];
+            
+            // Opciones de compresión (ajusta según necesites)
+            const options = {
+                maxSizeMB: 1,          // Máximo 1MB
+                maxWidthOrHeight: 1200, // Resolución máxima
+                useWebWorker: true,    // Mejor rendimiento
+                fileType: 'image/jpeg' // Convertir a JPEG para mejor compresión
+            };
+
+            const compressedFile = await imageCompression(file, options);
+            
+            const storageRef = ref(storage, 'productos/' + Date.now() + '_' + compressedFile.name);
+            await uploadBytes(storageRef, compressedFile);
+            imagenFinal = await getDownloadURL(storageRef);
+        }
+
+        await addDoc(collection(db,"productos"),{
+            titulo: titulo.value,
+            descripcion: descripcion.value || "Sin descripción adicional",
+            precio: Number(precio.value).toFixed(2),
+            estado: estado.value,
+            foto: imagenFinal,
+            categoria: categoria.value,
+            depto: depto.value,
+            muni: muni.value,
+            vendedor: perfil.nombre,
+            telefono: perfil.telefono,
+            creado: Date.now(),
+            duenoId: MI_ID,
+            vendido: false
+        });
+        
+        // Limpiar formulario
+        titulo.value = ""; 
+        descripcion.value = ""; 
+        precio.value = ""; 
+        fotoUrl.value = "";
+        fotoFile.value = "";
+        cerrar();
+        cargar();
+        alert("¡Anuncio publicado con éxito! 📸");
+    } catch (error) {
+        console.error("Error al publicar:", error);
+        alert("Hubo un error al publicar. Intenta de nuevo.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Publicar Ahora";
+    }
 };
 
 window.eliminar = async id => {
@@ -339,7 +397,6 @@ async function cargar(){
     productos = snap.docs.map(d=>({id:d.id,...d.data()}));
     render(productos);
 
-    // Manejar enlace profundo
     const urlParams = new URLSearchParams(window.location.search);
     const idParam = urlParams.get('id');
     if(idParam){
