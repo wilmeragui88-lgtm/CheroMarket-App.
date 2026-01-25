@@ -1,4 +1,5 @@
- <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -56,6 +57,7 @@ h1{margin:0;color:var(--azul)}
 .btn-del{background:transparent;color:var(--rojo);border:none;padding:5px;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:5px}
 .btn-sold{background:var(--txt);color:var(--card);border:none;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;font-weight:bold}
 .btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none;box-shadow: 0 4px 10px rgba(0,0,0,0.3);z-index:10;cursor:pointer}
+.btn-share{background:transparent;border:none;color:var(--azul);cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px;padding:5px 0}
 
 #modal, #modalPerfil{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:99;overflow-y:auto;padding:20px}
 .modal-content{background:var(--card);max-width:500px;margin:auto;padding:20px;border-radius:15px;display:flex;flex-direction:column;gap:12px}
@@ -225,6 +227,7 @@ const svData = {
 };
 
 const state = { categoria:"Todos" };
+let productos = [];
 
 function initUbicaciones() {
     const deptoSelect = document.getElementById('depto');
@@ -312,10 +315,38 @@ window.filtrar=()=>{
     });
 };
 
+window.compartir = id => {
+    const p = productos.find(x => x.id === id);
+    if(!p) return;
+
+    const text = `¡Mira este producto en CheroMarketApp! ${p.titulo} por $${p.precio}. ${p.descripcion} Ubicación: ${p.muni}, ${p.depto}. Contacto: https://wa.me/503${p.telefono}?text=Interesado%20en%20${encodeURIComponent(p.titulo)}`;
+    const url = window.location.href.split('?')[0] + '?id=' + p.id;
+
+    if(navigator.share){
+        navigator.share({
+            title: p.titulo,
+            text: text,
+            url: url
+        }).catch(console.error);
+    } else {
+        navigator.clipboard.writeText(text + ' ' + url);
+        alert('Detalles copiados al portapapeles!');
+    }
+};
+
 async function cargar(){
     const q=query(collection(db,"productos"),orderBy("creado","desc"));
     const snap=await getDocs(q);
-    render(snap.docs.map(d=>({id:d.id,...d.data()})));
+    productos = snap.docs.map(d=>({id:d.id,...d.data()}));
+    render(productos);
+
+    // Manejar enlace profundo
+    const urlParams = new URLSearchParams(window.location.search);
+    const idParam = urlParams.get('id');
+    if(idParam){
+        const el = document.querySelector(`.card[data-id="${idParam}"]`);
+        if(el) el.scrollIntoView({behavior: 'smooth'});
+    }
 }
 
 function render(lista){
@@ -338,7 +369,7 @@ function render(lista){
             : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket."><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
 
         feed.innerHTML+=`
-        <div class="card" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
+        <div class="card" data-id="${p.id}" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
             ${estaVendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
             <img class="foto" src="${p.foto}" alt="producto" style="${estaVendido ? 'filter:grayscale(1);opacity:0.6' : ''}">
             <div class="info">
@@ -350,6 +381,7 @@ function render(lista){
                 <div class="precio">$${p.precio}</div>
                 <div class="desc">${p.descripcion}</div>
                 <div class="mut"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto} <br><i class="fa-solid fa-user-tag"></i> ${p.vendedor}</div>
+                <button class="btn-share" onclick="compartir('${p.id}')"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
                 ${botonContacto}
                 ${botonesPrivados}
             </div>
@@ -363,5 +395,3 @@ cargar();
 
 </body>
 </html>
-
-
