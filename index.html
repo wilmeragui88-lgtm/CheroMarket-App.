@@ -87,127 +87,26 @@ textarea{resize:none;height:80px}
         <button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user"></i> Mi Perfil</button>
     </div>
 </header>
-<div style="max-width:600px; margin:20px auto; border:1px solid #e0e0e0; background:#ffffff;">
 
-  <details open>
-    <summary style="padding:15px; font-weight:bold; background:#f8f9fa;">
-      📜 Términos y Condiciones de CheroMarketApp
-    </summary>
-
-    <div style="padding:15px; font-size:14px;">
-      <h4>1. Aceptación de los Términos</h4>
-      <p>Al descargar, instalar o usar CheroMarketApp, el usuario acepta cumplir con estos términos. Si no está de acuerdo, debe abstenerse de utilizar la plataforma.</p>
-
-      <h4>2. Descripción del Servicio</h4>
-      <p>CheroMarketApp es una plataforma intermediaria que permite publicar anuncios en El Salvador. La aplicación no es dueña ni garantiza los artículos publicados.</p>
-
-      <h4>3. Registro y Seguridad</h4>
-      <ul>
-        <li>Solo mayores de 18 años.</li>
-        <li>El usuario es responsable de sus credenciales.</li>
-        <li>Toda actividad bajo la cuenta es su responsabilidad.</li>
-      </ul>
-
-      <h4>4. Reglas de Publicación</h4>
-      <p>Está prohibido publicar artículos ilegales, ofensivos o falsificados.</p>
-
-      <h4>5. Transacciones</h4>
-      <p>CheroMarketApp no participa en pagos ni entregas.</p>
-
-      <h4>6. Privacidad</h4>
-      <p>El uso de datos se rige por nuestra Política de Privacidad.</p>
-
-      <h4>7. Suspensión</h4>
-      <p>Las cuentas que infrinjan estos términos pueden ser suspendidas.</p>
-
-      <h4>8. Modificaciones</h4>
-      <p>Los términos pueden actualizarse en cualquier momento.</p>
-
-      <h4>9. Jurisdicción</h4>
-      <p>Leyes de la República de El Salvador.</p>
-    </div>
-  </details>
-
-  <details open>
-    <summary style="padding:15px; font-weight:bold; background:#f8f9fa;">
-      ⚖️ Política de Privacidad
-    </summary>
-
-    <div style="padding:15px; font-size:14px;">
-      <p><em>Última actualización: 22 de enero de 2026</em></p>
-
-      <h4>1. Información recopilada</h4>
-      <p>Nombre, correo, teléfono, contenido del usuario, ubicación y datos del dispositivo.</p>
-
-      <h4>2. Uso de la información</h4>
-      <p>Para anuncios, notificaciones y seguridad.</p>
-
-      <h4>3. Compartición</h4>
-      <p>Nombre y teléfono pueden ser visibles en anuncios. No vendemos datos.</p>
-
-      <h4>4. Derechos</h4>
-      <p>Puedes editar o eliminar tu cuenta cuando lo desees.</p>
-    </div>
-  </details>
-
-  <details open>
-    <summary style="padding:15px; font-weight:bold; background:#eef6ff;">
-      🛡️ Guía de Seguridad para Cheros
-    </summary>
-
-    <div style="padding:15px; font-size:14px;">
-      <p><strong>🤝 Reuniones:</strong> Lugares públicos y de día.</p>
-      <p><strong>💰 Pagos:</strong> Nunca envíes dinero por adelantado.</p>
-      <p><strong>📦 Verificación:</strong> Revisa productos y documentos antes de pagar.</p>
-    </div>
-  </details>
-
-  <div style="padding:15px; text-align:center;">
-    <strong>✔ Al usar CheroMarketApp aceptas estos términos</strong>
-    <p style="font-size:11px; color:#777;">
-      Has leído y comprendido los documentos legales.
-    </p>
-  </div>
-
-</div>
-
-      <details style="border-bottom: 1px solid #eee;">
-        <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
-          <span style="margin-right: 12px; font-size: 1.2em;">⚖️</span> Política de Privacidad
-        </summary>
-        <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
-          <p><em>Última actualización: 22 de enero de 2026</em></p>
-          <h4>1. Información que Recopilamos</h4>
-          <p>Recolectamos información de registro (nombre, email, teléfono), contenido del usuario (fotos, mensajes), datos de ubicación y del dispositivo.</p>
-          <h4>2. Uso de la Información</h4>
-          <p>Para facilitar anuncios, personalizar tu experiencia en El Salvador, enviar notificaciones y mantener la seguridad.</p>
-          <h4>3. Cómo Compartimos tu Información</h4>
-          <p>Tu nombre y teléfono pueden ser visibles en anuncios. No vendemos tus datos a terceros con fines publicitarios.</p>
-          <h4>4. Tus Derechos</h4>
-          <p>Puedes editar tu perfil, solicitar la eliminación de tu cuenta o gestionar permisos de ubicación y cámara desde tu dispositivo.</p>
-        </div>
-      </details>
+<div id="sidebar" class="sidebar">
+    <button class="close-sidebar" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i> Cerrar Menú</button>
     
-      <details style="border-bottom: 1px solid #eee;">
-        <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #e8f4fd; color: #0056b3; display: flex; align-items: center; list-style: none;">
-          <span style="margin-right: 12px; font-size: 1.2em;">🛡️</span> Guía de Seguridad para Cheros
-        </summary>
-        <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; background-color: #fafcfe;">
-          <p><strong>🤝 Negocios Seguros:</strong> Reúnete en centros comerciales o gasolineras con cámaras. Ve acompañado y de día.</p>
-          <p><strong>💰 Pagos:</strong> <strong>NUNCA</strong> envíes dinero por adelantado. Verifica el saldo disponible en tu banco antes de entregar el producto.</p>
-          <p><strong>📦 Verificación:</strong> Prueba los electrónicos y revisa documentos de vehículos en el VMT antes de pagar.</p>
-        </div>
-      </details>
-    
-      <div style="padding: 20px; text-align: center; background-color: #ffffff;">
-        <button type="button" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); transition: background 0.3s;" onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">
-          Acepto todos los Términos y Condiciones
-        </button>
-        <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
-      </div>
-    
+    <div class="sidebar-item">
+        <h2><i class="fa-solid fa-file-contract"></i> Términos y Condiciones</h2>
+        <p>Al usar CheroMarketApp, aceptas que la plataforma solo facilita el contacto entre usuarios. No nos hacemos responsables por transacciones fallidas.</p>
     </div>
-    
+
+    <div class="sidebar-item">
+        <h2><i class="fa-solid fa-gavel"></i> Avisos Legales</h2>
+        <p>Queda prohibida la venta de artículos ilícitos. Cada usuario es responsable legalmente por lo que publica y vende.</p>
+    </div>
+
+    <div class="sidebar-item" style="color:var(--rojo)">
+        <h2><i class="fa-solid fa-shield-halved"></i> Guía Anti-Estafas</h2>
+        <p><strong>1.</strong> No envíes dinero por adelantado.<br>
+        <strong>2.</strong> Reúnete en lugares públicos y seguros.<br>
+        <strong>3.</strong> Revisa el producto antes de pagar.</p>
+    </div>
     
     <div class="sidebar-item">
         <p class="mut">Versión 1.2 Pro · 2026</p>
@@ -419,7 +318,7 @@ window.compartir = id => {
     const p = productos.find(x => x.id === id);
     if(!p) return;
 
-    const text = `¡Mira este producto en CheroMarketApp!  por $.  Ubicación: , . Contacto: https://wa.me/503?text=Interesado%20en%20`;
+    const text = `¡Mira este producto en CheroMarketApp! ${p.titulo} por $${p.precio}. ${p.descripcion} Ubicación: ${p.muni}, ${p.depto}. Contacto: https://wa.me/503${p.telefono}?text=Interesado%20en%20${encodeURIComponent(p.titulo)}`;
     const url = window.location.href.split('?')[0] + '?id=' + p.id;
 
     if(navigator.share){
@@ -444,7 +343,7 @@ async function cargar(){
     const urlParams = new URLSearchParams(window.location.search);
     const idParam = urlParams.get('id');
     if(idParam){
-        const el = document.querySelector(`.card[data-id=""]`);
+        const el = document.querySelector(`.card[data-id="${idParam}"]`);
         if(el) el.scrollIntoView({behavior: 'smooth'});
     }
 }
@@ -459,31 +358,31 @@ function render(lista){
         if(esDueno){
             botonesPrivados = `
                 <div style="display:flex;gap:10px;margin-top:5px">
-                    ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('')">Marcar Vendido</button>` : ''}
-                    <button class="btn-del" onclick="eliminar('')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
+                    ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('${p.id}')">Marcar Vendido</button>` : ''}
+                    <button class="btn-del" onclick="eliminar('${p.id}')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
                 </div>`;
         }
 
         const botonContacto = estaVendido 
             ? `<div style="text-align:center;color:var(--rojo);font-weight:bold;padding:10px;border:1px solid var(--rojo);border-radius:8px">NO DISPONIBLE</div>`
-            : `<a class="btn-wa" target="_blank" href="https://wa.me/503?text=Hola! Me interesa el producto:  ($) que vi en CheroMarket."><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
+            : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket."><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
 
         feed.innerHTML+=`
-        <div class="card" data-id="" data-t="" data-l="" data-c="">
-             ''
-            <img class="foto" src="" alt="producto" style="grayscale(1);opacity:0.6' : ''">
+        <div class="card" data-id="${p.id}" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
+            ${estaVendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
+            <img class="foto" src="${p.foto}" alt="producto" style="${estaVendido ? 'filter:grayscale(1);opacity:0.6' : ''}">
             <div class="info">
                 <div class="tag-row">
-                    <span class="tag"></span>
-                    <span class="tag tag-estado  ''"> p.estado</span>
+                    <span class="tag">${p.categoria}</span>
+                    <span class="tag tag-estado ${estaVendido ? 'tag-vendido' : ''}">${estaVendido ? 'Vendido' : p.estado}</span>
                 </div>
-                <div class="titulo"></div>
-                <div class="precio">$</div>
-                <div class="desc"></div>
-                <div class="mut"><i class="fa-solid fa-location-dot"></i> ,  <br><i class="fa-solid fa-user-tag"></i> </div>
-                <button class="btn-share" onclick="compartir('')"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
-                
-                
+                <div class="titulo">${p.titulo}</div>
+                <div class="precio">$${p.precio}</div>
+                <div class="desc">${p.descripcion}</div>
+                <div class="mut"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto} <br><i class="fa-solid fa-user-tag"></i> ${p.vendedor}</div>
+                <button class="btn-share" onclick="compartir('${p.id}')"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
+                ${botonContacto}
+                ${botonesPrivados}
             </div>
         </div>`;
     });
