@@ -63,10 +63,6 @@ h1{margin:0;color:var(--azul)}
 input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
 textarea{resize:none;height:80px}
 .sold-overlay{position:absolute;top:10px;right:10px;background:var(--rojo);color:white;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:12px;z-index:1}
-
-/* Estilo para el input de archivo */
-.file-input-label{background:var(--b);padding:12px;border-radius:8px;text-align:center;cursor:pointer;font-size:14px;color:var(--txt);border:2px dashed var(--azul)}
-#fotoFile{display:none}
 </style>
 </head>
 
@@ -113,7 +109,7 @@ textarea{resize:none;height:80px}
     </div>
     
     <div class="sidebar-item">
-        <p class="mut">Versión 1.3 Pro · 2026</p>
+        <p class="mut">Versión 1.2 Pro · 2026</p>
     </div>
 </div>
 
@@ -143,12 +139,7 @@ textarea{resize:none;height:80px}
                 <option value="Usado">Usado</option>
             </select>
         </div>
-        
-        <label for="fotoFile" class="file-input-label" id="labelFoto">
-            <i class="fa-solid fa-image"></i> Seleccionar Foto de Galería
-        </label>
-        <input type="file" id="fotoFile" accept="image/*">
-        
+        <input id="fotoUrl" placeholder="URL de la imagen (ej: https://...)">
         <select id="categoria">
             <option>Tecnología</option>
             <option>Ropa</option>
@@ -161,7 +152,7 @@ textarea{resize:none;height:80px}
         <select id="muni">
             <option value="">Selecciona Municipio</option>
         </select>
-        <button id="btnPublicar" type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
+        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
         <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
     </div>
 </div>
@@ -217,36 +208,6 @@ window.guardarPerfil = () => {
     cerrarPerfil();
 };
 
-// --- LÓGICA DE COMPRESIÓN DE IMAGEN ---
-let imagenBase64 = "";
-document.getElementById('fotoFile').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    document.getElementById('labelFoto').innerText = "Procesando imagen...";
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function(event) {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 600; // Reducimos para que pese poco
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
-
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            
-            // Comprimimos al 70% de calidad
-            imagenBase64 = canvas.toDataURL('image/jpeg', 0.7);
-            document.getElementById('labelFoto').innerText = "✅ Foto cargada";
-            document.getElementById('labelFoto').style.borderColor = "var(--verde)";
-        }
-    };
-});
-
 const svData = {
 "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
 "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
@@ -299,40 +260,27 @@ window.publicar = async () => {
     if(!titulo.value || !precio.value || !depto.value || !muni.value) return alert("Completa los campos obligatorios");
     
     const perfil = obtenerPerfil();
-    const imagenFinal = imagenBase64 || "https://via.placeholder.com/400?text=Sin+Foto";
+    const imagenFinal = fotoUrl.value || "https://via.placeholder.com/400?text=Sin+Foto";
 
-    btnPublicar.disabled = true;
-    btnPublicar.innerText = "Publicando...";
-
-    try {
-        await addDoc(collection(db,"productos"),{
-            titulo: titulo.value,
-            descripcion: descripcion.value || "Sin descripción adicional",
-            precio: Number(precio.value).toFixed(2),
-            estado: estado.value,
-            foto: imagenFinal,
-            categoria: categoria.value,
-            depto: depto.value,
-            muni: muni.value,
-            vendedor: perfil.nombre,
-            telefono: perfil.telefono,
-            creado: Date.now(),
-            duenoId: MI_ID,
-            vendido: false
-        });
-        
-        titulo.value = ""; descripcion.value = ""; precio.value = ""; 
-        imagenBase64 = ""; 
-        document.getElementById('labelFoto').innerText = "Seleccionar Foto de Galería";
-        document.getElementById('labelFoto').style.borderColor = "var(--azul)";
-        cerrar();
-        cargar();
-    } catch (e) {
-        alert("Error al publicar");
-    } finally {
-        btnPublicar.disabled = false;
-        btnPublicar.innerText = "Publicar Ahora";
-    }
+    await addDoc(collection(db,"productos"),{
+        titulo: titulo.value,
+        descripcion: descripcion.value || "Sin descripción adicional",
+        precio: Number(precio.value).toFixed(2),
+        estado: estado.value,
+        foto: imagenFinal,
+        categoria: categoria.value,
+        depto: depto.value,
+        muni: muni.value,
+        vendedor: perfil.nombre,
+        telefono: perfil.telefono,
+        creado: Date.now(),
+        duenoId: MI_ID,
+        vendido: false
+    });
+    
+    titulo.value = ""; descripcion.value = ""; precio.value = ""; fotoUrl.value = "";
+    cerrar();
+    cargar();
 };
 
 window.eliminar = async id => {
@@ -370,7 +318,7 @@ window.compartir = id => {
     const p = productos.find(x => x.id === id);
     if(!p) return;
 
-    const text = `¡Mira este producto en CheroMarketApp! ${p.titulo} por $${p.precio}. Ubicación: ${p.muni}, ${p.depto}.`;
+    const text = `¡Mira este producto en CheroMarketApp! ${p.titulo} por $${p.precio}. ${p.descripcion} Ubicación: ${p.muni}, ${p.depto}. Contacto: https://wa.me/503${p.telefono}?text=Interesado%20en%20${encodeURIComponent(p.titulo)}`;
     const url = window.location.href.split('?')[0] + '?id=' + p.id;
 
     if(navigator.share){
@@ -381,7 +329,7 @@ window.compartir = id => {
         }).catch(console.error);
     } else {
         navigator.clipboard.writeText(text + ' ' + url);
-        alert('Enlace copiado!');
+        alert('Detalles copiados al portapapeles!');
     }
 };
 
@@ -391,6 +339,7 @@ async function cargar(){
     productos = snap.docs.map(d=>({id:d.id,...d.data()}));
     render(productos);
 
+    // Manejar enlace profundo
     const urlParams = new URLSearchParams(window.location.search);
     const idParam = urlParams.get('id');
     if(idParam){
