@@ -6,7 +6,6 @@
 <title>CheroMarketApp · Pro</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<script src="https://unpkg.com/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 
 <style>
 :root{
@@ -20,19 +19,26 @@ body{margin:0;font-family:Segoe UI;background:var(--fondo);color:var(--txt);padd
 header{background:var(--card);border-bottom:3px solid var(--azul);padding:15px;text-align:center;position:sticky;top:0;z-index:9}
 h1{margin:0;color:var(--azul)}
 .sub{font-size:13px;color:var(--mut)}
+
+/* Botón Menú Hamburguesa */
 .btn-menu{position:absolute;right:15px;top:20px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--azul)}
+
+/* Sidebar / Menú Lateral */
 .sidebar{position:fixed;top:0;right:-280px;width:280px;height:100%;background:var(--card);box-shadow:-2px 0 10px rgba(0,0,0,0.2);z-index:100;transition:0.3s;padding:20px;box-sizing:border-box;overflow-y:auto}
 .sidebar.active{right:0}
 .sidebar h2{color:var(--azul);font-size:18px;margin-top:0}
 .sidebar-item{margin-bottom:20px;font-size:14px;line-height:1.4;border-bottom:1px solid var(--b);padding-bottom:10px}
 .close-sidebar{background:var(--b);border:none;padding:8px;width:100%;border-radius:8px;cursor:pointer;margin-bottom:20px}
+
 .buscador-cont{max-width:500px;margin:10px auto;display:flex;gap:8px;position:relative}
 .buscador{flex:1;padding:12px;padding-left:40px;border-radius:25px;border:1px solid var(--b);background:var(--fondo)}
 .search-icon{position:absolute;left:15px;top:15px;color:var(--mut)}
 .btn-theme{width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
 .categorias{display:flex;gap:8px;overflow-x:auto;padding:10px;max-width:500px;margin:auto}
 .cat{padding:8px 14px;border:none;border-radius:20px;font-weight:600;background:var(--b);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .cat.active{background:var(--azul);color:white}
+
 .feed{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;max-width:900px;margin:auto}
 .card{background:var(--card);border-radius:12px;border:1px solid var(--b);overflow:hidden;display:flex;flex-direction:column;transition: 0.3s;position:relative}
 .foto{height:180px;width:100%;object-fit:cover;background:#eee}
@@ -45,113 +51,124 @@ h1{margin:0;color:var(--azul)}
 .precio{color:var(--naranja);font-size:20px;font-weight:700}
 .desc{font-size:12px;color:var(--txt);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mut{font-size:11px;color:var(--mut)}
+
 .btn-wa{margin-top:auto;background:var(--verde);color:white;text-decoration:none;text-align:center;padding:10px;border-radius:8px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-del{background:transparent;color:var(--rojo);border:none;padding:5px;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:5px}
 .btn-sold{background:var(--txt);color:var(--card);border:none;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;font-weight:bold}
 .btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none;box-shadow: 0 4px 10px rgba(0,0,0,0.3);z-index:10;cursor:pointer}
 .btn-share{background:transparent;border:none;color:var(--azul);cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px;padding:5px 0}
+
 #modal, #modalPerfil{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:99;overflow-y:auto;padding:20px}
 .modal-content{background:var(--card);max-width:500px;margin:auto;padding:20px;border-radius:15px;display:flex;flex-direction:column;gap:12px}
 input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
 textarea{resize:none;height:80px}
 .sold-overlay{position:absolute;top:10px;right:10px;background:var(--rojo);color:white;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:12px;z-index:1}
-input[type="file"]{padding: 8px;border: 1px dashed var(--mut);border-radius: 8px;background: var(--card);cursor: pointer}
+
+/* Estilo para el input de archivo */
+.file-input-label{background:var(--b);padding:12px;border-radius:8px;text-align:center;cursor:pointer;font-size:14px;color:var(--txt);border:2px dashed var(--azul)}
+#fotoFile{display:none}
 </style>
 </head>
 
 <body data-theme="light">
 
 <header>
-<button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-<h1>🇸🇻 CheroMarketApp</h1>
-<div class="sub">Vende y compra en todo El Salvador</div>
+    <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    <h1>🇸🇻 CheroMarketApp</h1>
+    <div class="sub">Vende y compra en todo El Salvador</div>
 
-<div class="buscador-cont">
-<i class="fa-solid fa-magnifying-glass search-icon"></i>
-<input id="buscar" class="buscador" placeholder="Buscar por nombre o lugar…" oninput="filtrar()">
-<button class="btn-theme" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
-</div>
+    <div class="buscador-cont">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input id="buscar" class="buscador" placeholder="Buscar por nombre o lugar…" oninput="filtrar()">
+        <button class="btn-theme" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
+    </div>
 
-<div class="categorias">
-<button class="cat active" onclick="setCat('Todos',this)"><i class="fa-solid fa-border-all"></i> Todos</button>
-<button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tecnología</button>
-<button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
-<button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
-<button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user"></i> Mi Perfil</button>
-</div>
+    <div class="categorias">
+        <button class="cat active" onclick="setCat('Todos',this)"><i class="fa-solid fa-border-all"></i> Todos</button>
+        <button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tecnología</button>
+        <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
+        <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
+        <button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user"></i> Mi Perfil</button>
+    </div>
 </header>
 
 <div id="sidebar" class="sidebar">
-<button class="close-sidebar" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i> Cerrar Menú</button>
-<div class="sidebar-item">
-<h2><i class="fa-solid fa-file-contract"></i> Términos y Condiciones</h2>
-<p>Al usar CheroMarketApp, aceptas que la plataforma solo facilita el contacto entre usuarios. No nos hacemos responsables por transacciones fallidas.</p>
-</div>
-<div class="sidebar-item">
-<h2><i class="fa-solid fa-gavel"></i> Avisos Legales</h2>
-<p>Queda prohibida la venta de artículos ilícitos. Cada usuario es responsable legalmente por lo que publica y vende.</p>
-</div>
-<div class="sidebar-item" style="color:var(--rojo)">
-<h2><i class="fa-solid fa-shield-halved"></i> Guía Anti-Estafas</h2>
-<p><strong>1.</strong> No envíes dinero por adelantado.<br>
-<strong>2.</strong> Reúnete en lugares públicos y seguros.<br>
-<strong>3.</strong> Revisa el producto antes de pagar.</p>
-</div>
-<div class="sidebar-item">
-<p class="mut">Versión 1.3 Pro · 2026 (con compresión de fotos)</p>
-</div>
+    <button class="close-sidebar" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i> Cerrar Menú</button>
+    
+    <div class="sidebar-item">
+        <h2><i class="fa-solid fa-file-contract"></i> Términos y Condiciones</h2>
+        <p>Al usar CheroMarketApp, aceptas que la plataforma solo facilita el contacto entre usuarios. No nos hacemos responsables por transacciones fallidas.</p>
+    </div>
+
+    <div class="sidebar-item">
+        <h2><i class="fa-solid fa-gavel"></i> Avisos Legales</h2>
+        <p>Queda prohibida la venta de artículos ilícitos. Cada usuario es responsable legalmente por lo que publica y vende.</p>
+    </div>
+
+    <div class="sidebar-item" style="color:var(--rojo)">
+        <h2><i class="fa-solid fa-shield-halved"></i> Guía Anti-Estafas</h2>
+        <p><strong>1.</strong> No envíes dinero por adelantado.<br>
+        <strong>2.</strong> Reúnete en lugares públicos y seguros.<br>
+        <strong>3.</strong> Revisa el producto antes de pagar.</p>
+    </div>
+    
+    <div class="sidebar-item">
+        <p class="mut">Versión 1.3 Pro · 2026</p>
+    </div>
 </div>
 
 <div id="feed" class="feed"></div>
 <button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
 
 <div id="modalPerfil">
-<div class="modal-content">
-<h3 style="margin:0"><i class="fa-solid fa-user-gear"></i> Configurar mi Perfil</h3>
-<p class="mut">Estos datos aparecerán en tus anuncios para que te contacten.</p>
-<input id="perfilNombre" placeholder="Tu nombre o negocio">
-<input id="perfilTelefono" type="number" placeholder="Tu WhatsApp (ej: 77771234)">
-<button type="button" onclick="guardarPerfil()" style="background:var(--verde);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Guardar Cambios</button>
-<button type="button" onclick="cerrarPerfil()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cerrar</button>
-</div>
+    <div class="modal-content">
+        <h3 style="margin:0"><i class="fa-solid fa-user-gear"></i> Configurar mi Perfil</h3>
+        <p class="mut">Estos datos aparecerán en tus anuncios para que te contacten.</p>
+        <input id="perfilNombre" placeholder="Tu nombre o negocio">
+        <input id="perfilTelefono" type="number" placeholder="Tu WhatsApp (ej: 77771234)">
+        <button type="button" onclick="guardarPerfil()" style="background:var(--verde);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Guardar Cambios</button>
+        <button type="button" onclick="cerrarPerfil()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cerrar</button>
+    </div>
 </div>
 
 <div id="modal">
-<div class="modal-content">
-<h3 style="margin:0"><i class="fa-solid fa-tag"></i> Nuevo Anuncio</h3>
-<input id="titulo" placeholder="¿Qué vendes?">
-<textarea id="descripcion" placeholder="Describe tu producto (detalles, fallas, etc.)"></textarea>
-<div style="display:flex;gap:10px">
-<input id="precio" type="number" step="0.01" placeholder="Precio $" style="flex:1">
-<select id="estado" style="flex:1">
-<option value="Nuevo">Nuevo</option>
-<option value="Usado">Usado</option>
-</select>
-</div>
-<input type="file" id="fotoFile" accept="image/*" capture="environment">
-<small class="mut">Sube foto desde cámara o galería (se comprime automáticamente)</small>
-<input id="fotoUrl" placeholder="O pega URL de imagen si no quieres subir archivo">
-<select id="categoria">
-<option>Tecnología</option>
-<option>Ropa</option>
-<option>Comida</option>
-<option>Otros</option>
-</select>
-<select id="depto" onchange="actualizarMunicipios()">
-<option value="">Selecciona Departamento</option>
-</select>
-<select id="muni">
-<option value="">Selecciona Municipio</option>
-</select>
-<button type="button" id="btnPublicar" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
-<button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
-</div>
+    <div class="modal-content">
+        <h3 style="margin:0"><i class="fa-solid fa-tag"></i> Nuevo Anuncio</h3>
+        <input id="titulo" placeholder="¿Qué vendes?">
+        <textarea id="descripcion" placeholder="Describe tu producto (detalles, fallas, etc.)"></textarea>
+        <div style="display:flex;gap:10px">
+            <input id="precio" type="number" step="0.01" placeholder="Precio $" style="flex:1">
+            <select id="estado" style="flex:1">
+                <option value="Nuevo">Nuevo</option>
+                <option value="Usado">Usado</option>
+            </select>
+        </div>
+        
+        <label for="fotoFile" class="file-input-label" id="labelFoto">
+            <i class="fa-solid fa-image"></i> Seleccionar Foto de Galería
+        </label>
+        <input type="file" id="fotoFile" accept="image/*">
+        
+        <select id="categoria">
+            <option>Tecnología</option>
+            <option>Ropa</option>
+            <option>Comida</option>
+            <option>Otros</option>
+        </select>
+        <select id="depto" onchange="actualizarMunicipios()">
+            <option value="">Selecciona Departamento</option>
+        </select>
+        <select id="muni">
+            <option value="">Selecciona Municipio</option>
+        </select>
+        <button id="btnPublicar" type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
+        <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
+    </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
 apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -164,146 +181,264 @@ appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
-// Menú
-window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
+// LÓGICA DE MENÚ HAMBURGUESA
+window.toggleMenu = () => {
+    document.getElementById('sidebar').classList.toggle('active');
+};
 
-// Perfil
-if(!localStorage.getItem("mi_id_usuario")) localStorage.setItem("mi_id_usuario", "user_" + Math.random().toString(36).substr(2, 9));
+// --- LÓGICA DE IDENTIDAD Y PERFIL ---
+if(!localStorage.getItem("mi_id_usuario")) {
+    localStorage.setItem("mi_id_usuario", "user_" + Math.random().toString(36).substr(2, 9));
+}
 const MI_ID = localStorage.getItem("mi_id_usuario");
 
 const obtenerPerfil = () => ({
-nombre: localStorage.getItem("perfil_nombre") || "Vendedor Anónimo",
-telefono: localStorage.getItem("perfil_telefono") || "77771234"
+    nombre: localStorage.getItem("perfil_nombre") || "Vendedor Anónimo",
+    telefono: localStorage.getItem("perfil_telefono") || "77771234"
 });
 
 window.abrirPerfil = () => {
-const p = obtenerPerfil();
-document.getElementById('perfilNombre').value = p.nombre==="Vendedor Anónimo"?"":p.nombre;
-document.getElementById('perfilTelefono').value = p.telefono==="77771234"?"":p.telefono;
-document.getElementById('modalPerfil').style.display="block";
+    const p = obtenerPerfil();
+    document.getElementById('perfilNombre').value = p.nombre === "Vendedor Anónimo" ? "" : p.nombre;
+    document.getElementById('perfilTelefono').value = p.telefono === "77771234" ? "" : p.telefono;
+    document.getElementById('modalPerfil').style.display = "block";
 };
-window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display="none";
+
+window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
+
 window.guardarPerfil = () => {
-const nom=document.getElementById('perfilNombre').value.trim();
-const tel=document.getElementById('perfilTelefono').value.trim();
-if(!nom||!tel) return alert("Por favor completa tu nombre y teléfono");
-localStorage.setItem("perfil_nombre",nom);
-localStorage.setItem("perfil_telefono",tel);
-alert("Perfil actualizado correctamente");
-cerrarPerfil();
+    const nom = document.getElementById('perfilNombre').value.trim();
+    const tel = document.getElementById('perfilTelefono').value.trim();
+    if(!nom || !tel) return alert("Por favor completa tu nombre y teléfono");
+    localStorage.setItem("perfil_nombre", nom);
+    localStorage.setItem("perfil_telefono", tel);
+    alert("Perfil actualizado correctamente");
+    cerrarPerfil();
 };
 
-// Ubicaciones SV
-const svData = { /* tus datos de departamentos y municipios, se mantiene igual */ };
-// Estado
+// --- LÓGICA DE COMPRESIÓN DE IMAGEN ---
+let imagenBase64 = "";
+document.getElementById('fotoFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    document.getElementById('labelFoto').innerText = "Procesando imagen...";
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function(event) {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 600; // Reducimos para que pese poco
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Comprimimos al 70% de calidad
+            imagenBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('labelFoto').innerText = "✅ Foto cargada";
+            document.getElementById('labelFoto').style.borderColor = "var(--verde)";
+        }
+    };
+});
+
+const svData = {
+"Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
+"Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
+"Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
+"Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+"La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+"San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
+"Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
+"La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
+"Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
+"San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+"Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
+"San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
+"Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+"La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
+};
+
 const state = { categoria:"Todos" };
-let productos=[];
+let productos = [];
 
-function initUbicaciones(){
-const deptoSelect=document.getElementById('depto');
-Object.keys(svData).forEach(d=>{let opt=document.createElement('option');opt.value=d;opt.innerText=d;deptoSelect.appendChild(opt)});
-}
-window.actualizarMunicipios=()=>{const deptoVal=document.getElementById('depto').value;const muniSelect=document.getElementById('muni');muniSelect.innerHTML='<option value="">Selecciona Municipio</option>';if(deptoVal){svData[deptoVal].forEach(m=>{let opt=document.createElement('option');opt.value=m;opt.innerText=m;muniSelect.appendChild(opt);});}};
-
-window.toggleTheme=()=>document.body.dataset.theme=document.body.dataset.theme==="dark"?"light":"dark";
-window.abrir=()=>{document.getElementById('modal').style.display="block";document.getElementById('fotoFile').value="";document.getElementById('fotoUrl').value="";}
-window.cerrar=()=>document.getElementById('modal').style.display="none";
-
-// Publicar
-window.publicar = async () => {
-const titulo = document.getElementById('titulo');
-const descripcion = document.getElementById('descripcion');
-const precio = document.getElementById('precio');
-const estado = document.getElementById('estado');
-const categoria = document.getElementById('categoria');
-const depto = document.getElementById('depto');
-const muni = document.getElementById('muni');
-const fotoFile = document.getElementById('fotoFile');
-const fotoUrl = document.getElementById('fotoUrl');
-
-if(!titulo.value.trim()||!precio.value.trim()||!depto.value||!muni.value) return alert("Completa los campos obligatorios");
-
-const btn=document.getElementById('btnPublicar');btn.disabled=true;btn.innerText="Procesando...";
-
-try{
-const perfil=obtenerPerfil();
-let imagenFinal=fotoUrl.value.trim()||"https://via.placeholder.com/400?text=Sin+Foto";
-
-if(fotoFile.files && fotoFile.files.length>0){
-const file=fotoFile.files[0];
-const options={maxSizeMB:1,maxWidthOrHeight:1200,useWebWorker:true,fileType:'image/jpeg'};
-const compressedFile=await imageCompression(file,options);
-const storageRef=ref(storage,'productos/'+Date.now()+'_'+compressedFile.name);
-await uploadBytes(storageRef,compressedFile);
-imagenFinal=await getDownloadURL(storageRef);
+function initUbicaciones() {
+    const deptoSelect = document.getElementById('depto');
+    Object.keys(svData).forEach(d => {
+        let opt = document.createElement('option');
+        opt.value = d; opt.innerText = d;
+        deptoSelect.appendChild(opt);
+    });
 }
 
-await addDoc(collection(db,"productos"),{
-titulo: titulo.value.trim(),
-descripcion: descripcion.value.trim()||"Sin descripción adicional",
-precio: parseFloat(precio.value),
-estado: estado.value,
-foto: imagenFinal,
-categoria: categoria.value,
-depto: depto.value,
-muni: muni.value,
-vendedor: perfil.nombre,
-telefono: perfil.telefono,
-creado: Date.now(),
-duenoId: MI_ID,
-vendido:false
-});
-
-// Limpiar formulario
-titulo.value=""; descripcion.value=""; precio.value=""; fotoUrl.value=""; fotoFile.value="";
-cerrar();
-cargar();
-alert("¡Anuncio publicado con éxito! 📸");
-}catch(error){console.error("Error al publicar:",error);alert("Hubo un error al publicar. Revisa la consola.");}finally{btn.disabled=false;btn.innerText="Publicar Ahora";}
+window.actualizarMunicipios = () => {
+    const deptoVal = document.getElementById('depto').value;
+    const muniSelect = document.getElementById('muni');
+    muniSelect.innerHTML = '<option value="">Selecciona Municipio</option>';
+    if(deptoVal) {
+        svData[deptoVal].forEach(m => {
+            let opt = document.createElement('option');
+            opt.value = m; opt.innerText = m;
+            muniSelect.appendChild(opt);
+        });
+    }
 };
 
-// Cargar productos
+window.toggleTheme=()=>document.body.dataset.theme=
+document.body.dataset.theme==="dark"?"light":"dark";
+
+window.abrir=()=>modal.style.display="block";
+window.cerrar=()=>modal.style.display="none";
+
+window.publicar = async () => {
+    if(!titulo.value || !precio.value || !depto.value || !muni.value) return alert("Completa los campos obligatorios");
+    
+    const perfil = obtenerPerfil();
+    const imagenFinal = imagenBase64 || "https://via.placeholder.com/400?text=Sin+Foto";
+
+    btnPublicar.disabled = true;
+    btnPublicar.innerText = "Publicando...";
+
+    try {
+        await addDoc(collection(db,"productos"),{
+            titulo: titulo.value,
+            descripcion: descripcion.value || "Sin descripción adicional",
+            precio: Number(precio.value).toFixed(2),
+            estado: estado.value,
+            foto: imagenFinal,
+            categoria: categoria.value,
+            depto: depto.value,
+            muni: muni.value,
+            vendedor: perfil.nombre,
+            telefono: perfil.telefono,
+            creado: Date.now(),
+            duenoId: MI_ID,
+            vendido: false
+        });
+        
+        titulo.value = ""; descripcion.value = ""; precio.value = ""; 
+        imagenBase64 = ""; 
+        document.getElementById('labelFoto').innerText = "Seleccionar Foto de Galería";
+        document.getElementById('labelFoto').style.borderColor = "var(--azul)";
+        cerrar();
+        cargar();
+    } catch (e) {
+        alert("Error al publicar");
+    } finally {
+        btnPublicar.disabled = false;
+        btnPublicar.innerText = "Publicar Ahora";
+    }
+};
+
+window.eliminar = async id => {
+    if(confirm("¿Eliminar este anuncio permanentemente?")){
+        await deleteDoc(doc(db,"productos",id));
+        cargar();
+    }
+};
+
+window.marcarVendido = async id => {
+    if(confirm("¿Marcar este producto como vendido? Ya no se podrá contactar.")){
+        await updateDoc(doc(db,"productos",id), { vendido: true });
+        cargar();
+    }
+};
+
+window.setCat=(c,b)=>{
+    state.categoria=c;
+    document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    filtrar();
+};
+
+window.filtrar=()=>{
+    const t=buscar.value.toLowerCase();
+    document.querySelectorAll(".card").forEach(c=>{
+        c.style.display=
+        (c.dataset.t.includes(t) || c.dataset.l.includes(t)) &&
+        (state.categoria==="Todos"||c.dataset.c===state.categoria)
+        ?"flex":"none";
+    });
+};
+
+window.compartir = id => {
+    const p = productos.find(x => x.id === id);
+    if(!p) return;
+
+    const text = `¡Mira este producto en CheroMarketApp! ${p.titulo} por $${p.precio}. Ubicación: ${p.muni}, ${p.depto}.`;
+    const url = window.location.href.split('?')[0] + '?id=' + p.id;
+
+    if(navigator.share){
+        navigator.share({
+            title: p.titulo,
+            text: text,
+            url: url
+        }).catch(console.error);
+    } else {
+        navigator.clipboard.writeText(text + ' ' + url);
+        alert('Enlace copiado!');
+    }
+};
+
 async function cargar(){
-productos=[];
-const q=query(collection(db,"productos"),orderBy("creado","desc"));
-const snap=await getDocs(q);
-snap.forEach(docu=>{productos.push({id:docu.id,...docu.data()});});
-renderFeed();
+    const q=query(collection(db,"productos"),orderBy("creado","desc"));
+    const snap=await getDocs(q);
+    productos = snap.docs.map(d=>({id:d.id,...d.data()}));
+    render(productos);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const idParam = urlParams.get('id');
+    if(idParam){
+        const el = document.querySelector(`.card[data-id="${idParam}"]`);
+        if(el) el.scrollIntoView({behavior: 'smooth'});
+    }
 }
 
-// Renderizar feed
-function renderFeed(){
-const feed=document.getElementById('feed');feed.innerHTML="";
-let filtrarCat=state.categoria!=="Todos"?productos.filter(p=>p.categoria===state.categoria):productos;
-const buscar=document.getElementById('buscar').value.trim().toLowerCase();
-if(buscar){filtrarCat=filtrarCat.filter(p=>p.titulo.toLowerCase().includes(buscar)||p.depto.toLowerCase().includes(buscar)||p.muni.toLowerCase().includes(buscar));}
-filtrarCat.forEach(p=>{
-let c=document.createElement('div');c.className="card";
-let soldOverlay=p.vendido?'<div class="sold-overlay">VENDIDO</div>':'';
-c.innerHTML=`
-<img src="${p.foto}" class="foto">
-<div class="info">
-<div class="titulo">${p.titulo}</div>
-<div class="precio">$${p.precio.toFixed(2)}</div>
-<div class="desc">${p.descripcion}</div>
-<div class="tag-row">
-<span class="tag tag-estado">${p.estado}</span>
-<span class="tag">${p.categoria}</span>
-<span class="tag">${p.depto} / ${p.muni}</span>
-</div>
-<a href="https://wa.me/503${p.telefono}?text=Hola,%20vi%20tu%20anuncio%20de%20${encodeURIComponent(p.titulo)}" target="_blank" class="btn-wa"><i class="fa-brands fa-whatsapp"></i> Contactar</a>
-</div>
-`;c.innerHTML+=soldOverlay;feed.appendChild(c);
-});
+function render(lista){
+    feed.innerHTML="";
+    lista.forEach(p=>{
+        const esDueno = p.duenoId === MI_ID;
+        const estaVendido = p.vendido === true;
+
+        let botonesPrivados = "";
+        if(esDueno){
+            botonesPrivados = `
+                <div style="display:flex;gap:10px;margin-top:5px">
+                    ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('${p.id}')">Marcar Vendido</button>` : ''}
+                    <button class="btn-del" onclick="eliminar('${p.id}')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
+                </div>`;
+        }
+
+        const botonContacto = estaVendido 
+            ? `<div style="text-align:center;color:var(--rojo);font-weight:bold;padding:10px;border:1px solid var(--rojo);border-radius:8px">NO DISPONIBLE</div>`
+            : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket."><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
+
+        feed.innerHTML+=`
+        <div class="card" data-id="${p.id}" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
+            ${estaVendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
+            <img class="foto" src="${p.foto}" alt="producto" style="${estaVendido ? 'filter:grayscale(1);opacity:0.6' : ''}">
+            <div class="info">
+                <div class="tag-row">
+                    <span class="tag">${p.categoria}</span>
+                    <span class="tag tag-estado ${estaVendido ? 'tag-vendido' : ''}">${estaVendido ? 'Vendido' : p.estado}</span>
+                </div>
+                <div class="titulo">${p.titulo}</div>
+                <div class="precio">$${p.precio}</div>
+                <div class="desc">${p.descripcion}</div>
+                <div class="mut"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto} <br><i class="fa-solid fa-user-tag"></i> ${p.vendedor}</div>
+                <button class="btn-share" onclick="compartir('${p.id}')"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
+                ${botonContacto}
+                ${botonesPrivados}
+            </div>
+        </div>`;
+    });
 }
 
-// Filtros
-window.setCat=(cat,el)=>{state.categoria=cat;document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderFeed();}
-window.filtrar=()=>renderFeed();
-
-// Inicializar
 initUbicaciones();
 cargar();
 </script>
