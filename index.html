@@ -56,24 +56,13 @@ h1{margin:0;color:var(--azul)}
 .btn-del{background:transparent;color:var(--rojo);border:none;padding:5px;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:5px}
 .btn-sold{background:var(--txt);color:var(--card);border:none;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;font-weight:bold}
 .btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none;box-shadow: 0 4px 10px rgba(0,0,0,0.3);z-index:10;cursor:pointer}
+.btn-share{background:transparent;border:none;color:var(--azul);cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px;padding:5px 0}
 
 #modal, #modalPerfil{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:99;overflow-y:auto;padding:20px}
 .modal-content{background:var(--card);max-width:500px;margin:auto;padding:20px;border-radius:15px;display:flex;flex-direction:column;gap:12px}
 input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
 textarea{resize:none;height:80px}
 .sold-overlay{position:absolute;top:10px;right:10px;background:var(--rojo);color:white;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:12px;z-index:1}
-
-/* NUEVOS ESTILOS AGREGADOS PARA CARGA DE IMAGEN */
-.upload-box {
-    border: 2px dashed var(--azul);
-    padding: 15px;
-    text-align: center;
-    border-radius: 8px;
-    cursor: pointer;
-    background: var(--card);
-}
-.upload-box i { font-size: 24px; color: var(--azul); }
-#preview { width: 100%; max-height: 150px; object-fit: contain; margin-top: 10px; display: none; border-radius: 8px; }
 </style>
 </head>
 
@@ -141,15 +130,6 @@ textarea{resize:none;height:80px}
 <div id="modal">
     <div class="modal-content">
         <h3 style="margin:0"><i class="fa-solid fa-tag"></i> Nuevo Anuncio</h3>
-        
-        <div class="upload-box" onclick="document.getElementById('fotoInput').click()">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <p id="uploadStatus">Toca para elegir foto</p>
-            <img id="preview">
-        </div>
-        <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="subirImagenImgBB()">
-        <input id="fotoUrl" type="hidden">
-
         <input id="titulo" placeholder="¿Qué vendes?">
         <textarea id="descripcion" placeholder="Describe tu producto (detalles, fallas, etc.)"></textarea>
         <div style="display:flex;gap:10px">
@@ -159,7 +139,7 @@ textarea{resize:none;height:80px}
                 <option value="Usado">Usado</option>
             </select>
         </div>
-        
+        <input id="fotoUrl" placeholder="URL de la imagen (ej: https://...)">
         <select id="categoria">
             <option>Tecnología</option>
             <option>Ropa</option>
@@ -172,7 +152,7 @@ textarea{resize:none;height:80px}
         <select id="muni">
             <option value="">Selecciona Municipio</option>
         </select>
-        <button id="btnPublicar" type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
+        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
         <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
     </div>
 </div>
@@ -192,45 +172,6 @@ appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-// NUEVA FUNCIÓN AGREGADA PARA IMGBB
-const IMGBB_API_KEY = "36329e46a9482759e09d18585e50965d";
-
-window.subirImagenImgBB = () => {
-  const input = document.getElementById("fotoInput");
-  const status = document.getElementById("uploadStatus");
-  const preview = document.getElementById("preview");
-  const file = input.files[0];
-
-  if (!file) return;
-
-  status.innerText = "Subiendo foto... ⏳";
-  
-  const formData = new FormData();
-  formData.append("key", IMGBB_API_KEY);
-  formData.append("image", file);
-
-  fetch("https://api.imgbb.com/1/upload", {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      document.getElementById("fotoUrl").value = data.data.url;
-      preview.src = data.data.url;
-      preview.style.display = "block";
-      status.innerText = "Foto lista ✅";
-    } else {
-      alert("Error al subir foto");
-      status.innerText = "Error al subir";
-    }
-  })
-  .catch(() => {
-    alert("Error de conexión");
-    status.innerText = "Reintentar";
-  });
-};
 
 // LÓGICA DE MENÚ HAMBURGUESA
 window.toggleMenu = () => {
@@ -285,6 +226,7 @@ const svData = {
 };
 
 const state = { categoria:"Todos" };
+let productos = [];
 
 function initUbicaciones() {
     const deptoSelect = document.getElementById('depto');
@@ -312,26 +254,13 @@ window.toggleTheme=()=>document.body.dataset.theme=
 document.body.dataset.theme==="dark"?"light":"dark";
 
 window.abrir=()=>modal.style.display="block";
-window.cerrar=()=> {
-    modal.style.display="none";
-    // Limpieza de preview al cerrar
-    document.getElementById("preview").style.display = "none";
-    document.getElementById("uploadStatus").innerText = "Toca para elegir foto";
-    document.getElementById("fotoUrl").value = "";
-};
+window.cerrar=()=>modal.style.display="none";
 
 window.publicar = async () => {
     if(!titulo.value || !precio.value || !depto.value || !muni.value) return alert("Completa los campos obligatorios");
     
-    // Verificación de imagen
-    if(!fotoUrl.value) return alert("Por favor espera a que la imagen se suba o elige una.");
-
     const perfil = obtenerPerfil();
-    const imagenFinal = fotoUrl.value;
-
-    const btn = document.getElementById("btnPublicar");
-    btn.disabled = true;
-    btn.innerText = "Publicando...";
+    const imagenFinal = fotoUrl.value || "https://via.placeholder.com/400?text=Sin+Foto";
 
     await addDoc(collection(db,"productos"),{
         titulo: titulo.value,
@@ -350,8 +279,6 @@ window.publicar = async () => {
     });
     
     titulo.value = ""; descripcion.value = ""; precio.value = ""; fotoUrl.value = "";
-    btn.disabled = false;
-    btn.innerText = "Publicar Ahora";
     cerrar();
     cargar();
 };
@@ -387,10 +314,38 @@ window.filtrar=()=>{
     });
 };
 
+window.compartir = id => {
+    const p = productos.find(x => x.id === id);
+    if(!p) return;
+
+    const text = `¡Mira este producto en CheroMarketApp! ${p.titulo} por $${p.precio}. ${p.descripcion} Ubicación: ${p.muni}, ${p.depto}. Contacto: https://wa.me/503${p.telefono}?text=Interesado%20en%20${encodeURIComponent(p.titulo)}`;
+    const url = window.location.href.split('?')[0] + '?id=' + p.id;
+
+    if(navigator.share){
+        navigator.share({
+            title: p.titulo,
+            text: text,
+            url: url
+        }).catch(console.error);
+    } else {
+        navigator.clipboard.writeText(text + ' ' + url);
+        alert('Detalles copiados al portapapeles!');
+    }
+};
+
 async function cargar(){
     const q=query(collection(db,"productos"),orderBy("creado","desc"));
     const snap=await getDocs(q);
-    render(snap.docs.map(d=>({id:d.id,...d.data()})));
+    productos = snap.docs.map(d=>({id:d.id,...d.data()}));
+    render(productos);
+
+    // Manejar enlace profundo
+    const urlParams = new URLSearchParams(window.location.search);
+    const idParam = urlParams.get('id');
+    if(idParam){
+        const el = document.querySelector(`.card[data-id="${idParam}"]`);
+        if(el) el.scrollIntoView({behavior: 'smooth'});
+    }
 }
 
 function render(lista){
@@ -413,7 +368,7 @@ function render(lista){
             : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket."><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
 
         feed.innerHTML+=`
-        <div class="card" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
+        <div class="card" data-id="${p.id}" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
             ${estaVendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
             <img class="foto" src="${p.foto}" alt="producto" style="${estaVendido ? 'filter:grayscale(1);opacity:0.6' : ''}">
             <div class="info">
@@ -425,6 +380,7 @@ function render(lista){
                 <div class="precio">$${p.precio}</div>
                 <div class="desc">${p.descripcion}</div>
                 <div class="mut"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto} <br><i class="fa-solid fa-user-tag"></i> ${p.vendedor}</div>
+                <button class="btn-share" onclick="compartir('${p.id}')"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
                 ${botonContacto}
                 ${botonesPrivados}
             </div>
