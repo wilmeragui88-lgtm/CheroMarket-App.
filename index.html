@@ -1,82 +1,85 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CheroMarketApp · Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheroMarketApp · Pro 🇸🇻</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root{
+            --azul:#0047AB; --naranja:#FF8C00; --verde:#25D366;
+            --fondo:#f0f2f5; --card:#fff; --txt:#333; --mut:#777; --b:#ddd; --rojo:#c62828
+        }
+        [data-theme=dark]{
+            --fondo:#121212; --card:#1e1e1e; --txt:#eee; --mut:#aaa; --b:#333; --azul:#4c8cff
+        }
+        body{margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--fondo); color:var(--txt); padding-bottom:80px}
+        header{background:var(--card); border-bottom:3px solid var(--azul); padding:15px; text-align:center; position:sticky; top:0; z-index:9}
+        h1{margin:0; color:var(--azul); font-size: 22px;}
+        .sub{font-size:12px; color:var(--mut); margin-bottom: 10px;}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        /* Buscador y Filtros */
+        .buscador-cont{max-width:500px; margin:10px auto; display:flex; gap:8px; position:relative; padding: 0 10px;}
+        .buscador{flex:1; padding:12px 12px 12px 35px; border-radius:25px; border:1px solid var(--b); background:var(--fondo); color: var(--txt)}
+        .search-icon{position:absolute; left:22px; top:15px; color:var(--mut)}
+        .input-precio{width: 80px; padding: 12px; border-radius: 25px; border: 1px solid var(--b); background: var(--fondo); color: var(--txt); text-align: center;}
+        
+        .filtro-depto-cont{max-width:500px; margin: 5px auto; padding: 0 10px;}
+        #filtroDepto{width:100%; padding: 10px; border-radius: 12px; border: 1px solid var(--azul); background: var(--card); color: var(--azul); font-weight: bold;}
 
-<style>
-:root{
---azul:#0047AB;--naranja:#FF8C00;--verde:#25D366;
---fondo:#f0f2f5;--card:#fff;--txt:#333;--mut:#777;--b:#ddd;--rojo:#c62828
-}
-[data-theme=dark]{
---fondo:#121212;--card:#1e1e1e;--txt:#eee;--mut:#aaa;--b:#333;--azul:#4c8cff
-}
-body{margin:0;font-family:Segoe UI;background:var(--fondo);color:var(--txt);padding-bottom:80px}
-header{background:var(--card);border-bottom:3px solid var(--azul);padding:15px;text-align:center;position:sticky;top:0;z-index:9}
-h1{margin:0;color:var(--azul)}
-.sub{font-size:13px;color:var(--mut)}
+        .categorias{display:flex; gap:8px; overflow-x:auto; padding:10px; max-width:500px; margin:auto; scrollbar-width: none;}
+        .cat{padding:8px 14px; border:none; border-radius:20px; font-weight:600; background:var(--b); color: var(--txt); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px}
+        .cat.active{background:var(--azul); color:white}
+        .cat-fav{background: #ffeaa7 !important; color: #d63031 !important;}
 
-/* Botón Menú Hamburguesa */
-.btn-menu{position:absolute;right:15px;top:20px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--azul)}
+        /* Grid de Productos */
+        .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
+        .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
+        .foto{height:160px; width:100%; object-fit:cover; background:#eee}
+        
+        .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
+        .btn-fav.active {color: #ff4757;}
 
-/* Sidebar / Menú Lateral */
-.sidebar{position:fixed;top:0;right:-280px;width:280px;height:100%;background:var(--card);box-shadow:-2px 0 10px rgba(0,0,0,0.2);z-index:100;transition:0.3s;padding:20px;box-sizing:border-box;overflow-y:auto}
-.sidebar.active{right:0}
-.sidebar h2{color:var(--azul);font-size:18px;margin-top:0}
-.sidebar-item{margin-bottom:20px;font-size:14px;line-height:1.4;border-bottom:1px solid var(--b);padding-bottom:10px}
-.close-sidebar{background:var(--b);border:none;padding:8px;width:100%;border-radius:8px;cursor:pointer;margin-bottom:20px}
+        .info{padding:10px; display:flex; flex-direction:column; gap:4px; flex:1}
+        .tag{font-size:9px; border:1px solid var(--azul); color:var(--azul); padding:1px 6px; border-radius:4px; font-weight: bold;}
+        .titulo{font-weight:600; font-size:15px; line-height: 1.2; margin-top: 4px;}
+        .precio{color:var(--naranja); font-size:18px; font-weight:800}
+        .desc{font-size:11px; color:var(--mut); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+        .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
 
-.buscador-cont{max-width:500px;margin:10px auto;display:flex;gap:8px;position:relative}
-.buscador{flex:1;padding:12px;padding-left:40px;border-radius:25px;border:1px solid var(--b);background:var(--fondo)}
-.search-icon{position:absolute;left:15px;top:15px;color:var(--mut)}
-.btn-theme{width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
-.categorias{display:flex;gap:8px;overflow-x:auto;padding:10px;max-width:500px;margin:auto}
-.cat{padding:8px 14px;border:none;border-radius:20px;font-weight:600;background:var(--b);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px}
-.cat.active{background:var(--azul);color:white}
-
-.feed{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;max-width:900px;margin:auto}
-.card{background:var(--card);border-radius:12px;border:1px solid var(--b);overflow:hidden;display:flex;flex-direction:column;transition: 0.3s;position:relative}
-.foto{height:180px;width:100%;object-fit:cover;background:#eee}
-.info{padding:12px;display:flex;flex-direction:column;gap:5px;flex:1}
-.tag-row{display:flex;gap:5px;flex-wrap:wrap}
-.tag{font-size:10px;border:1px solid var(--azul);color:var(--azul);padding:2px 8px;border-radius:6px}
-.tag-estado{background:var(--azul);color:white}
-.tag-vendido{background:var(--rojo);color:white;border-color:var(--rojo)}
-.titulo{font-weight:600;font-size:16px;margin-top:5px}
-.precio{color:var(--naranja);font-size:20px;font-weight:700}
-.desc{font-size:12px;color:var(--txt);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.mut{font-size:11px;color:var(--mut)}
-
-.btn-wa{margin-top:auto;background:var(--verde);color:white;text-decoration:none;text-align:center;padding:10px;border-radius:8px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-del{background:transparent;color:var(--rojo);border:none;padding:5px;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:5px}
-.btn-sold{background:var(--txt);color:var(--card);border:none;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;font-weight:bold}
-.btn-add{position:fixed;bottom:20px;right:20px;width:65px;height:65px;border-radius:50%;background:var(--naranja);color:white;font-size:32px;border:none;box-shadow: 0 4px 10px rgba(0,0,0,0.3);z-index:10;cursor:pointer}
-.btn-share{background:transparent;border:none;color:var(--azul);cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px;padding:5px 0}
-
-#modal, #modalPerfil{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;z-index:99;overflow-y:auto;padding:20px}
-.modal-content{background:var(--card);max-width:500px;margin:auto;padding:20px;border-radius:15px;display:flex;flex-direction:column;gap:12px}
-input,select,textarea{padding:12px;border-radius:8px;border:1px solid var(--b);background:var(--fondo);color:var(--txt);font-family:inherit}
-textarea{resize:none;height:80px}
-.sold-overlay{position:absolute;top:10px;right:10px;background:var(--rojo);color:white;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:12px;z-index:1}
-</style>
+        /* Botones */
+        .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
+        .btn-add{position:fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:var(--naranja); color:white; font-size:28px; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:10; cursor:pointer}
+        
+        /* Modales y Sidebar */
+        #modal, #modalPerfil{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:99; overflow-y:auto; padding:20px}
+        .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
+        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
+        
+        .sidebar{position:fixed; top:0; right:-280px; width:280px; height:100%; background:var(--card); box-shadow:-5px 0 15px rgba(0,0,0,0.3); z-index:100; transition:0.3s; padding:20px; box-sizing:border-box}
+        .sidebar.active{right:0}
+        .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
+        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.5); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
+    </style>
 </head>
-
 <body data-theme="light">
 
 <header>
     <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     <h1>🇸🇻 CheroMarketApp</h1>
-    <div class="sub">Vende y compra en todo El Salvador</div>
+    <div class="sub">Compra y vende entre salvadoreños</div>
 
     <div class="buscador-cont">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input id="buscar" class="buscador" placeholder="Buscar por nombre o lugar…" oninput="filtrar()">
+        <input id="buscar" class="buscador" placeholder="¿Qué buscas?" oninput="filtrar()">
+        <input id="precioMax" class="input-precio" type="number" placeholder="$ Máx" oninput="filtrar()">
         <button class="btn-theme" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
+    </div>
+
+    <div class="filtro-depto-cont">
+        <select id="filtroDepto" onchange="filtrar()">
+            <option value="">📍 Todo El Salvador</option>
+        </select>
     </div>
 
     <div class="categorias">
@@ -84,76 +87,67 @@ textarea{resize:none;height:80px}
         <button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tecnología</button>
         <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
         <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
+        <button class="cat cat-fav" onclick="verFavoritos(this)"><i class="fa-solid fa-heart"></i> Favoritos</button>
         <button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user"></i> Mi Perfil</button>
     </div>
 </header>
 
 <div id="sidebar" class="sidebar">
-    <button class="close-sidebar" onclick="toggleMenu()"><i class="fa-solid fa-xmark"></i> Cerrar Menú</button>
-    
-    <div class="sidebar-item">
-        <h2><i class="fa-solid fa-file-contract"></i> Términos y Condiciones</h2>
-        <p>Al usar CheroMarketApp, aceptas que la plataforma solo facilita el contacto entre usuarios. No nos hacemos responsables por transacciones fallidas.</p>
-    </div>
-
-    <div class="sidebar-item">
-        <h2><i class="fa-solid fa-gavel"></i> Avisos Legales</h2>
-        <p>Queda prohibida la venta de artículos ilícitos. Cada usuario es responsable legalmente por lo que publica y vende.</p>
-    </div>
-
-    <div class="sidebar-item" style="color:var(--rojo)">
-        <h2><i class="fa-solid fa-shield-halved"></i> Guía Anti-Estafas</h2>
-        <p><strong>1.</strong> No envíes dinero por adelantado.<br>
-        <strong>2.</strong> Reúnete en lugares públicos y seguros.<br>
-        <strong>3.</strong> Revisa el producto antes de pagar.</p>
-    </div>
-    
-    <div class="sidebar-item">
-        <p class="mut">Versión 1.2 Pro · 2026</p>
+    <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
+    <h3>Menú Principal</h3>
+    <button onclick="compartirApp()" style="width:100%; background:var(--azul); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom: 15px;">
+        <i class="fa-solid fa-share-nodes"></i> Recomendar App
+    </button>
+    <div style="font-size: 13px; color: var(--mut)">
+        <p><strong>Seguridad:</strong> No envíes dinero sin ver el producto.</p>
+        <hr>
+        <p>Versión 2.0 Pro · 2026</p>
     </div>
 </div>
 
 <div id="feed" class="feed"></div>
 <button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
 
-<div id="modalPerfil">
-    <div class="modal-content">
-        <h3 style="margin:0"><i class="fa-solid fa-user-gear"></i> Configurar mi Perfil</h3>
-        <p class="mut">Estos datos aparecerán en tus anuncios para que te contacten.</p>
-        <input id="perfilNombre" placeholder="Tu nombre o negocio">
-        <input id="perfilTelefono" type="number" placeholder="Tu WhatsApp (ej: 77771234)">
-        <button type="button" onclick="guardarPerfil()" style="background:var(--verde);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Guardar Cambios</button>
-        <button type="button" onclick="cerrarPerfil()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cerrar</button>
-    </div>
-</div>
-
 <div id="modal">
     <div class="modal-content">
-        <h3 style="margin:0"><i class="fa-solid fa-tag"></i> Nuevo Anuncio</h3>
+        <h3 style="margin:0">Nuevo Anuncio</h3>
         <input id="titulo" placeholder="¿Qué vendes?">
-        <textarea id="descripcion" placeholder="Describe tu producto (detalles, fallas, etc.)"></textarea>
+        <textarea id="descripcion" placeholder="Detalles del producto..."></textarea>
         <div style="display:flex;gap:10px">
-            <input id="precio" type="number" step="0.01" placeholder="Precio $" style="flex:1">
+            <input id="precio" type="number" placeholder="Precio $" style="flex:1">
             <select id="estado" style="flex:1">
                 <option value="Nuevo">Nuevo</option>
                 <option value="Usado">Usado</option>
             </select>
         </div>
-        <input id="fotoUrl" placeholder="URL de la imagen (ej: https://...)">
+        
+        <div style="border:1px dashed var(--azul); padding:10px; border-radius:8px; text-align:center">
+            <input type="file" id="fotoFile" accept="image/*" style="font-size:12px; width:100%">
+            <img id="imgPrevia" style="width:100%; height:120px; object-fit:cover; display:none; margin-top:10px; border-radius:5px">
+        </div>
+
         <select id="categoria">
-            <option>Tecnología</option>
-            <option>Ropa</option>
-            <option>Comida</option>
-            <option>Otros</option>
+            <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
         </select>
         <select id="depto" onchange="actualizarMunicipios()">
-            <option value="">Selecciona Departamento</option>
+            <option value="">Departamento</option>
         </select>
         <select id="muni">
-            <option value="">Selecciona Municipio</option>
+            <option value="">Municipio</option>
         </select>
-        <button type="button" onclick="publicar()" style="background:var(--azul);color:white;padding:15px;border:none;border-radius:8px;font-weight:bold;cursor:pointer">Publicar Ahora</button>
-        <button type="button" onclick="cerrar()" style="background:transparent;color:var(--mut);border:none;cursor:pointer">Cancelar</button>
+        
+        <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
+        <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
+    </div>
+</div>
+
+<div id="modalPerfil">
+    <div class="modal-content">
+        <h3>Mi Perfil de Vendedor</h3>
+        <input id="perfilNombre" placeholder="Tu nombre">
+        <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
+        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar</button>
+        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
     </div>
 </div>
 
@@ -162,235 +156,183 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
-authDomain:"cheromarket.firebaseapp.com",
-projectId:"cheromarket",
-storageBucket:"cheromarket.firebasestorage.app",
-messagingSenderId:"777368646513",
-appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
+    apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
+    authDomain:"cheromarket.firebaseapp.com",
+    projectId:"cheromarket",
+    storageBucket:"cheromarket.firebasestorage.app",
+    messagingSenderId:"777368646513",
+    appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// LÓGICA DE MENÚ HAMBURGUESA
-window.toggleMenu = () => {
-    document.getElementById('sidebar').classList.toggle('active');
-};
-
-// --- LÓGICA DE IDENTIDAD Y PERFIL ---
-if(!localStorage.getItem("mi_id_usuario")) {
-    localStorage.setItem("mi_id_usuario", "user_" + Math.random().toString(36).substr(2, 9));
-}
-const MI_ID = localStorage.getItem("mi_id_usuario");
-
-const obtenerPerfil = () => ({
-    nombre: localStorage.getItem("perfil_nombre") || "Vendedor Anónimo",
-    telefono: localStorage.getItem("perfil_telefono") || "77771234"
-});
-
-window.abrirPerfil = () => {
-    const p = obtenerPerfil();
-    document.getElementById('perfilNombre').value = p.nombre === "Vendedor Anónimo" ? "" : p.nombre;
-    document.getElementById('perfilTelefono').value = p.telefono === "77771234" ? "" : p.telefono;
-    document.getElementById('modalPerfil').style.display = "block";
-};
-
-window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
-
-window.guardarPerfil = () => {
-    const nom = document.getElementById('perfilNombre').value.trim();
-    const tel = document.getElementById('perfilTelefono').value.trim();
-    if(!nom || !tel) return alert("Por favor completa tu nombre y teléfono");
-    localStorage.setItem("perfil_nombre", nom);
-    localStorage.setItem("perfil_telefono", tel);
-    alert("Perfil actualizado correctamente");
-    cerrarPerfil();
-};
-
+// --- DATOS Y ESTADO ---
 const svData = {
-"Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
-"Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
-"Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
-"Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
-"La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
-"San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
-"Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
-"La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
-"Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
-"San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
-"Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
-"San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
-"Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
-"La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
+    "Ahuachapán": ["Ahuachapán", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez"],
+    "Santa Ana": ["Santa Ana", "Chalchuapa", "Metapán", "Coatepeque", "El Congo", "San Sebastián Salitrillo"],
+    "Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Izalco", "Juayúa", "Nahuizalco"],
+    "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Colón", "Quezaltepeque", "San Juan Opico", "Zaragoza"],
+    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Ilopango", "Apopa", "Santa Tecla", "San Marcos", "Delgado"],
+    "San Miguel": ["San Miguel", "Chinameca", "Ciudad Barrios", "El Tránsito", "Lolotique", "Moncagua"],
+    "Usulután": ["Usulután", "Berlin", "Jiquilisco", "Santiago de María", "Puerto El Triunfo"],
+    "La Unión": ["La Unión", "Santa Rosa de Lima", "Conchagua", "Pasaquina"],
+    "Cabañas": ["Sensuntepeque", "Ilobasco"],
+    "Cuscatlán": ["Cojutepeque", "Suchitoto"],
+    "La Paz": ["Zacatecoluca", "Olocuilta", "San Luis Talpa"],
+    "Morazán": ["San Francisco Gotera", "Perquín"],
+    "San Vicente": ["San Vicente", "San Sebastián"],
+    "Chalatenango": ["Chalatenango", "La Palma", "Nueva Concepción"]
 };
 
-const state = { categoria:"Todos" };
 let productos = [];
+let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
+const state = { categoria: "Todos" };
+const MI_ID = localStorage.getItem("mi_id_usuario") || "user_" + Math.random().toString(36).substr(2, 9);
+localStorage.setItem("mi_id_usuario", MI_ID);
 
-function initUbicaciones() {
-    const deptoSelect = document.getElementById('depto');
-    Object.keys(svData).forEach(d => {
-        let opt = document.createElement('option');
-        opt.value = d; opt.innerText = d;
-        deptoSelect.appendChild(opt);
-    });
-}
+// --- PROCESAMIENTO DE IMAGEN ---
+let imagenBase64 = "";
+document.getElementById('fotoFile').onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX = 800;
+            let w = img.width, h = img.height;
+            if (w > MAX) { h *= MAX/w; w = MAX; }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            imagenBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('imgPrevia').src = imagenBase64;
+            document.getElementById('imgPrevia').style.display = "block";
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
+// --- FUNCIONES CORE ---
+window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
+window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
+window.abrir = () => document.getElementById('modal').style.display = "block";
+window.cerrar = () => document.getElementById('modal').style.display = "none";
 
 window.actualizarMunicipios = () => {
-    const deptoVal = document.getElementById('depto').value;
-    const muniSelect = document.getElementById('muni');
-    muniSelect.innerHTML = '<option value="">Selecciona Municipio</option>';
-    if(deptoVal) {
-        svData[deptoVal].forEach(m => {
-            let opt = document.createElement('option');
-            opt.value = m; opt.innerText = m;
-            muniSelect.appendChild(opt);
-        });
-    }
+    const d = document.getElementById('depto').value;
+    const m = document.getElementById('muni');
+    m.innerHTML = '<option value="">Municipio</option>';
+    if(d) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
 
-window.toggleTheme=()=>document.body.dataset.theme=
-document.body.dataset.theme==="dark"?"light":"dark";
-
-window.abrir=()=>modal.style.display="block";
-window.cerrar=()=>modal.style.display="none";
+const init = () => {
+    const dSelect = document.getElementById('depto');
+    const fDepto = document.getElementById('filtroDepto');
+    Object.keys(svData).forEach(d => {
+        const opt = `<option value="${d}">${d}</option>`;
+        dSelect.innerHTML += opt;
+        fDepto.innerHTML += opt;
+    });
+};
 
 window.publicar = async () => {
-    if(!titulo.value || !precio.value || !depto.value || !muni.value) return alert("Completa los campos obligatorios");
-    
-    const perfil = obtenerPerfil();
-    const imagenFinal = fotoUrl.value || "https://via.placeholder.com/400?text=Sin+Foto";
+    const t = document.getElementById('titulo').value;
+    const p = document.getElementById('precio').value;
+    const dep = document.getElementById('depto').value;
+    if(!t || !p || !dep || !imagenBase64) return alert("Completa los datos y la foto.");
 
-    await addDoc(collection(db,"productos"),{
-        titulo: titulo.value,
-        descripcion: descripcion.value || "Sin descripción adicional",
-        precio: Number(precio.value).toFixed(2),
-        estado: estado.value,
-        foto: imagenFinal,
-        categoria: categoria.value,
-        depto: depto.value,
-        muni: muni.value,
-        vendedor: perfil.nombre,
-        telefono: perfil.telefono,
-        creado: Date.now(),
-        duenoId: MI_ID,
-        vendido: false
+    await addDoc(collection(db,"productos"), {
+        titulo: t, descripcion: document.getElementById('descripcion').value,
+        precio: parseFloat(p).toFixed(2), estado: document.getElementById('estado').value,
+        foto: imagenBase64, categoria: document.getElementById('categoria').value,
+        depto: dep, muni: document.getElementById('muni').value,
+        vendedor: localStorage.getItem("perfil_nombre") || "Anonimo",
+        telefono: localStorage.getItem("perfil_telefono") || "70000000",
+        creado: Date.now(), duenoId: MI_ID, vendido: false
     });
-    
-    titulo.value = ""; descripcion.value = ""; precio.value = ""; fotoUrl.value = "";
-    cerrar();
-    cargar();
+    location.reload();
 };
 
-window.eliminar = async id => {
-    if(confirm("¿Eliminar este anuncio permanentemente?")){
-        await deleteDoc(doc(db,"productos",id));
-        cargar();
-    }
+window.toggleFavorito = (id) => {
+    favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
+    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
+    render(productos);
 };
 
-window.marcarVendido = async id => {
-    if(confirm("¿Marcar este producto como vendido? Ya no se podrá contactar.")){
-        await updateDoc(doc(db,"productos",id), { vendido: true });
-        cargar();
-    }
+window.filtrar = () => {
+    const txt = document.getElementById('buscar').value.toLowerCase();
+    const dep = document.getElementById('filtroDepto').value;
+    const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
+
+    const filtrados = productos.filter(p => {
+        const cTxt = p.titulo.toLowerCase().includes(txt) || p.muni.toLowerCase().includes(txt);
+        const cDep = dep === "" || p.depto === dep;
+        const cPre = parseFloat(p.precio) <= pMax;
+        let cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
+        return cTxt && cDep && cPre && cCat;
+    });
+    render(filtrados);
 };
 
-window.setCat=(c,b)=>{
-    state.categoria=c;
-    document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+window.setCat = (c, b) => {
+    state.categoria = c;
+    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
     b.classList.add("active");
     filtrar();
 };
 
-window.filtrar=()=>{
-    const t=buscar.value.toLowerCase();
-    document.querySelectorAll(".card").forEach(c=>{
-        c.style.display=
-        (c.dataset.t.includes(t) || c.dataset.l.includes(t)) &&
-        (state.categoria==="Todos"||c.dataset.c===state.categoria)
-        ?"flex":"none";
-    });
-};
+window.verFavoritos = (b) => setCat("Favoritos", b);
 
-window.compartir = id => {
-    const p = productos.find(x => x.id === id);
-    if(!p) return;
-
-    const text = `¡Mira este producto en CheroMarketApp! ${p.titulo} por $${p.precio}. ${p.descripcion} Ubicación: ${p.muni}, ${p.depto}. Contacto: https://wa.me/503${p.telefono}?text=Interesado%20en%20${encodeURIComponent(p.titulo)}`;
-    const url = window.location.href.split('?')[0] + '?id=' + p.id;
-
-    if(navigator.share){
-        navigator.share({
-            title: p.titulo,
-            text: text,
-            url: url
-        }).catch(console.error);
-    } else {
-        navigator.clipboard.writeText(text + ' ' + url);
-        alert('Detalles copiados al portapapeles!');
-    }
-};
-
-async function cargar(){
-    const q=query(collection(db,"productos"),orderBy("creado","desc"));
-    const snap=await getDocs(q);
-    productos = snap.docs.map(d=>({id:d.id,...d.data()}));
+async function cargar() {
+    const q = query(collection(db, "productos"), orderBy("creado", "desc"));
+    const snap = await getDocs(q);
+    productos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render(productos);
-
-    // Manejar enlace profundo
-    const urlParams = new URLSearchParams(window.location.search);
-    const idParam = urlParams.get('id');
-    if(idParam){
-        const el = document.querySelector(`.card[data-id="${idParam}"]`);
-        if(el) el.scrollIntoView({behavior: 'smooth'});
-    }
 }
 
-function render(lista){
-    feed.innerHTML="";
-    lista.forEach(p=>{
-        const esDueno = p.duenoId === MI_ID;
-        const estaVendido = p.vendido === true;
-
-        let botonesPrivados = "";
-        if(esDueno){
-            botonesPrivados = `
-                <div style="display:flex;gap:10px;margin-top:5px">
-                    ${!estaVendido ? `<button class="btn-sold" onclick="marcarVendido('${p.id}')">Marcar Vendido</button>` : ''}
-                    <button class="btn-del" onclick="eliminar('${p.id}')"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
-                </div>`;
-        }
-
-        const botonContacto = estaVendido 
-            ? `<div style="text-align:center;color:var(--rojo);font-weight:bold;padding:10px;border:1px solid var(--rojo);border-radius:8px">NO DISPONIBLE</div>`
-            : `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola! Me interesa el producto: ${p.titulo} ($${p.precio}) que vi en CheroMarket."><i class="fa-brands fa-whatsapp"></i> Contactar</a>`;
-
-        feed.innerHTML+=`
-        <div class="card" data-id="${p.id}" data-t="${p.titulo.toLowerCase()}" data-l="${p.muni.toLowerCase()}" data-c="${p.categoria}">
-            ${estaVendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
-            <img class="foto" src="${p.foto}" alt="producto" style="${estaVendido ? 'filter:grayscale(1);opacity:0.6' : ''}">
-            <div class="info">
-                <div class="tag-row">
+function render(lista) {
+    const feed = document.getElementById('feed');
+    feed.innerHTML = "";
+    lista.forEach(p => {
+        const esFav = favoritos.includes(p.id);
+        const esMio = p.duenoId === MI_ID;
+        feed.innerHTML += `
+            <div class="card">
+                <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')">
+                    <i class="${esFav?'fa-solid':'fa-regular'} fa-heart"></i>
+                </button>
+                ${p.vendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
+                <img class="foto" src="${p.foto}">
+                <div class="info">
                     <span class="tag">${p.categoria}</span>
-                    <span class="tag tag-estado ${estaVendido ? 'tag-vendido' : ''}">${estaVendido ? 'Vendido' : p.estado}</span>
+                    <div class="titulo">${p.titulo}</div>
+                    <div class="precio">$${p.precio}</div>
+                    <div class="desc">${p.descripcion}</div>
+                    <div class="loc"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto}</div>
+                    ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Me+interesa+${p.titulo}"><i class="fa-brands fa-whatsapp"></i> Contactar</a>` : ''}
                 </div>
-                <div class="titulo">${p.titulo}</div>
-                <div class="precio">$${p.precio}</div>
-                <div class="desc">${p.descripcion}</div>
-                <div class="mut"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto} <br><i class="fa-solid fa-user-tag"></i> ${p.vendedor}</div>
-                <button class="btn-share" onclick="compartir('${p.id}')"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
-                ${botonContacto}
-                ${botonesPrivados}
-            </div>
-        </div>`;
+            </div>`;
     });
 }
 
-initUbicaciones();
+// Inicialización de perfil
+window.abrirPerfil = () => {
+    document.getElementById('perfilNombre').value = localStorage.getItem("perfil_nombre") || "";
+    document.getElementById('perfilTelefono').value = localStorage.getItem("perfil_telefono") || "";
+    document.getElementById('modalPerfil').style.display = "block";
+};
+window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
+window.guardarPerfil = () => {
+    localStorage.setItem("perfil_nombre", document.getElementById('perfilNombre').value);
+    localStorage.setItem("perfil_telefono", document.getElementById('perfilTelefono').value);
+    cerrarPerfil();
+};
+
+init();
 cargar();
 </script>
-
 </body>
 </html>
