@@ -256,6 +256,20 @@ window.publicar = async () => {
     location.reload();
 };
 
+window.eliminar = async id => {
+    if(confirm("¿Eliminar este anuncio permanentemente?")){
+        await deleteDoc(doc(db,"productos",id));
+        cargar();
+    }
+};
+
+window.marcarVendido = async id => {
+    if(confirm("¿Marcar este producto como vendido? Ya no se podrá contactar.")){
+        await updateDoc(doc(db,"productos",id), { vendido: true });
+        cargar();
+    }
+};
+
 window.toggleFavorito = (id) => {
     favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
     localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
