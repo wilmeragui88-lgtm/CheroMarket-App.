@@ -35,6 +35,7 @@
         /* Grid de Productos */
         .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
         .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
+        .is-sold { filter: grayscale(0.6); opacity: 0.8; }
         .foto{height:160px; width:100%; object-fit:cover; background:#eee}
         
         .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
@@ -48,18 +49,23 @@
         .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
 
         /* Botones */
-        .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
+        .btn-wa{background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px; flex:1}
+        .btn-share-item{background:var(--azul); color:white; border:none; border-radius:8px; width:40px; cursor:pointer}
+        .btn-sold-action{margin-top:8px; background:var(--txt); color:var(--card); border:none; padding:8px; border-radius:5px; font-size:11px; cursor:pointer; font-weight:bold}
+        
         .btn-add{position:fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:var(--naranja); color:white; font-size:28px; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:10; cursor:pointer}
         
-        /* Modales y Sidebar */
-        #modal, #modalPerfil{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:99; overflow-y:auto; padding:20px}
-        .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
-        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
-        
+        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.6); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1; font-size: 20px; letter-spacing: 2px;}
+
+        /* Sidebar */
         .sidebar{position:fixed; top:0; right:-280px; width:280px; height:100%; background:var(--card); box-shadow:-5px 0 15px rgba(0,0,0,0.3); z-index:100; transition:0.3s; padding:20px; box-sizing:border-box}
         .sidebar.active{right:0}
         .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
-        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.5); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
+
+        /* Modales */
+        #modal, #modalPerfil{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:99; overflow-y:auto; padding:20px}
+        .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
+        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
     </style>
 </head>
 <body data-theme="light">
@@ -120,12 +126,10 @@
                 <option value="Usado">Usado</option>
             </select>
         </div>
-        
         <div style="border:1px dashed var(--azul); padding:10px; border-radius:8px; text-align:center">
             <input type="file" id="fotoFile" accept="image/*" style="font-size:12px; width:100%">
             <img id="imgPrevia" style="width:100%; height:120px; object-fit:cover; display:none; margin-top:10px; border-radius:5px">
         </div>
-
         <select id="categoria">
             <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
         </select>
@@ -135,7 +139,6 @@
         <select id="muni">
             <option value="">Municipio</option>
         </select>
-        
         <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
         <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
     </div>
@@ -153,7 +156,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -167,13 +170,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- DATOS Y ESTADO ---
+// --- DATOS ---
 const svData = {
     "Ahuachapán": ["Ahuachapán", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Jujutla", "San Francisco Menéndez"],
     "Santa Ana": ["Santa Ana", "Chalchuapa", "Metapán", "Coatepeque", "El Congo", "San Sebastián Salitrillo"],
     "Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Izalco", "Juayúa", "Nahuizalco"],
     "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Colón", "Quezaltepeque", "San Juan Opico", "Zaragoza"],
-    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Ilopango", "Apopa", "Santa Tecla", "San Marcos", "Delgado"],
+    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Ilopango", "Apopa", "San Marcos", "Delgado"],
     "San Miguel": ["San Miguel", "Chinameca", "Ciudad Barrios", "El Tránsito", "Lolotique", "Moncagua"],
     "Usulután": ["Usulután", "Berlin", "Jiquilisco", "Santiago de María", "Puerto El Triunfo"],
     "La Unión": ["La Unión", "Santa Rosa de Lima", "Conchagua", "Pasaquina"],
@@ -191,7 +194,7 @@ const state = { categoria: "Todos" };
 const MI_ID = localStorage.getItem("mi_id_usuario") || "user_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("mi_id_usuario", MI_ID);
 
-// --- PROCESAMIENTO DE IMAGEN ---
+// --- IMAGENES ---
 let imagenBase64 = "";
 document.getElementById('fotoFile').onchange = e => {
     const file = e.target.files[0];
@@ -215,11 +218,11 @@ document.getElementById('fotoFile').onchange = e => {
     reader.readAsDataURL(file);
 };
 
-// --- FUNCIONES CORE ---
+// --- CORE ---
 window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
 window.abrir = () => document.getElementById('modal').style.display = "block";
-window.cerrar = () => document.getElementById('modal').style.display = "none";
+window.cerrar = () => { document.getElementById('modal').style.display = "none"; imagenBase64 = ""; };
 
 window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value;
@@ -228,16 +231,7 @@ window.actualizarMunicipios = () => {
     if(d) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
 
-const init = () => {
-    const dSelect = document.getElementById('depto');
-    const fDepto = document.getElementById('filtroDepto');
-    Object.keys(svData).forEach(d => {
-        const opt = `<option value="${d}">${d}</option>`;
-        dSelect.innerHTML += opt;
-        fDepto.innerHTML += opt;
-    });
-};
-
+// --- ACCIONES ---
 window.publicar = async () => {
     const t = document.getElementById('titulo').value;
     const p = document.getElementById('precio').value;
@@ -249,26 +243,34 @@ window.publicar = async () => {
         precio: parseFloat(p).toFixed(2), estado: document.getElementById('estado').value,
         foto: imagenBase64, categoria: document.getElementById('categoria').value,
         depto: dep, muni: document.getElementById('muni').value,
-        vendedor: localStorage.getItem("perfil_nombre") || "Anonimo",
-        telefono: localStorage.getItem("perfil_telefono") || "70000000",
+        vendedor: localStorage.getItem("perfil_nombre") || "Anónimo",
+        telefono: localStorage.getItem("perfil_telefono") || "00000000",
         creado: Date.now(), duenoId: MI_ID, vendido: false
     });
     location.reload();
 };
 
-window.eliminar = async id => {
-    if(confirm("¿Eliminar este anuncio permanentemente?")){
-        await deleteDoc(doc(db,"productos",id));
-        cargar();
-    }
+window.marcarVendido = async (id) => {
+    if(!confirm("¿Confirmas que ya vendiste este producto?")) return;
+    try {
+        const docRef = doc(db, "productos", id);
+        await updateDoc(docRef, { vendido: true });
+        productos = productos.map(p => p.id === id ? {...p, vendido: true} : p);
+        render(productos);
+    } catch (e) { alert("Error al actualizar"); }
 };
 
-window.marcarVendido = async id => {
-    if(confirm("¿Marcar este producto como vendido? Ya no se podrá contactar.")){
-        await updateDoc(doc(db,"productos",id), { vendido: true });
-        cargar();
-    }
+window.compartirProducto = async (titulo, precio) => {
+    const data = {
+        title: `CheroMarket: ${titulo}`,
+        text: `¡Mirá este volado! ${titulo} a solo $${precio} en CheroMarket SV.`,
+        url: window.location.href
+    };
+    if (navigator.share) await navigator.share(data);
+    else { navigator.clipboard.writeText(data.url); alert("Link copiado"); }
 };
+
+window.compartirApp = () => window.compartirProducto("CheroMarketApp", "los mejores precios");
 
 window.toggleFavorito = (id) => {
     favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
@@ -294,7 +296,7 @@ window.filtrar = () => {
 window.setCat = (c, b) => {
     state.categoria = c;
     document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
+    if(b) b.classList.add("active");
     filtrar();
 };
 
@@ -313,8 +315,9 @@ function render(lista) {
     lista.forEach(p => {
         const esFav = favoritos.includes(p.id);
         const esMio = p.duenoId === MI_ID;
+        
         feed.innerHTML += `
-            <div class="card">
+            <div class="card ${p.vendido ? 'is-sold' : ''}">
                 <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')">
                     <i class="${esFav?'fa-solid':'fa-regular'} fa-heart"></i>
                 </button>
@@ -326,13 +329,19 @@ function render(lista) {
                     <div class="precio">$${p.precio}</div>
                     <div class="desc">${p.descripcion}</div>
                     <div class="loc"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto}</div>
-                    ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Me+interesa+${p.titulo}"><i class="fa-brands fa-whatsapp"></i> Contactar</a>` : ''}
+                    
+                    <div style="display:flex; gap:5px; margin-top:auto">
+                        ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Me+interesa+${p.titulo}"><i class="fa-brands fa-whatsapp"></i> Chat</a>` : ''}
+                        <button class="btn-share-item" onclick="compartirProducto('${p.titulo}', '${p.precio}')"><i class="fa-solid fa-share-nodes"></i></button>
+                    </div>
+
+                    ${esMio && !p.vendido ? `<button class="btn-sold-action" onclick="marcarVendido('${p.id}')"><i class="fa-solid fa-check"></i> Marcar Vendido</button>` : ''}
                 </div>
             </div>`;
     });
 }
 
-// Inicialización de perfil
+// Perfil
 window.abrirPerfil = () => {
     document.getElementById('perfilNombre').value = localStorage.getItem("perfil_nombre") || "";
     document.getElementById('perfilTelefono').value = localStorage.getItem("perfil_telefono") || "";
@@ -342,10 +351,19 @@ window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display
 window.guardarPerfil = () => {
     localStorage.setItem("perfil_nombre", document.getElementById('perfilNombre').value);
     localStorage.setItem("perfil_telefono", document.getElementById('perfilTelefono').value);
+    alert("Perfil guardado");
     cerrarPerfil();
 };
 
-init();
+// Init
+const dSelect = document.getElementById('depto');
+const fDepto = document.getElementById('filtroDepto');
+Object.keys(svData).forEach(d => {
+    const opt = `<option value="${d}">${d}</option>`;
+    dSelect.innerHTML += opt;
+    fDepto.innerHTML += opt;
+});
+
 cargar();
 </script>
 </body>
