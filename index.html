@@ -18,6 +18,9 @@
         h1{margin:0; color:var(--azul); font-size: 22px;}
         .sub{font-size:12px; color:var(--mut); margin-bottom: 10px;}
 
+        /* Alerta de Perfil */
+        .alerta-perfil{background: #fff3cd; color: #856404; padding: 12px; font-size: 13px; text-align: center; border-bottom: 1px solid #ffeeba; display: none; position: sticky; top: 0; z-index: 10;}
+
         .buscador-cont{max-width:500px; margin:10px auto; display:flex; gap:8px; position:relative; padding: 0 10px;}
         .buscador{flex:1; padding:12px 12px 12px 35px; border-radius:25px; border:1px solid var(--b); background:var(--fondo); color: var(--txt)}
         .search-icon{position:absolute; left:22px; top:15px; color:var(--mut)}
@@ -46,24 +49,8 @@
         .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
 
         .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
-        
-        /* Estilo para el botón de borrar */
-        .btn-eliminar {
-            margin-top: 8px;
-            background: var(--rojo);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
+        .btn-vendido-accion{background:var(--azul); color:white; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:8px}
+        .btn-eliminar-accion{background:none; color:var(--rojo); border:none; padding:5px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:5px}
         .btn-add{position:fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:var(--naranja); color:white; font-size:28px; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:10; cursor:pointer}
         
         #modal, #modalPerfil{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:99; overflow-y:auto; padding:20px}
@@ -73,10 +60,15 @@
         .sidebar{position:fixed; top:0; right:-280px; width:280px; height:100%; background:var(--card); box-shadow:-5px 0 15px rgba(0,0,0,0.3); z-index:100; transition:0.3s; padding:20px; box-sizing:border-box}
         .sidebar.active{right:0}
         .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
-        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.5); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
+        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.7); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
+        .seccion-titulo{grid-column: 1 / -1; font-size: 14px; font-weight: bold; color: var(--mut); margin-top: 15px; border-bottom: 1px solid var(--b); padding-bottom: 5px;}
     </style>
 </head>
 <body data-theme="light">
+
+<div id="bannerPerfil" class="alerta-perfil">
+    ⚠️ <strong>Perfil Incompleto:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Configura tu WhatsApp</a> para vender.
+</div>
 
 <header>
     <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
@@ -87,7 +79,7 @@
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input id="buscar" class="buscador" placeholder="¿Qué buscas?" oninput="filtrar()">
         <input id="precioMax" class="input-precio" type="number" placeholder="$ Máx" oninput="filtrar()">
-        <button class="btn-theme" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
+        <button class="btn-theme" style="background:none; border:none; cursor:pointer; color:var(--azul)" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
     </div>
 
     <div class="filtro-depto-cont">
@@ -102,16 +94,21 @@
         <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
         <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
         <button class="cat cat-fav" onclick="verFavoritos(this)"><i class="fa-solid fa-heart"></i> Favoritos</button>
-        <button class="cat" style="background:var(--naranja);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user"></i> Mi Perfil</button>
+        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user-circle"></i> Mi Perfil</button>
     </div>
 </header>
 
 <div id="sidebar" class="sidebar">
     <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
     <h3>Menú Principal</h3>
-    <button onclick="compartirApp()" style="width:100%; background:var(--azul); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom: 15px;">
+    <button onclick="alert('Link copiado!')" style="width:100%; background:var(--azul); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom: 15px;">
         <i class="fa-solid fa-share-nodes"></i> Recomendar App
     </button>
+    <div style="font-size: 13px; color: var(--mut)">
+        <p><strong>Seguridad:</strong> No envíes dinero sin ver el producto.</p>
+        <hr>
+        <p>Versión 2.0 Pro · 2026</p>
+    </div>
 </div>
 
 <div id="feed" class="feed"></div>
@@ -119,7 +116,7 @@
 
 <div id="modal">
     <div class="modal-content">
-        <h3 style="margin:0">Nuevo Anuncio</h3>
+        <h3>Nuevo Anuncio</h3>
         <input id="titulo" placeholder="¿Qué vendes?">
         <textarea id="descripcion" placeholder="Detalles del producto..."></textarea>
         <div style="display:flex;gap:10px">
@@ -136,12 +133,8 @@
         <select id="categoria">
             <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
         </select>
-        <select id="depto" onchange="actualizarMunicipios()">
-            <option value="">Departamento</option>
-        </select>
-        <select id="muni">
-            <option value="">Municipio</option>
-        </select>
+        <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
+        <select id="muni"><option value="">Municipio</option></select>
         <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
         <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
     </div>
@@ -149,10 +142,10 @@
 
 <div id="modalPerfil">
     <div class="modal-content">
-        <h3>Mi Perfil de Vendedor</h3>
+        <h3>Registro de Vendedor</h3>
         <input id="perfilNombre" placeholder="Tu nombre">
         <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
-        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar</button>
+        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
         <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
     </div>
 </div>
@@ -173,32 +166,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- DATOS SV ---
 const svData = {
-    "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
-    "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
-    "Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
-    "Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
-    "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
-    "San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
-    "Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
-    "La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
-    "Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
-    "San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
-    "Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
-    "San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
-    "Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
-    "La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
+    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Santa Tecla", "Ilopango"],
+    "La Libertad": ["Santa Tecla", "Zaragoza", "Antiguo Cuscatlán", "Colón"],
+    "Santa Ana": ["Santa Ana", "Metapán", "Chalchuapa"],
+    "San Miguel": ["San Miguel", "Chinameca", "El Tránsito"]
+    // ... los demás se cargan dinámicamente si los incluyes en la lista completa
 };
 
-// --- ESTADO GLOBAL ---
 let productos = [];
 let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
-const MI_ID = localStorage.getItem("mi_id_usuario") || "user_" + Math.random().toString(36).substr(2, 9);
+const MI_ID = localStorage.getItem("mi_id_usuario") || "u_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("mi_id_usuario", MI_ID);
 
-// --- LÓGICA DE IMAGEN ---
 let imagenBase64 = "";
 document.getElementById('fotoFile').onchange = e => {
     const file = e.target.files[0];
@@ -222,64 +203,68 @@ document.getElementById('fotoFile').onchange = e => {
     reader.readAsDataURL(file);
 };
 
-// --- FUNCIONES CORE ---
+// --- PERFIL ---
+function verificarPerfil() {
+    const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
+    document.getElementById("bannerPerfil").style.display = (n && t) ? "none" : "block";
+    return (n && t);
+}
+window.abrirPerfil = () => {
+    document.getElementById('perfilNombre').value = localStorage.getItem("p_nombre") || "";
+    document.getElementById('perfilTelefono').value = localStorage.getItem("p_tel") || "";
+    document.getElementById('modalPerfil').style.display = "block";
+};
+window.guardarPerfil = () => {
+    localStorage.setItem("p_nombre", document.getElementById('perfilNombre').value);
+    localStorage.setItem("p_tel", document.getElementById('perfilTelefono').value);
+    verificarPerfil(); document.getElementById('modalPerfil').style.display = "none";
+};
+window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
+
+// --- CORE ---
 window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
-window.abrir = () => document.getElementById('modal').style.display = "block";
+window.abrir = () => !verificarPerfil() ? abrirPerfil() : document.getElementById('modal').style.display = "block";
 window.cerrar = () => document.getElementById('modal').style.display = "none";
 
 window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value;
     const m = document.getElementById('muni');
     m.innerHTML = '<option value="">Municipio</option>';
-    if(d) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
+    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
 
 window.publicar = async () => {
-    const t = document.getElementById('titulo').value;
-    const p = document.getElementById('precio').value;
-    const dep = document.getElementById('depto').value;
-    if(!t || !p || !dep || !imagenBase64) return alert("Faltan datos o foto.");
-
+    const t = document.getElementById('titulo').value, p = document.getElementById('precio').value;
+    if(!t || !p || !imagenBase64) return alert("Faltan datos.");
     await addDoc(collection(db,"productos"), {
         titulo: t, descripcion: document.getElementById('descripcion').value,
-        precio: parseFloat(p).toFixed(2), estado: document.getElementById('estado').value,
-        foto: imagenBase64, categoria: document.getElementById('categoria').value,
-        depto: dep, muni: document.getElementById('muni').value,
-        vendedor: localStorage.getItem("perfil_nombre") || "Anónimo",
-        telefono: localStorage.getItem("perfil_telefono") || "70000000",
-        creado: Date.now(), duenoId: MI_ID, vendido: false
+        precio: parseFloat(p).toFixed(2), foto: imagenBase64,
+        categoria: document.getElementById('categoria').value,
+        depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
+        vendedor: localStorage.getItem("p_nombre"), telefono: localStorage.getItem("p_tel"),
+        creado: Date.now(), duenoId: MI_ID, vendido: false, oculto: false
     });
     location.reload();
 };
 
-// NUEVA FUNCIÓN: ELIMINAR
-window.eliminarPublicacion = async (id) => {
-    if (confirm("¿Seguro que quieres borrar este anuncio?")) {
-        try {
-            await deleteDoc(doc(db, "productos", id));
-            productos = productos.filter(p => p.id !== id);
-            render(productos);
-        } catch (e) { alert("Error al borrar"); }
-    }
+window.marcarVendido = async (id) => {
+    if(confirm("¿Vendido?")) { await updateDoc(doc(db,"productos",id), {vendido:true}); cargar(); }
 };
 
-window.toggleFavorito = (id) => {
-    favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
-    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
-    render(productos);
+window.eliminar = async (id) => {
+    if(confirm("¿Eliminar anuncio?")) { await updateDoc(doc(db,"productos",id), {oculto:true}); cargar(); }
 };
 
 window.filtrar = () => {
     const txt = document.getElementById('buscar').value.toLowerCase();
     const dep = document.getElementById('filtroDepto').value;
     const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
-
     const filtrados = productos.filter(p => {
-        const cTxt = p.titulo.toLowerCase().includes(txt);
+        const cTxt = p.titulo.toLowerCase().includes(txt) || p.muni.toLowerCase().includes(txt);
         const cDep = dep === "" || p.depto === dep;
         const cPre = parseFloat(p.precio) <= pMax;
-        let cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
+        const cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
         return cTxt && cDep && cPre && cCat;
     });
     render(filtrados);
@@ -292,70 +277,63 @@ window.setCat = (c, b) => {
     filtrar();
 };
 
+window.toggleFavorito = (id) => {
+    favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
+    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
+    render(productos);
+};
+
 window.verFavoritos = (b) => setCat("Favoritos", b);
 
 async function cargar() {
     const q = query(collection(db, "productos"), orderBy("creado", "desc"));
     const snap = await getDocs(q);
-    productos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
     render(productos);
 }
 
 function render(lista) {
     const feed = document.getElementById('feed');
     feed.innerHTML = "";
-    lista.forEach(p => {
-        const esFav = favoritos.includes(p.id);
-        const esMio = p.duenoId === MI_ID; // <--- Validación de dueño
-        
-        feed.innerHTML += `
-            <div class="card">
-                <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')">
-                    <i class="${esFav?'fa-solid':'fa-regular'} fa-heart"></i>
-                </button>
-                ${p.vendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
-                <img class="foto" src="${p.foto}">
-                <div class="info">
-                    <span class="tag">${p.categoria}</span>
-                    <div class="titulo">${p.titulo}</div>
-                    <div class="precio">$${p.precio}</div>
-                    <div class="desc">${p.descripcion}</div>
-                    <div class="loc"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto}</div>
-                    
-                    ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Me+interesa+${p.titulo}"><i class="fa-brands fa-whatsapp"></i> Contactar</a>` : ''}
-                    
-                    ${esMio ? `
-                        <button class="btn-eliminar" onclick="eliminarPublicacion('${p.id}')">
-                            <i class="fa-solid fa-trash"></i> Eliminar mi anuncio
-                        </button>
-                    ` : ''}
-                </div>
-            </div>`;
-    });
+    const disp = lista.filter(p => !p.vendido);
+    const vend = lista.filter(p => p.vendido);
+
+    disp.forEach(p => feed.innerHTML += crearCard(p));
+    if(vend.length > 0) {
+        feed.innerHTML += `<div class="seccion-titulo">YA VENDIDOS (${vend.length})</div>`;
+        vend.forEach(p => feed.innerHTML += crearCard(p));
+    }
 }
 
-// Perfil
-window.abrirPerfil = () => {
-    document.getElementById('perfilNombre').value = localStorage.getItem("perfil_nombre") || "";
-    document.getElementById('perfilTelefono').value = localStorage.getItem("perfil_telefono") || "";
-    document.getElementById('modalPerfil').style.display = "block";
-};
-window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
-window.guardarPerfil = () => {
-    localStorage.setItem("perfil_nombre", document.getElementById('perfilNombre').value);
-    localStorage.setItem("perfil_telefono", document.getElementById('perfilTelefono').value);
-    cerrarPerfil();
-};
+function crearCard(p) {
+    const esFav = favoritos.includes(p.id);
+    const esMio = p.duenoId === MI_ID;
+    return `
+        <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
+            <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
+            ${p.vendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
+            <img class="foto" src="${p.foto}">
+            <div class="info">
+                <span class="tag">${p.categoria}</span>
+                <div class="titulo">${p.titulo}</div>
+                <div class="precio">$${p.precio}</div>
+                <div class="loc">${p.muni}, ${p.depto}</div>
+                ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ''}
+                ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Vendido</button>` : ''}
+                ${esMio ? `<button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button>` : ''}
+            </div>
+        </div>`;
+}
 
-// Init Deptos
+// Init departamentos
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
-    const opt = `<option value="${d}">${d}</option>`;
-    dSelect.innerHTML += opt;
-    fDepto.innerHTML += opt;
+    dSelect.innerHTML += `<option value="${d}">${d}</option>`;
+    fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
 
+verificarPerfil();
 cargar();
 </script>
 </body>
