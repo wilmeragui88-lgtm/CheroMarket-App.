@@ -34,6 +34,12 @@
         .cat.active{background:var(--azul); color:white}
         .cat-fav{background: #ffeaa7 !important; color: #d63031 !important;}
 
+        /* Estilos Perfil y Catálogo */
+        .perfil-img-cont{text-align:center; position:relative; width:80px; margin:auto}
+        .foto-perfil{width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--azul); background:#eee; cursor:pointer}
+        .vendedor-link {font-size: 11px; color: var(--azul); text-decoration: underline; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 4px;}
+        .header-catalogo{grid-column: 1 / -1; background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 1px solid var(--azul); margin-bottom: 10px;}
+
         .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
         .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
         .foto{height:160px; width:100%; object-fit:cover; background:#eee}
@@ -67,7 +73,7 @@
 <body data-theme="light">
 
 <div id="bannerPerfil" class="alerta-perfil">
-    ⚠️ <strong>Perfil Incompleto:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Configura tu WhatsApp</a> para vender.
+    ⚠️ <strong>Perfil Incompleto:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Configura tu foto y WhatsApp</a> para vender.
 </div>
 
 <header>
@@ -142,10 +148,16 @@
 
 <div id="modalPerfil">
     <div class="modal-content">
-        <h3>Registro de Vendedor</h3>
-        <input id="perfilNombre" placeholder="Tu nombre">
+        <h3>Mi Perfil de Vendedor</h3>
+        <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
+            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
+            <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+            <div style="font-size:10px; color:var(--azul); margin-top:5px; font-weight: bold;">Toca para cambiar foto</div>
+        </div>
+        <input id="perfilNombre" placeholder="Tu nombre o negocio">
         <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
         <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
+        <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Ver mis anuncios</button>
         <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
     </div>
 </div>
@@ -171,7 +183,6 @@ const svData = {
     "La Libertad": ["Santa Tecla", "Zaragoza", "Antiguo Cuscatlán", "Colón"],
     "Santa Ana": ["Santa Ana", "Metapán", "Chalchuapa"],
     "San Miguel": ["San Miguel", "Chinameca", "El Tránsito"]
-    // ... los demás se cargan dinámicamente si los incluyes en la lista completa
 };
 
 let productos = [];
@@ -180,7 +191,10 @@ const state = { categoria: "Todos" };
 const MI_ID = localStorage.getItem("mi_id_usuario") || "u_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("mi_id_usuario", MI_ID);
 
+// --- GESTIÓN DE FOTOS ---
 let imagenBase64 = "";
+let fotoPerfilBase64 = localStorage.getItem("p_foto") || "";
+
 document.getElementById('fotoFile').onchange = e => {
     const file = e.target.files[0];
     if (!file) return;
@@ -203,20 +217,44 @@ document.getElementById('fotoFile').onchange = e => {
     reader.readAsDataURL(file);
 };
 
+document.getElementById('fotoPerfilFile').onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX = 200;
+            let w = img.width, h = img.height;
+            if (w > MAX) { h *= MAX/w; w = MAX; }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64;
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
 // --- PERFIL ---
 function verificarPerfil() {
     const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
     document.getElementById("bannerPerfil").style.display = (n && t) ? "none" : "block";
+    if(fotoPerfilBase64) document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64;
     return (n && t);
 }
 window.abrirPerfil = () => {
     document.getElementById('perfilNombre').value = localStorage.getItem("p_nombre") || "";
     document.getElementById('perfilTelefono').value = localStorage.getItem("p_tel") || "";
+    document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64 || "https://via.placeholder.com/80";
     document.getElementById('modalPerfil').style.display = "block";
 };
 window.guardarPerfil = () => {
     localStorage.setItem("p_nombre", document.getElementById('perfilNombre').value);
     localStorage.setItem("p_tel", document.getElementById('perfilTelefono').value);
+    localStorage.setItem("p_foto", fotoPerfilBase64);
     verificarPerfil(); document.getElementById('modalPerfil').style.display = "none";
 };
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
@@ -243,6 +281,7 @@ window.publicar = async () => {
         categoria: document.getElementById('categoria').value,
         depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
         vendedor: localStorage.getItem("p_nombre"), telefono: localStorage.getItem("p_tel"),
+        fotoPerfilVendedor: fotoPerfilBase64, // Guardar foto de perfil en el post
         creado: Date.now(), duenoId: MI_ID, vendido: false, oculto: false
     });
     location.reload();
@@ -285,6 +324,33 @@ window.toggleFavorito = (id) => {
 
 window.verFavoritos = (b) => setCat("Favoritos", b);
 
+// CATÁLOGO POR VENDEDOR
+window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
+    const filtrados = productos.filter(p => p.duenoId === idVendedor);
+    const feed = document.getElementById('feed');
+    feed.innerHTML = `
+        <div class="header-catalogo">
+            <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
+            <h2 style="margin:5px 0">${nombreVendedor}</h2>
+            <p style="font-size:12px; color:var(--mut)">Catálogo de productos</p>
+            <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer; margin-top:10px">Ver todo el Market</button>
+        </div>
+    `;
+    const disp = filtrados.filter(p => !p.vendido);
+    const vend = filtrados.filter(p => p.vendido);
+    disp.forEach(p => feed.innerHTML += crearCard(p));
+    if(vend.length > 0) {
+        feed.innerHTML += `<div class="seccion-titulo">YA VENDIDOS POR ESTE VENDEDOR (${vend.length})</div>`;
+        vend.forEach(p => feed.innerHTML += crearCard(p));
+    }
+    window.scrollTo(0,0);
+};
+
+window.verMisAnuncios = () => {
+    cerrarPerfil();
+    verCatalogo(MI_ID, localStorage.getItem("p_nombre"), fotoPerfilBase64);
+};
+
 async function cargar() {
     const q = query(collection(db, "productos"), orderBy("creado", "desc"));
     const snap = await getDocs(q);
@@ -297,7 +363,6 @@ function render(lista) {
     feed.innerHTML = "";
     const disp = lista.filter(p => !p.vendido);
     const vend = lista.filter(p => p.vendido);
-
     disp.forEach(p => feed.innerHTML += crearCard(p));
     if(vend.length > 0) {
         feed.innerHTML += `<div class="seccion-titulo">YA VENDIDOS (${vend.length})</div>`;
@@ -318,6 +383,11 @@ function crearCard(p) {
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
                 <div class="loc">${p.muni}, ${p.depto}</div>
+                
+                <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor || ''}')">
+                    <i class="fa-solid fa-store"></i> Ver tienda de ${p.vendedor}
+                </div>
+
                 ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ''}
                 ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Vendido</button>` : ''}
                 ${esMio ? `<button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button>` : ''}
