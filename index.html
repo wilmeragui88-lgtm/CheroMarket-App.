@@ -1,5 +1,3 @@
-La app en modificación 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,7 +18,6 @@ La app en modificación
         h1{margin:0; color:var(--azul); font-size: 22px;}
         .sub{font-size:12px; color:var(--mut); margin-bottom: 10px;}
 
-        /* Buscador y Filtros */
         .buscador-cont{max-width:500px; margin:10px auto; display:flex; gap:8px; position:relative; padding: 0 10px;}
         .buscador{flex:1; padding:12px 12px 12px 35px; border-radius:25px; border:1px solid var(--b); background:var(--fondo); color: var(--txt)}
         .search-icon{position:absolute; left:22px; top:15px; color:var(--mut)}
@@ -34,7 +31,6 @@ La app en modificación
         .cat.active{background:var(--azul); color:white}
         .cat-fav{background: #ffeaa7 !important; color: #d63031 !important;}
 
-        /* Grid de Productos */
         .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
         .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
         .foto{height:160px; width:100%; object-fit:cover; background:#eee}
@@ -49,11 +45,27 @@ La app en modificación
         .desc{font-size:11px; color:var(--mut); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
         .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
 
-        /* Botones */
         .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
+        
+        /* Estilo para el botón de borrar */
+        .btn-eliminar {
+            margin-top: 8px;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
         .btn-add{position:fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:var(--naranja); color:white; font-size:28px; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:10; cursor:pointer}
         
-        /* Modales y Sidebar */
         #modal, #modalPerfil{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:99; overflow-y:auto; padding:20px}
         .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
         input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
@@ -100,11 +112,6 @@ La app en modificación
     <button onclick="compartirApp()" style="width:100%; background:var(--azul); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom: 15px;">
         <i class="fa-solid fa-share-nodes"></i> Recomendar App
     </button>
-    <div style="font-size: 13px; color: var(--mut)">
-        <p><strong>Seguridad:</strong> No envíes dinero sin ver el producto.</p>
-        <hr>
-        <p>Versión 2.0 Pro · 2026</p>
-    </div>
 </div>
 
 <div id="feed" class="feed"></div>
@@ -122,12 +129,10 @@ La app en modificación
                 <option value="Usado">Usado</option>
             </select>
         </div>
-        
         <div style="border:1px dashed var(--azul); padding:10px; border-radius:8px; text-align:center">
             <input type="file" id="fotoFile" accept="image/*" style="font-size:12px; width:100%">
             <img id="imgPrevia" style="width:100%; height:120px; object-fit:cover; display:none; margin-top:10px; border-radius:5px">
         </div>
-
         <select id="categoria">
             <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
         </select>
@@ -137,7 +142,6 @@ La app en modificación
         <select id="muni">
             <option value="">Municipio</option>
         </select>
-        
         <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
         <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
     </div>
@@ -169,31 +173,32 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- DATOS Y ESTADO ---
+// --- DATOS SV ---
 const svData = {
     "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
-"Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
-"Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
-"Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
-"La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
-"San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
-"Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
-"La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
-"Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
-"San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
-"Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
-"San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
-"Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
-"La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
+    "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
+    "Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
+    "Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+    "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+    "San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
+    "Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
+    "La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
+    "Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
+    "San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+    "Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
+    "San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
+    "Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+    "La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
 };
 
+// --- ESTADO GLOBAL ---
 let productos = [];
 let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
 const MI_ID = localStorage.getItem("mi_id_usuario") || "user_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("mi_id_usuario", MI_ID);
 
-// --- PROCESAMIENTO DE IMAGEN ---
+// --- LÓGICA DE IMAGEN ---
 let imagenBase64 = "";
 document.getElementById('fotoFile').onchange = e => {
     const file = e.target.files[0];
@@ -230,32 +235,33 @@ window.actualizarMunicipios = () => {
     if(d) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
 
-const init = () => {
-    const dSelect = document.getElementById('depto');
-    const fDepto = document.getElementById('filtroDepto');
-    Object.keys(svData).forEach(d => {
-        const opt = `<option value="${d}">${d}</option>`;
-        dSelect.innerHTML += opt;
-        fDepto.innerHTML += opt;
-    });
-};
-
 window.publicar = async () => {
     const t = document.getElementById('titulo').value;
     const p = document.getElementById('precio').value;
     const dep = document.getElementById('depto').value;
-    if(!t || !p || !dep || !imagenBase64) return alert("Completa los datos y la foto.");
+    if(!t || !p || !dep || !imagenBase64) return alert("Faltan datos o foto.");
 
     await addDoc(collection(db,"productos"), {
         titulo: t, descripcion: document.getElementById('descripcion').value,
         precio: parseFloat(p).toFixed(2), estado: document.getElementById('estado').value,
         foto: imagenBase64, categoria: document.getElementById('categoria').value,
         depto: dep, muni: document.getElementById('muni').value,
-        vendedor: localStorage.getItem("perfil_nombre") || "Anonimo",
+        vendedor: localStorage.getItem("perfil_nombre") || "Anónimo",
         telefono: localStorage.getItem("perfil_telefono") || "70000000",
         creado: Date.now(), duenoId: MI_ID, vendido: false
     });
     location.reload();
+};
+
+// NUEVA FUNCIÓN: ELIMINAR
+window.eliminarPublicacion = async (id) => {
+    if (confirm("¿Seguro que quieres borrar este anuncio?")) {
+        try {
+            await deleteDoc(doc(db, "productos", id));
+            productos = productos.filter(p => p.id !== id);
+            render(productos);
+        } catch (e) { alert("Error al borrar"); }
+    }
 };
 
 window.toggleFavorito = (id) => {
@@ -270,7 +276,7 @@ window.filtrar = () => {
     const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
 
     const filtrados = productos.filter(p => {
-        const cTxt = p.titulo.toLowerCase().includes(txt) || p.muni.toLowerCase().includes(txt);
+        const cTxt = p.titulo.toLowerCase().includes(txt);
         const cDep = dep === "" || p.depto === dep;
         const cPre = parseFloat(p.precio) <= pMax;
         let cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
@@ -300,7 +306,8 @@ function render(lista) {
     feed.innerHTML = "";
     lista.forEach(p => {
         const esFav = favoritos.includes(p.id);
-        const esMio = p.duenoId === MI_ID;
+        const esMio = p.duenoId === MI_ID; // <--- Validación de dueño
+        
         feed.innerHTML += `
             <div class="card">
                 <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')">
@@ -314,13 +321,20 @@ function render(lista) {
                     <div class="precio">$${p.precio}</div>
                     <div class="desc">${p.descripcion}</div>
                     <div class="loc"><i class="fa-solid fa-location-dot"></i> ${p.muni}, ${p.depto}</div>
+                    
                     ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Me+interesa+${p.titulo}"><i class="fa-brands fa-whatsapp"></i> Contactar</a>` : ''}
+                    
+                    ${esMio ? `
+                        <button class="btn-eliminar" onclick="eliminarPublicacion('${p.id}')">
+                            <i class="fa-solid fa-trash"></i> Eliminar mi anuncio
+                        </button>
+                    ` : ''}
                 </div>
             </div>`;
     });
 }
 
-// Inicialización de perfil
+// Perfil
 window.abrirPerfil = () => {
     document.getElementById('perfilNombre').value = localStorage.getItem("perfil_nombre") || "";
     document.getElementById('perfilTelefono').value = localStorage.getItem("perfil_telefono") || "";
@@ -333,7 +347,15 @@ window.guardarPerfil = () => {
     cerrarPerfil();
 };
 
-init();
+// Init Deptos
+const dSelect = document.getElementById('depto');
+const fDepto = document.getElementById('filtroDepto');
+Object.keys(svData).forEach(d => {
+    const opt = `<option value="${d}">${d}</option>`;
+    dSelect.innerHTML += opt;
+    fDepto.innerHTML += opt;
+});
+
 cargar();
 </script>
 </body>
