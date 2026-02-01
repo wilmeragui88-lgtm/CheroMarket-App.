@@ -44,7 +44,6 @@
         
         .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b);}
         .mini-foto{width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer;}
-        .mini-foto:active{transform: scale(0.9);}
 
         .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
         .btn-fav.active {color: #ff4757;}
@@ -68,6 +67,11 @@
         .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
         input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
         
+        /* VISOR DE IMAGEN INTERNO */
+        #visorFotoInterno{position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; display:none; justify-content:center; align-items:center; flex-direction:column}
+        #fotoGrande{max-width:95%; max-height:80%; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5)}
+        .btn-cerrar-visor{position:absolute; top:30px; right:20px; color:white; font-size:30px; cursor:pointer; background:none; border:none}
+
         .subir-fotos-grid{display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px;}
         .foto-input-box{border: 2px dashed var(--azul); border-radius: 8px; height: 80px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--fondo);}
         .foto-input-box input{opacity: 0; position: absolute; inset: 0; z-index: 2; cursor: pointer;}
@@ -119,19 +123,17 @@
     <button onclick="compartirApp()" style="width:100%; background:var(--azul); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom: 15px;">
         <i class="fa-solid fa-share-nodes"></i> Recomendar App
     </button>
-    <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
-      <div style="max-height: 400px; overflow-y: auto;">
-        <details style="border-bottom: 1px solid #eee;" open>
-          <summary style="padding: 15px; cursor: pointer; font-weight: bold; background-color: #f8f9fa;">📜 Términos y Condiciones</summary>
-          <div style="padding: 15px; font-size: 13px;">Uso exclusivo para El Salvador. La app no se hace responsable por estafas. Reúnase en lugares públicos.</div>
-        </details>
-      </div>
-    </div>
+    <div style="font-size: 13px;">Uso exclusivo para El Salvador. Reúnase en lugares públicos.</div>
     <p>Versión 2.0 Pro · 2026</p>
 </div>
 
 <div id="feed" class="feed"></div>
 <button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
+
+<div id="visorFotoInterno" onclick="cerrarVisor()">
+    <button class="btn-cerrar-visor"><i class="fa-solid fa-xmark"></i></button>
+    <img id="fotoGrande" src="" onclick="event.stopPropagation()">
+</div>
 
 <div id="modal">
     <div class="modal-content">
@@ -143,38 +145,22 @@
             <select id="estado" style="flex:1">
                 <option value="Nuevo">Nuevo</option>
                 <option value="Usado">Usado</option>
-                <option value="Otros">Otros</option>
             </select>
         </div>
-
-        <label style="font-size:12px; font-weight:bold; color:var(--azul)">Tipo de Entrega:</label>
         <select id="opcionEnvio">
             <option value="Solo entrega local">Solo entrega local</option>
             <option value="Envíos a todo el país">Envíos a todo el país</option>
         </select>
-
-        <label style="font-size:12px; font-weight:bold; color:var(--azul)">Fotos del producto (Máx 3):</label>
         <div class="subir-fotos-grid">
-            <div class="foto-input-box">
-                <input type="file" class="foto-item" data-idx="0" accept="image/*">
-                <img id="p-0"><i class="fa-solid fa-camera"></i>
-            </div>
-            <div class="foto-input-box">
-                <input type="file" class="foto-item" data-idx="1" accept="image/*">
-                <img id="p-1"><i class="fa-solid fa-camera"></i>
-            </div>
-            <div class="foto-input-box">
-                <input type="file" class="foto-item" data-idx="2" accept="image/*">
-                <img id="p-2"><i class="fa-solid fa-camera"></i>
-            </div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2"><i class="fa-solid fa-camera"></i></div>
         </div>
-
         <select id="categoria">
             <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
         </select>
         <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
         <select id="muni"><option value="">Municipio</option></select>
-        
         <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
         <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
     </div>
@@ -237,7 +223,19 @@ localStorage.setItem("mi_id_usuario", MI_ID);
 let fotosAnuncio = ["", "", ""];
 let fotoPerfilBase64 = localStorage.getItem("p_foto") || "";
 
-// --- SISTEMA DE FOTOS ---
+// --- SISTEMA DE VISOR (PARA NO SALIR DE LA APP) ---
+window.verImagenFull = (src) => {
+    const visor = document.getElementById('visorFotoInterno');
+    const foto = document.getElementById('fotoGrande');
+    foto.src = src;
+    visor.style.display = 'flex';
+};
+
+window.cerrarVisor = () => {
+    document.getElementById('visorFotoInterno').style.display = 'none';
+};
+
+// --- PROCESAMIENTO DE FOTOS ---
 document.querySelectorAll('.foto-item').forEach(input => {
     input.onchange = e => {
         const file = e.target.files[0];
@@ -283,7 +281,7 @@ document.getElementById('fotoPerfilFile').onchange = e => {
     reader.readAsDataURL(file);
 };
 
-// --- CORE FUNCTIONS ---
+// --- FUNCIONES CORE ---
 window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
 window.abrir = () => !verificarPerfil() ? abrirPerfil() : document.getElementById('modal').style.display = "block";
@@ -344,16 +342,16 @@ window.compartirPost = async (titulo, precio, muni) => {
         try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
     } else {
         navigator.clipboard.writeText(`${texto}\n${window.location.href}`);
-        alert("Copiado!");
+        alert("Copiado al portapapeles!");
     }
 };
 
 window.marcarVendido = async (id) => {
-    if(confirm("¿Vendido?")) { await updateDoc(doc(db,"productos",id), {vendido:true}); cargar(); }
+    if(confirm("¿Marcar como vendido?")) { await updateDoc(doc(db,"productos",id), {vendido:true}); cargar(); }
 };
 
 window.eliminar = async (id) => {
-    if(confirm("¿Eliminar anuncio?")) { await updateDoc(doc(db,"productos",id), {oculto:true}); cargar(); }
+    if(confirm("¿Eliminar anuncio definitivamente?")) { await updateDoc(doc(db,"productos",id), {oculto:true}); cargar(); }
 };
 
 window.filtrar = () => {
@@ -425,8 +423,6 @@ function crearCard(p) {
     const esFav = favoritos.includes(p.id);
     const esMio = p.duenoId === MI_ID;
     const esEnvio = p.entrega === "Envíos a todo el país";
-    
-    // Compatibilidad fotos nuevas (array) y viejas (string)
     const fotos = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [p.foto] : []);
     
     let miniHTML = "";
@@ -442,7 +438,8 @@ function crearCard(p) {
             <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
             ${p.vendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
             
-            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" onclick="window.open(this.src)">
+            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" onclick="verImagenFull(this.src)">
+            
             ${miniHTML}
 
             <div class="info">
@@ -458,14 +455,14 @@ function crearCard(p) {
                 <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
-                ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ''}
+                ${!p.vendido ? `<a class="btn-wa" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ''}
                 ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Vendido</button>` : ''}
                 ${esMio ? `<button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button>` : ''}
             </div>
         </div>`;
 }
 
-// Init
+// Inicialización
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
