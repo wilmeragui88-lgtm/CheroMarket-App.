@@ -18,7 +18,6 @@
         h1{margin:0; color:var(--azul); font-size: 22px;}
         .sub{font-size:12px; color:var(--mut); margin-bottom: 10px;}
 
-        /* Alerta de Perfil */
         .alerta-perfil{background: #fff3cd; color: #856404; padding: 12px; font-size: 13px; text-align: center; border-bottom: 1px solid #ffeeba; display: none; position: sticky; top: 0; z-index: 10;}
 
         .buscador-cont{max-width:500px; margin:10px auto; display:flex; gap:8px; position:relative; padding: 0 10px;}
@@ -41,8 +40,12 @@
 
         .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
         .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
-        .foto{height:160px; width:100%; object-fit:cover; background:#eee}
+        .foto-principal{height:160px; width:100%; object-fit:cover; background:#eee; cursor: pointer;}
         
+        .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b);}
+        .mini-foto{width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer;}
+        .mini-foto:active{transform: scale(0.9);}
+
         .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
         .btn-fav.active {color: #ff4757;}
         .btn-share-post {position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--azul);}
@@ -65,6 +68,11 @@
         .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
         input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
         
+        .subir-fotos-grid{display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px;}
+        .foto-input-box{border: 2px dashed var(--azul); border-radius: 8px; height: 80px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--fondo);}
+        .foto-input-box input{opacity: 0; position: absolute; inset: 0; z-index: 2; cursor: pointer;}
+        .foto-input-box img{width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1;}
+
         .sidebar{position:fixed; top:0; right:-280px; width:280px; height:100%; background:var(--card); box-shadow:-5px 0 15px rgba(0,0,0,0.3); z-index:100; transition:0.3s; padding:20px; box-sizing:border-box}
         .sidebar.active{right:0}
         .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
@@ -111,92 +119,14 @@
     <button onclick="compartirApp()" style="width:100%; background:var(--azul); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom: 15px;">
         <i class="fa-solid fa-share-nodes"></i> Recomendar App
     </button>
-       <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
-  
-  <div style="max-height: 450px; overflow-y: auto; scrollbar-width: thin;">
-    
-    <details style="border-bottom: 1px solid #eee;" open>
-      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
-        <span style="margin-right: 12px; font-size: 1.2em;">📜</span> Términos y Condiciones de CheroMarketApp
-      </summary>
-      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
-        <h4 style="margin-top: 0;">1. Aceptación de los Términos</h4>
-        <p>Al descargar, instalar o usar CheroMarketApp, el usuario acepta cumplir con estos términos. Si no está de acuerdo, debe abstenerse de utilizar la plataforma.</p>
-        
-        <h4>2. Descripción del Servicio</h4>
-        <p>CheroMarketApp es una plataforma intermediaria que permite a los usuarios publicar anuncios de productos o servicios para su compra y venta en el territorio de El Salvador. La aplicación no es dueña, no vende, ni garantiza los artículos publicados por terceros.</p>
-        
-        <h4>3. Registro y Seguridad</h4>
-        <ul>
-          <li>Solo podrán registrarse personas mayores de 18 años.</li>
-          <li>El usuario es responsable de mantener la confidencialidad de sus credenciales de acceso.</li>
-          <li>Cualquier actividad realizada bajo la cuenta del usuario será su responsabilidad exclusiva.</li>
-        </ul>
-        
-        <h4>4. Reglas de Publicación y Uso</h4>
-        <p>Queda estrictamente prohibido publicar artículos ilegales según las leyes de la República de El Salvador, contenido ofensivo o productos falsificados.</p>
-        
-        <h4>5. Responsabilidad en las Transacciones</h4>
-        <p>CheroMarketApp no participa en la negociación ni entrega. El contacto y la transacción financiera ocurren exclusivamente entre comprador y vendedor.</p>
-        
-        <h4>6. Privacidad de Datos</h4>
-        <p>El uso de datos personales se rige por nuestra Política de Privacidad, cumpliendo con los estándares de protección de datos en el país.</p>
-        
-        <h4>7. Suspensión y Terminación</h4>
-        <p>Nos reservamos el derecho de suspender cuentas que infrinjan estos términos sin previo aviso.</p>
-        
-        <h4>8. Modificaciones</h4>
-        <p>Podemos actualizar estos términos en cualquier momento notificando cambios significativos.</p>
-        
-        <h4>9. Jurisdicción y Ley Aplicable</h4>
-        <p>Leyes de la República de El Salvador. Disputas ante tribunales de San Salvador.</p>
+    <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
+      <div style="max-height: 400px; overflow-y: auto;">
+        <details style="border-bottom: 1px solid #eee;" open>
+          <summary style="padding: 15px; cursor: pointer; font-weight: bold; background-color: #f8f9fa;">📜 Términos y Condiciones</summary>
+          <div style="padding: 15px; font-size: 13px;">Uso exclusivo para El Salvador. La app no se hace responsable por estafas. Reúnase en lugares públicos.</div>
+        </details>
       </div>
-    </details>
-
-    <details style="border-bottom: 1px solid #eee;">
-      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
-        <span style="margin-right: 12px; font-size: 1.2em;">⚖️</span> Política de Privacidad
-      </summary>
-      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
-        <p><em>Última actualización: 22 de enero de 2026</em></p>
-        <h4>1. Información que Recopilamos</h4>
-        <p>Recolectamos información de registro (nombre, email, teléfono), contenido del usuario (fotos, mensajes), datos de ubicación y del dispositivo.</p>
-        
-        <h4>2. Uso de la Información</h4>
-        <p>Para facilitar anuncios, personalizar tu experiencia en El Salvador, enviar notificaciones y mantener la seguridad.</p>
-        
-        <h4>3. Cómo Compartimos tu Información</h4>
-        <p>Tu nombre y teléfono pueden ser visibles en anuncios. No vendemos tus datos a terceros con fines publicitarios.</p>
-        
-        <h4>4. Tus Derechos</h4>
-        <p>Puedes editar tu perfil, solicitar la eliminación de tu cuenta o gestionar permisos de ubicación y cámara desde tu dispositivo.</p>
-      </div>
-    </details>
-
-    <details style="border-bottom: 1px solid #eee;">
-      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #e8f4fd; color: #0056b3; display: flex; align-items: center; list-style: none;">
-        <span style="margin-right: 12px; font-size: 1.2em;">🛡️</span> Guía de Seguridad para Cheros
-      </summary>
-      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; background-color: #fafcfe;">
-        <p><strong>🤝 Negocios Seguros:</strong> Reúnete en centros comerciales o gasolineras con cámaras. Ve acompañado y de día.</p>
-        <p><strong>💰 Pagos:</strong> <strong>NUNCA</strong> envíes dinero por adelantado. Verifica el saldo disponible en tu banco antes de entregar el producto.</p>
-        <p><strong>📦 Verificación:</strong> Prueba los electrónicos y revisa documentos de vehículos en el VMT antes de pagar.</p>
-      </div>
-    </details>
-
-  </div>
-
-  <div style="padding: 20px; text-align: center; background-color: #ffffff; border-top: 1px solid #eee;">
-    <button type="button" onclick="alert('Gracias por aceptar los términos de CheroMarketApp')" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); transition: background 0.3s;">
-      Acepto todos los Términos y Condiciones
-    </button>
-    <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
-  </div>
-
-</div>
-      
-    <p><strong>Seguridad:</strong> Reúnete en lugares públicos.</p>
-    <hr>
+    </div>
     <p>Versión 2.0 Pro · 2026</p>
 </div>
 
@@ -213,7 +143,7 @@
             <select id="estado" style="flex:1">
                 <option value="Nuevo">Nuevo</option>
                 <option value="Usado">Usado</option>
-                <option value="Otros productos">Otros productos </option>
+                <option value="Otros">Otros</option>
             </select>
         </div>
 
@@ -223,10 +153,22 @@
             <option value="Envíos a todo el país">Envíos a todo el país</option>
         </select>
 
-        <div style="border:1px dashed var(--azul); padding:10px; border-radius:8px; text-align:center">
-            <input type="file" id="fotoFile" accept="image/*" style="font-size:12px; width:100%">
-            <img id="imgPrevia" style="width:100%; height:120px; object-fit:cover; display:none; margin-top:10px; border-radius:5px">
+        <label style="font-size:12px; font-weight:bold; color:var(--azul)">Fotos del producto (Máx 3):</label>
+        <div class="subir-fotos-grid">
+            <div class="foto-input-box">
+                <input type="file" class="foto-item" data-idx="0" accept="image/*">
+                <img id="p-0"><i class="fa-solid fa-camera"></i>
+            </div>
+            <div class="foto-input-box">
+                <input type="file" class="foto-item" data-idx="1" accept="image/*">
+                <img id="p-1"><i class="fa-solid fa-camera"></i>
+            </div>
+            <div class="foto-input-box">
+                <input type="file" class="foto-item" data-idx="2" accept="image/*">
+                <img id="p-2"><i class="fa-solid fa-camera"></i>
+            </div>
         </div>
+
         <select id="categoria">
             <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
         </select>
@@ -292,51 +234,36 @@ const state = { categoria: "Todos" };
 const MI_ID = localStorage.getItem("mi_id_usuario") || "u_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("mi_id_usuario", MI_ID);
 
-let imagenBase64 = "";
+let fotosAnuncio = ["", "", ""];
 let fotoPerfilBase64 = localStorage.getItem("p_foto") || "";
 
-window.compartirPost = async (titulo, precio, muni) => {
-    const texto = `¡Mira lo que encontré en CheroMarketApp! 🇸🇻\n\n📦 ${titulo}\n💰 Precio: $${precio}\n📍 Ubicación: ${muni}`;
-    if (navigator.share) {
-        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
-    } else {
-        navigator.clipboard.writeText(`${texto}\n${window.location.href}`);
-        alert("¡Copiado!");
-    }
-};
-
-window.compartirApp = async () => {
-    const texto = "Te recomiendo CheroMarketApp 🇸🇻 para comprar y vender fácil.";
-    if (navigator.share) {
-        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
-    } else {
-        navigator.clipboard.writeText(window.location.href);
-        alert("Link copiado.");
-    }
-};
-
-// --- FOTOS ---
-document.getElementById('fotoFile').onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX = 800;
-            let w = img.width, h = img.height;
-            if (w > MAX) { h *= MAX/w; w = MAX; }
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            imagenBase64 = canvas.toDataURL('image/jpeg', 0.7);
-            document.getElementById('imgPrevia').src = imagenBase64;
-            document.getElementById('imgPrevia').style.display = "block";
+// --- SISTEMA DE FOTOS ---
+document.querySelectorAll('.foto-item').forEach(input => {
+    input.onchange = e => {
+        const file = e.target.files[0];
+        const idx = e.target.dataset.idx;
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 800;
+                let w = img.width, h = img.height;
+                if (w > MAX) { h *= MAX/w; w = MAX; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                const b64 = canvas.toDataURL('image/jpeg', 0.7);
+                fotosAnuncio[idx] = b64;
+                const prev = document.getElementById(`p-${idx}`);
+                prev.src = b64;
+                prev.style.display = "block";
+            };
+            img.src = ev.target.result;
         };
-        img.src = ev.target.result;
+        reader.readAsDataURL(file);
     };
-    reader.readAsDataURL(file);
-};
+});
 
 document.getElementById('fotoPerfilFile').onchange = e => {
     const file = e.target.files[0];
@@ -356,7 +283,16 @@ document.getElementById('fotoPerfilFile').onchange = e => {
     reader.readAsDataURL(file);
 };
 
-// --- PERFIL ---
+// --- CORE FUNCTIONS ---
+window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
+window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
+window.abrir = () => !verificarPerfil() ? abrirPerfil() : document.getElementById('modal').style.display = "block";
+window.cerrar = () => {
+    document.getElementById('modal').style.display = "none";
+    fotosAnuncio = ["", "", ""];
+    document.querySelectorAll('.foto-input-box img').forEach(i => i.style.display="none");
+};
+
 function verificarPerfil() {
     const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
     document.getElementById("bannerPerfil").style.display = (n && t) ? "none" : "block";
@@ -376,12 +312,6 @@ window.guardarPerfil = () => {
 };
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
 
-// --- CORE ---
-window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
-window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
-window.abrir = () => !verificarPerfil() ? abrirPerfil() : document.getElementById('modal').style.display = "block";
-window.cerrar = () => document.getElementById('modal').style.display = "none";
-
 window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value;
     const m = document.getElementById('muni');
@@ -391,18 +321,31 @@ window.actualizarMunicipios = () => {
 
 window.publicar = async () => {
     const t = document.getElementById('titulo').value, p = document.getElementById('precio').value;
-    if(!t || !p || !imagenBase64) return alert("Faltan datos.");
+    const fotosFinales = fotosAnuncio.filter(f => f !== "");
+    if(!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
+    
     await addDoc(collection(db,"productos"), {
         titulo: t, descripcion: document.getElementById('descripcion').value,
-        precio: parseFloat(p).toFixed(2), foto: imagenBase64,
+        precio: parseFloat(p).toFixed(2), 
+        fotos: fotosFinales,
         categoria: document.getElementById('categoria').value,
-        entrega: document.getElementById('opcionEnvio').value, // NUEVO
+        entrega: document.getElementById('opcionEnvio').value,
         depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
         vendedor: localStorage.getItem("p_nombre"), telefono: localStorage.getItem("p_tel"),
         fotoPerfilVendedor: fotoPerfilBase64,
         creado: Date.now(), duenoId: MI_ID, vendido: false, oculto: false
     });
     location.reload();
+};
+
+window.compartirPost = async (titulo, precio, muni) => {
+    const texto = `¡Mira lo que encontré en CheroMarketApp! 🇸🇻\n\n📦 ${titulo}\n💰 Precio: $${precio}\n📍 Ubicación: ${muni}`;
+    if (navigator.share) {
+        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
+    } else {
+        navigator.clipboard.writeText(`${texto}\n${window.location.href}`);
+        alert("Copiado!");
+    }
 };
 
 window.marcarVendido = async (id) => {
@@ -481,19 +424,32 @@ function render(lista) {
 function crearCard(p) {
     const esFav = favoritos.includes(p.id);
     const esMio = p.duenoId === MI_ID;
-    const esEnvioNacional = p.entrega === "Envíos a todo el país";
+    const esEnvio = p.entrega === "Envíos a todo el país";
+    
+    // Compatibilidad fotos nuevas (array) y viejas (string)
+    const fotos = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [p.foto] : []);
+    
+    let miniHTML = "";
+    if(fotos.length > 1) {
+        miniHTML = `<div class="miniaturas-cont">
+            ${fotos.map(f => `<img src="${f}" class="mini-foto" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
+        </div>`;
+    }
 
     return `
         <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
             <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
             <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
             ${p.vendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
-            <img class="foto" src="${p.foto}">
+            
+            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" onclick="window.open(this.src)">
+            ${miniHTML}
+
             <div class="info">
                 <div class="tags-cont">
                     <span class="tag">${p.categoria}</span>
-                    <span class="tag-envio" style="background:${esEnvioNacional?'var(--azul)':'var(--mut)'}">
-                        <i class="fa-solid ${esEnvioNacional?'fa-truck-fast':'fa-handshake'}"></i> ${p.entrega || 'Entrega Local'}
+                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">
+                        <i class="fa-solid ${esEnvio?'fa-truck-fast':'fa-handshake'}"></i> ${p.entrega || 'Local'}
                     </span>
                 </div>
                 <div class="titulo">${p.titulo}</div>
