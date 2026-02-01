@@ -34,7 +34,6 @@
         .cat.active{background:var(--azul); color:white}
         .cat-fav{background: #ffeaa7 !important; color: #d63031 !important;}
 
-        /* Estilos Perfil y Catálogo */
         .perfil-img-cont{text-align:center; position:relative; width:80px; margin:auto}
         .foto-perfil{width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--azul); background:#eee; cursor:pointer}
         .vendedor-link {font-size: 11px; color: var(--azul); text-decoration: underline; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 4px;}
@@ -46,15 +45,15 @@
         
         .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
         .btn-fav.active {color: #ff4757;}
-
-        /* Botón Compartir en Card */
         .btn-share-post {position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--azul);}
 
         .info{padding:10px; display:flex; flex-direction:column; gap:4px; flex:1}
+        .tags-cont{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px}
         .tag{font-size:9px; border:1px solid var(--azul); color:var(--azul); padding:1px 6px; border-radius:4px; font-weight: bold;}
+        .tag-envio{font-size:9px; background:var(--azul); color:white; padding:1px 6px; border-radius:4px; font-weight: bold;}
+        
         .titulo{font-weight:600; font-size:15px; line-height: 1.2; margin-top: 4px;}
         .precio{color:var(--naranja); font-size:18px; font-weight:800}
-        .desc{font-size:11px; color:var(--mut); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
         .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
 
         .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
@@ -76,7 +75,7 @@
 <body data-theme="light">
 
 <div id="bannerPerfil" class="alerta-perfil">
-    ⚠️ <strong>Perfil Incompleto:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Configura tu foto y WhatsApp</a> para vender.
+    ⚠️ <strong>Perfil Incompleto:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Configura tu perfil</a> para vender.
 </div>
 
 <header>
@@ -109,99 +108,12 @@
 
 <div id="sidebar" class="sidebar">
     <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
-    <h3>Menú Principal</h3>
-    
     <button onclick="compartirApp()" style="width:100%; background:var(--azul); color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom: 15px;">
         <i class="fa-solid fa-share-nodes"></i> Recomendar App
     </button>
-
-   <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
-  
-  <div style="max-height: 450px; overflow-y: auto; scrollbar-width: thin;">
-    
-    <details style="border-bottom: 1px solid #eee;" open>
-      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
-        <span style="margin-right: 12px; font-size: 1.2em;">📜</span> Términos y Condiciones de CheroMarketApp
-      </summary>
-      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
-        <h4 style="margin-top: 0;">1. Aceptación de los Términos</h4>
-        <p>Al descargar, instalar o usar CheroMarketApp, el usuario acepta cumplir con estos términos. Si no está de acuerdo, debe abstenerse de utilizar la plataforma.</p>
-        
-        <h4>2. Descripción del Servicio</h4>
-        <p>CheroMarketApp es una plataforma intermediaria que permite a los usuarios publicar anuncios de productos o servicios para su compra y venta en el territorio de El Salvador. La aplicación no es dueña, no vende, ni garantiza los artículos publicados por terceros.</p>
-        
-        <h4>3. Registro y Seguridad</h4>
-        <ul>
-          <li>Solo podrán registrarse personas mayores de 18 años.</li>
-          <li>El usuario es responsable de mantener la confidencialidad de sus credenciales de acceso.</li>
-          <li>Cualquier actividad realizada bajo la cuenta del usuario será su responsabilidad exclusiva.</li>
-        </ul>
-        
-        <h4>4. Reglas de Publicación y Uso</h4>
-        <p>Queda estrictamente prohibido publicar artículos ilegales según las leyes de la República de El Salvador, contenido ofensivo o productos falsificados.</p>
-        
-        <h4>5. Responsabilidad en las Transacciones</h4>
-        <p>CheroMarketApp no participa en la negociación ni entrega. El contacto y la transacción financiera ocurren exclusivamente entre comprador y vendedor.</p>
-        
-        <h4>6. Privacidad de Datos</h4>
-        <p>El uso de datos personales se rige por nuestra Política de Privacidad, cumpliendo con los estándares de protección de datos en el país.</p>
-        
-        <h4>7. Suspensión y Terminación</h4>
-        <p>Nos reservamos el derecho de suspender cuentas que infrinjan estos términos sin previo aviso.</p>
-        
-        <h4>8. Modificaciones</h4>
-        <p>Podemos actualizar estos términos en cualquier momento notificando cambios significativos.</p>
-        
-        <h4>9. Jurisdicción y Ley Aplicable</h4>
-        <p>Leyes de la República de El Salvador. Disputas ante tribunales de San Salvador.</p>
-      </div>
-    </details>
-
-    <details style="border-bottom: 1px solid #eee;">
-      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
-        <span style="margin-right: 12px; font-size: 1.2em;">⚖️</span> Política de Privacidad
-      </summary>
-      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
-        <p><em>Última actualización: 22 de enero de 2026</em></p>
-        <h4>1. Información que Recopilamos</h4>
-        <p>Recolectamos información de registro (nombre, email, teléfono), contenido del usuario (fotos, mensajes), datos de ubicación y del dispositivo.</p>
-        
-        <h4>2. Uso de la Información</h4>
-        <p>Para facilitar anuncios, personalizar tu experiencia en El Salvador, enviar notificaciones y mantener la seguridad.</p>
-        
-        <h4>3. Cómo Compartimos tu Información</h4>
-        <p>Tu nombre y teléfono pueden ser visibles en anuncios. No vendemos tus datos a terceros con fines publicitarios.</p>
-        
-        <h4>4. Tus Derechos</h4>
-        <p>Puedes editar tu perfil, solicitar la eliminación de tu cuenta o gestionar permisos de ubicación y cámara desde tu dispositivo.</p>
-      </div>
-    </details>
-
-    <details style="border-bottom: 1px solid #eee;">
-      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #e8f4fd; color: #0056b3; display: flex; align-items: center; list-style: none;">
-        <span style="margin-right: 12px; font-size: 1.2em;">🛡️</span> Guía de Seguridad para Cheros
-      </summary>
-      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; background-color: #fafcfe;">
-        <p><strong>🤝 Negocios Seguros:</strong> Reúnete en centros comerciales o gasolineras con cámaras. Ve acompañado y de día.</p>
-        <p><strong>💰 Pagos:</strong> <strong>NUNCA</strong> envíes dinero por adelantado. Verifica el saldo disponible en tu banco antes de entregar el producto.</p>
-        <p><strong>📦 Verificación:</strong> Prueba los electrónicos y revisa documentos de vehículos en el VMT antes de pagar.</p>
-      </div>
-    </details>
-
-  </div>
-
-  <div style="padding: 20px; text-align: center; background-color: #ffffff; border-top: 1px solid #eee;">
-    <button type="button" onclick="alert('Gracias por aceptar los términos de CheroMarketApp')" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); transition: background 0.3s;">
-      Acepto todos los Términos y Condiciones
-    </button>
-    <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
-  </div>
-
-</div>
-        <p><strong>Seguridad:</strong> No envíes dinero sin ver el producto.</p>
-        <hr>
-        <p>Versión 2.0 Pro · 2026</p>
-    </div>
+    <p><strong>Seguridad:</strong> Reúnete en lugares públicos.</p>
+    <hr>
+    <p>Versión 2.0 Pro · 2026</p>
 </div>
 
 <div id="feed" class="feed"></div>
@@ -219,6 +131,13 @@
                 <option value="Usado">Usado</option>
             </select>
         </div>
+
+        <label style="font-size:12px; font-weight:bold; color:var(--azul)">Tipo de Entrega:</label>
+        <select id="opcionEnvio">
+            <option value="Solo entrega local">Solo entrega local</option>
+            <option value="Envíos a todo el país">Envíos a todo el país</option>
+        </select>
+
         <div style="border:1px dashed var(--azul); padding:10px; border-radius:8px; text-align:center">
             <input type="file" id="fotoFile" accept="image/*" style="font-size:12px; width:100%">
             <img id="imgPrevia" style="width:100%; height:120px; object-fit:cover; display:none; margin-top:10px; border-radius:5px">
@@ -228,6 +147,7 @@
         </select>
         <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
         <select id="muni"><option value="">Municipio</option></select>
+        
         <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
         <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
     </div>
@@ -239,19 +159,18 @@
         <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
             <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
             <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
-            <div style="font-size:10px; color:var(--azul); margin-top:5px; font-weight: bold;">Toca para cambiar foto</div>
         </div>
         <input id="perfilNombre" placeholder="Tu nombre o negocio">
         <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
         <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
-        <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Ver mis anuncios</button>
+        <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
         <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -265,7 +184,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Data de El Salvador
 const svData = {
 "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
 "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
@@ -292,36 +210,27 @@ localStorage.setItem("mi_id_usuario", MI_ID);
 let imagenBase64 = "";
 let fotoPerfilBase64 = localStorage.getItem("p_foto") || "";
 
-// --- NUEVA FUNCIÓN COMPARTIR ---
 window.compartirPost = async (titulo, precio, muni) => {
-    const texto = `¡Mira lo que encontré en CheroMarketApp! 🇸🇻\n\n📦 ${titulo}\n💰 Precio: $${precio}\n📍 Ubicación: ${muni}\n\nEntra a CheroMarket para ver más ofertas.`;
-    const url = window.location.href;
-
+    const texto = `¡Mira lo que encontré en CheroMarketApp! 🇸🇻\n\n📦 ${titulo}\n💰 Precio: $${precio}\n📍 Ubicación: ${muni}`;
     if (navigator.share) {
-        try {
-            await navigator.share({ title: 'CheroMarketApp', text: texto, url: url });
-        } catch (err) { console.log("Error compartiendo"); }
+        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
     } else {
-        navigator.clipboard.writeText(`${texto}\n${url}`);
-        alert("Enlace y detalles copiados al portapapeles. ¡Pégalo donde quieras!");
+        navigator.clipboard.writeText(`${texto}\n${window.location.href}`);
+        alert("¡Copiado!");
     }
 };
 
 window.compartirApp = async () => {
-    const texto = "¡Ey! Te recomiendo CheroMarketApp 🇸🇻. Es ideal para comprar y vender cosas entre nosotros los salvadoreños de forma fácil.";
-    const url = window.location.href;
-
+    const texto = "Te recomiendo CheroMarketApp 🇸🇻 para comprar y vender fácil.";
     if (navigator.share) {
-        try {
-            await navigator.share({ title: 'CheroMarketApp', text: texto, url: url });
-        } catch (err) { console.log("Error compartiendo"); }
+        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
     } else {
-        navigator.clipboard.writeText(`${texto}\n${url}`);
-        alert("Link de la App copiado. ¡Pásalo a tus cheros!");
+        navigator.clipboard.writeText(window.location.href);
+        alert("Link copiado.");
     }
 };
 
-// --- GESTIÓN DE FOTOS ---
+// --- FOTOS ---
 document.getElementById('fotoFile').onchange = e => {
     const file = e.target.files[0];
     if (!file) return;
@@ -352,11 +261,8 @@ document.getElementById('fotoPerfilFile').onchange = e => {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const MAX = 200;
-            let w = img.width, h = img.height;
-            if (w > MAX) { h *= MAX/w; w = MAX; }
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            canvas.width = 200; canvas.height = 200;
+            canvas.getContext('2d').drawImage(img, 0, 0, 200, 200);
             fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.8);
             document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64;
         };
@@ -369,7 +275,6 @@ document.getElementById('fotoPerfilFile').onchange = e => {
 function verificarPerfil() {
     const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
     document.getElementById("bannerPerfil").style.display = (n && t) ? "none" : "block";
-    if(fotoPerfilBase64) document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64;
     return (n && t);
 }
 window.abrirPerfil = () => {
@@ -406,6 +311,7 @@ window.publicar = async () => {
         titulo: t, descripcion: document.getElementById('descripcion').value,
         precio: parseFloat(p).toFixed(2), foto: imagenBase64,
         categoria: document.getElementById('categoria').value,
+        entrega: document.getElementById('opcionEnvio').value, // NUEVO
         depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
         vendedor: localStorage.getItem("p_nombre"), telefono: localStorage.getItem("p_tel"),
         fotoPerfilVendedor: fotoPerfilBase64,
@@ -454,21 +360,12 @@ window.verFavoritos = (b) => setCat("Favoritos", b);
 window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
     const filtrados = productos.filter(p => p.duenoId === idVendedor);
     const feed = document.getElementById('feed');
-    feed.innerHTML = `
-        <div class="header-catalogo">
-            <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
-            <h2 style="margin:5px 0">${nombreVendedor}</h2>
-            <p style="font-size:12px; color:var(--mut)">Catálogo de productos</p>
-            <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer; margin-top:10px">Ver todo el Market</button>
-        </div>
-    `;
-    const disp = filtrados.filter(p => !p.vendido);
-    const vend = filtrados.filter(p => p.vendido);
-    disp.forEach(p => feed.innerHTML += crearCard(p));
-    if(vend.length > 0) {
-        feed.innerHTML += `<div class="seccion-titulo">YA VENDIDOS POR ESTE VENDEDOR (${vend.length})</div>`;
-        vend.forEach(p => feed.innerHTML += crearCard(p));
-    }
+    feed.innerHTML = `<div class="header-catalogo">
+        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
+        <h2>${nombreVendedor}</h2>
+        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
+    </div>`;
+    filtrados.forEach(p => feed.innerHTML += crearCard(p));
     window.scrollTo(0,0);
 };
 
@@ -499,24 +396,27 @@ function render(lista) {
 function crearCard(p) {
     const esFav = favoritos.includes(p.id);
     const esMio = p.duenoId === MI_ID;
+    const esEnvioNacional = p.entrega === "Envíos a todo el país";
+
     return `
         <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
             <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
-            
             <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
-
             ${p.vendido ? '<div class="sold-overlay">VENDIDO</div>' : ''}
             <img class="foto" src="${p.foto}">
             <div class="info">
-                <span class="tag">${p.categoria}</span>
+                <div class="tags-cont">
+                    <span class="tag">${p.categoria}</span>
+                    <span class="tag-envio" style="background:${esEnvioNacional?'var(--azul)':'var(--mut)'}">
+                        <i class="fa-solid ${esEnvioNacional?'fa-truck-fast':'fa-handshake'}"></i> ${p.entrega || 'Entrega Local'}
+                    </span>
+                </div>
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
                 <div class="loc">${p.muni}, ${p.depto}</div>
-                
-                <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor || ''}')">
-                    <i class="fa-solid fa-store"></i> Ver tienda de ${p.vendedor}
+                <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
+                    <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
-
                 ${!p.vendido ? `<a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ''}
                 ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Vendido</button>` : ''}
                 ${esMio ? `<button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button>` : ''}
@@ -524,14 +424,13 @@ function crearCard(p) {
         </div>`;
 }
 
-// Init departamentos
+// Init
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
     dSelect.innerHTML += `<option value="${d}">${d}</option>`;
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
-
 verificarPerfil();
 cargar();
 </script>
