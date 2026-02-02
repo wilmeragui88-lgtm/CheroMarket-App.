@@ -238,7 +238,28 @@
 
 </div>
         <p>Versión 2.0 Pro · 2026</p>
-    </div>
+   <button id="btnCompartir" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+  📲 Compartir App
+</button>
+
+<script>
+  const btn = document.getElementById('btnCompartir');
+
+  btn.addEventListener('click', () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'CheroMarket App',
+        text: '¡Mira esta app para comprar y vender en El Salvador!',
+        url: 'https://wilmeragui88-lgtm.github.io/CheroMarket-App./'
+      })
+      .then(() => console.log('Compartido con éxito'))
+      .catch((error) => console.log('Error al compartir', error));
+    } else {
+      alert("Tu navegador no soporta compartir directamente, ¡pero puedes copiar el link!");
+    }
+  });
+</script>
+ </div>
 </div>
 
 <div id="feed" class="feed"></div>
