@@ -210,6 +210,28 @@
   <div style="padding: 20px; text-align: center; background-color: #ffffff; border-top: 1px solid #eee;">
     <button type="button" onclick="alert('Gracias por aceptar los términos de CheroMarketApp')" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); transition: background 0.3s;">
       Acepto todos los Términos y Condiciones
+   <button id="btnCompartir" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+  📲 Compartir App
+</button>
+
+<script>
+  const btn = document.getElementById('btnCompartir');
+
+  btn.addEventListener('click', () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'CheroMarket App',
+        text: '¡Mira esta app para comprar y vender en El Salvador!',
+        url: 'https://wilmeragui88-lgtm.github.io/CheroMarket-App./'
+      })
+      .then(() => console.log('Compartido con éxito'))
+      .catch((error) => console.log('Error al compartir', error));
+    } else {
+      alert("Tu navegador no soporta compartir directamente, ¡pero puedes copiar el link!");
+    }
+  });
+</script>
+
     </button>
     <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
   </div>
