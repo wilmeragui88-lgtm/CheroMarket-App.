@@ -131,12 +131,13 @@
 </header>
      
 <div id="sidebar" class="sidebar">
-    <button id="btnCompartirMenu" style="width: 100%; padding: 15px; background-color: #25d366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+    <button class="btn-compartir-app-func" style="width: 100%; padding: 15px; background-color: #25d366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
   📲 Compartir App
 </button>
 
 <script>
-  document.getElementById('btnCompartirMenu').addEventListener('click', () => {
+  // Función para compartir aplicación (Nueva Función 1)
+  function compartirAppFuncional() {
     if (navigator.share) {
       navigator.share({
         title: 'CheroMarket App',
@@ -146,6 +147,10 @@
     } else {
       alert("Copia y comparte este link: https://wilmeragui88-lgtm.github.io/CheroMarket-App./");
     }
+  }
+
+  document.querySelectorAll('.btn-compartir-app-func').forEach(btn => {
+      btn.addEventListener('click', compartirAppFuncional);
   });
 </script>
 
@@ -228,55 +233,21 @@
   <div style="padding: 20px; text-align: center; background-color: #ffffff; border-top: 1px solid #eee;">
     <button type="button" onclick="alert('Gracias por aceptar los términos de CheroMarketApp')" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); transition: background 0.3s;">
       Acepto todos los Términos y Condiciones
-   <button id="btnCompartir" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-  📲 Compartir App
-</button>
-
-<script>
-  const btn = document.getElementById('btnCompartir');
-
-  btn.addEventListener('click', () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'CheroMarket App',
-        text: '¡Mira esta app para comprar y vender en El Salvador!',
-        url: 'https://wilmeragui88-lgtm.github.io/CheroMarket-App./'
-      })
-      .then(() => console.log('Compartido con éxito'))
-      .catch((error) => console.log('Error al compartir', error));
-    } else {
-      alert("Tu navegador no soporta compartir directamente, ¡pero puedes copiar el link!");
-    }
-  });
-</script>
-
     </button>
+    
+    <button class="btn-compartir-app-func" style="margin-top:15px; width:100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        📲 Compartir App
+    </button>
+
     <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
   </div>
 
 </div>
         <p>Versión 2.0 Pro · 2026</p>
-   <button id="btnCompartir" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+   <button class="btn-compartir-app-func" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
   📲 Compartir App
 </button>
 
-<script>
-  const btn = document.getElementById('btnCompartir');
-
-  btn.addEventListener('click', () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'CheroMarket App',
-        text: '¡Mira esta app para comprar y vender en El Salvador!',
-        url: 'https://wilmeragui88-lgtm.github.io/CheroMarket-App./'
-      })
-      .then(() => console.log('Compartido con éxito'))
-      .catch((error) => console.log('Error al compartir', error));
-    } else {
-      alert("Tu navegador no soporta compartir directamente, ¡pero puedes copiar el link!");
-    }
-  });
-</script>
  </div>
 </div>
 
@@ -566,6 +537,12 @@ function render(lista) {
     }
 }
 
+// Nueva Función 2: Función para generar mensaje personalizado de Contacto
+function generarMensajeContacto(titulo, precio, muni, telefono) {
+    const mensaje = encodeURIComponent(`¡Hola! Me interesa este producto que vi en CheroMarket:\n📦 Producto: ${titulo}\n💰 Precio: $${precio}\n📍 Ubicación: ${muni}`);
+    window.open(`https://wa.me/503${telefono}?text=${mensaje}`, '_blank');
+}
+
 function crearCard(p) {
     const esFav = favoritos.includes(p.id);
     const esMio = p.duenoId === MI_ID;
@@ -603,7 +580,7 @@ function crearCard(p) {
                 <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
-                ${!p.vendido ? `<a class="btn-wa" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> Preguntar</a>` : ''}
+                ${!p.vendido ? `<button class="btn-wa" onclick="generarMensajeContacto('${p.titulo}', '${p.precio}', '${p.muni}', '${p.telefono}')" style="border:none; cursor:pointer"><i class="fa-brands fa-whatsapp"></i> Preguntar</button>` : ''}
                 ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Marcar Agotado</button>` : ''}
                 ${esMio ? `<button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button>` : ''}
             </div>
