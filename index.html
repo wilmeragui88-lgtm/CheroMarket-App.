@@ -131,6 +131,24 @@
 </header>
      
 <div id="sidebar" class="sidebar">
+    <button id="btnCompartirMenu" style="width: 100%; padding: 15px; background-color: #25d366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+  📲 Compartir App
+</button>
+
+<script>
+  document.getElementById('btnCompartirMenu').addEventListener('click', () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'CheroMarket App',
+        text: '¡Mira esta app para comprar y vender en El Salvador!',
+        url: 'https://wilmeragui88-lgtm.github.io/CheroMarket-App./'
+      }).catch(console.error);
+    } else {
+      alert("Copia y comparte este link: https://wilmeragui88-lgtm.github.io/CheroMarket-App./");
+    }
+  });
+</script>
+
     <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
     <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
   
