@@ -1,4 +1,42 @@
-<!DOCTYPE html>
+[6:17 p. m., 1/2/2026] 🦅🦅Wil🦅🦅: <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheroMarketApp · Pro 🇸🇻</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root{
+            --azul:#0047AB; --naranja:#FF8C00; --verde:#25D366;
+            --fondo:#f0f2f5; --card:#fff; --txt:#333; --mut:#777; --b:#ddd; --rojo:#c62828
+        }
+        [data-theme=dark]{
+            --fondo:#121212; --card:#1e1e1e; --txt:#eee; --mut:#aaa; --b:#333; --azul:#4c8cff
+        }
+        body{margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--fondo); color:var(--txt); padding-bottom:80px}
+ …
+[6:35 p. m., 1/2/2026] 🦅🦅Wil🦅🦅: rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // REGLAS PARA LA COLECCIÓN DE PRODUCTOS
+    match /productos/{id} {
+      // Cualquier persona (incluso sin login) puede ver los productos
+      allow read: if true; 
+      
+      // Solo usuarios que hayan iniciado sesión pueden crear, actualizar o borrar
+      // 'request.auth != null' asegura que el usuario esté autenticado
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // REGLAS PARA LA COLECCIÓN DE USUARIOS
+    // Esto es necesario para la función registrarUsuarioDB del código
+    match /usuarios/{userId} {
+      // Permite leer datos de usuario si está logueado
+      allow read: if request.auth != null;
+      
+      // Solo el propio …
+[6:37 p. m., 1/2/2026] 🦅🦅Wil🦅🦅: <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -87,7 +125,7 @@
 <body data-theme="light">
 
 <div id="bannerPerfil" class="alerta-perfil">
-    ⚠️ <strong>No has iniciado sesión:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Conecta con Google</a> para vender.
+    ⚠️ <strong>No has iniciado sesión:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Inicia Sesión</a> para vender.
 </div>
 
 <header>
@@ -121,8 +159,8 @@
 <div id="sidebar" class="sidebar">
     <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 20px auto; border-radius: 12px; background: #fff;">
-        <p style="padding: 10px; font-size: 14px;">📜 Al usar esta app aceptas los términos de comercio seguro en El Salvador.</p>
-        <button onclick="logout()" style="width: 100%; color: var(--rojo); padding: 10px; background: none; border: 1px solid var(--rojo); border-radius: 8px;">Cerrar Sesión</button>
+        <p style="padding: 10px; font-size: 14px; color: #333">📜 Al usar esta app aceptas los términos de comercio seguro en El Salvador.</p>
+        <button onclick="logout()" style="width: 100%; color: var(--rojo); padding: 10px; background: none; border: 1px solid var(--rojo); border-radius: 8px; cursor:pointer">Cerrar Sesión</button>
     </div>
 </div>
 
@@ -164,8 +202,8 @@
         </select>
         <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
         <select id="muni"><option value="">Municipio</option></select>
-        <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
-        <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
+        <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; cursor:pointer">Publicar Ahora</button>
+        <button onclick="cerrar()" style="background:none; color:var(--mut); border:none; cursor:pointer">Cancelar</button>
     </div>
 </div>
 
@@ -175,27 +213,33 @@
         <div class="perfil-img-cont">
             <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
         </div>
-        <p id="userEmail" style="text-align:center; font-size:12px; color:var(--mut)"></p>
-        
-        <div id="camposPerfil">
-            <input id="perfilNombre" placeholder="Tu nombre o negocio">
-            <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
-            <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Datos de Venta</button>
+
+        <div id="seccionLogin" style="display: flex; flex-direction: column; gap: 10px;">
+            <input id="logEmail" type="email" placeholder="Correo electrónico">
+            <input id="logPass" type="password" placeholder="Contraseña (min. 6 caracteres)">
+            <button onclick="loginConEmail()" style="background:var(--azul); color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer">Entrar / Registrarse</button>
+            <div style="text-align:center; font-size:12px; color:var(--mut)">— o —</div>
+            <button id="btnLoginGoogle" onclick="loginGoogle()" style="background:#fff; color:#444; border:1px solid #ddd; padding:12px; border-radius:8px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Conectar con Google
+            </button>
         </div>
 
-        <button id="btnLoginGoogle" onclick="loginGoogle()" style="background:#fff; color:#444; border:1px solid #ddd; padding:12px; border-radius:8px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:10px">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Conectar con Google
-        </button>
+        <div id="camposPerfil" style="display:none; flex-direction: column; gap: 10px;">
+            <p id="userEmail" style="text-align:center; font-size:12px; color:var(--mut)"></p>
+            <input id="perfilNombre" placeholder="Tu nombre o negocio">
+            <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
+            <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; cursor:pointer">Guardar Datos de Venta</button>
+            <button onclick="verMisAnuncios()" id="btnMisAnuncios" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px; cursor:pointer">Mis Anuncios</button>
+        </div>
 
-        <button onclick="verMisAnuncios()" id="btnMisAnuncios" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px; display:none">Mis Anuncios</button>
-        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
+        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none; cursor:pointer">Cerrar</button>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -232,37 +276,64 @@ let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
 let fotosAnuncio = ["", "", ""];
 
-// AUTH OBSERVER
-onAuthStateChanged(auth, (user) => {
+// --- AUTH LOGIC ---
+
+onAuthStateChanged(auth, async (user) => {
+    const secLogin = document.getElementById("seccionLogin");
+    const secPerfil = document.getElementById("camposPerfil");
+
     if (user) {
         document.getElementById("bannerPerfil").style.display = "none";
-        document.getElementById("imgPerfilPrevia").src = user.photoURL;
+        document.getElementById("imgPerfilPrevia").src = user.photoURL || 'https://via.placeholder.com/80';
         document.getElementById("userEmail").innerText = user.email;
-        document.getElementById("btnLoginGoogle").style.display = "none";
-        document.getElementById("btnMisAnuncios").style.display = "block";
-        document.getElementById("perfilNombre").value = localStorage.getItem("p_nombre") || user.displayName;
+        secLogin.style.display = "none";
+        secPerfil.style.display = "flex";
+        document.getElementById("perfilNombre").value = localStorage.getItem("p_nombre") || user.displayName || "";
     } else {
         document.getElementById("bannerPerfil").style.display = "block";
-        document.getElementById("btnLoginGoogle").style.display = "flex";
-        document.getElementById("btnMisAnuncios").style.display = "none";
+        secLogin.style.display = "flex";
+        secPerfil.style.display = "none";
     }
 });
 
-window.loginGoogle = async () => {
-    const provider = new GoogleAuthProvider();
+async function registrarUsuarioDB(user) {
     try {
-        const res = await signInWithPopup(auth, provider);
-        await setDoc(doc(db, "usuarios", res.user.uid), {
-            nombre: res.user.displayName,
-            correo: res.user.email,
-            foto: res.user.photoURL,
+        await setDoc(doc(db, "usuarios", user.uid), {
+            nombre: user.displayName || "Usuario",
+            correo: user.email,
+            foto: user.photoURL || "",
             login: Date.now()
         }, { merge: true });
-        alert("¡Bienvenido!");
-    } catch (e) { alert("Error al entrar con Google"); }
+    } catch (e) { console.error("Error DB:", e); }
+}
+
+window.loginGoogle = async () => {
+    try {
+        const res = await signInWithPopup(auth, new GoogleAuthProvider());
+        await registrarUsuarioDB(res.user);
+    } catch (e) { alert("Error con Google"); }
+};
+
+window.loginConEmail = async () => {
+    const email = document.getElementById("logEmail").value;
+    const pass = document.getElementById("logPass").value;
+    if(!email || pass.length < 6) return alert("Ingresa datos válidos (Pass min 6 caracteres)");
+
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+    } catch (e) {
+        if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
+                await registrarUsuarioDB(res.user);
+            } catch (e2) { alert("Error al crear cuenta: " + e2.message); }
+        } else { alert("Error: " + e.message); }
+    }
 };
 
 window.logout = () => signOut(auth).then(() => location.reload());
+
+// --- MARKET LOGIC ---
 
 window.verImagenFull = (src) => {
     document.getElementById('fotoGrande').src = src;
@@ -324,27 +395,29 @@ window.actualizarMunicipios = () => {
 
 window.publicar = async () => {
     const user = auth.currentUser;
-    if(!user) return alert("Inicia sesión con Google");
+    if(!user) return alert("Inicia sesión");
     const t = document.getElementById('titulo').value, p = document.getElementById('precio').value;
     const cant = document.getElementById('cantidad').value;
     const fotosFinales = fotosAnuncio.filter(f => f !== "");
     if(!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
     
-    await addDoc(collection(db,"productos"), {
-        titulo: t, descripcion: document.getElementById('descripcion').value,
-        precio: parseFloat(p).toFixed(2), 
-        cantidad: parseInt(cant) || 1,
-        fotos: fotosFinales,
-        categoria: document.getElementById('categoria').value,
-        entrega: document.getElementById('opcionEnvio').value,
-        depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
-        vendedor: localStorage.getItem("p_nombre") || user.displayName, 
-        telefono: localStorage.getItem("p_tel"),
-        fotoPerfilVendedor: user.photoURL,
-        creado: Date.now(), duenoId: user.uid, vendido: (parseInt(cant) <= 0), oculto: false
-    });
-    alert("¡Publicado!");
-    location.reload();
+    try {
+        await addDoc(collection(db,"productos"), {
+            titulo: t, descripcion: document.getElementById('descripcion').value,
+            precio: parseFloat(p).toFixed(2), 
+            cantidad: parseInt(cant) || 1,
+            fotos: fotosFinales,
+            categoria: document.getElementById('categoria').value,
+            entrega: document.getElementById('opcionEnvio').value,
+            depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
+            vendedor: localStorage.getItem("p_nombre") || user.displayName || "Vendedor", 
+            telefono: localStorage.getItem("p_tel"),
+            fotoPerfilVendedor: user.photoURL || "",
+            creado: Date.now(), duenoId: user.uid, vendido: (parseInt(cant) <= 0), oculto: false
+        });
+        alert("¡Publicado!");
+        location.reload();
+    } catch (e) { alert("Error al publicar: Revisa los permisos de Firestore."); }
 };
 
 window.compartirPost = async (titulo, precio, muni) => {
@@ -400,7 +473,7 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
     feed.innerHTML = `<div class="header-catalogo">
         <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
         <h2>${nombreVendedor}</h2>
-        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
+        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer">Ver todo el Market</button>
     </div>`;
     filtrados.forEach(p => feed.innerHTML += crearCard(p));
     window.scrollTo(0,0);
@@ -408,14 +481,16 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
 
 window.verMisAnuncios = () => {
     cerrarPerfil();
-    if(auth.currentUser) verCatalogo(auth.currentUser.uid, auth.currentUser.displayName, auth.currentUser.photoURL);
+    if(auth.currentUser) verCatalogo(auth.currentUser.uid, auth.currentUser.displayName || "Mi Tienda", auth.currentUser.photoURL);
 };
 
 async function cargar() {
-    const q = query(collection(db, "productos"), orderBy("creado", "desc"));
-    const snap = await getDocs(q);
-    productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
-    render(productos);
+    try {
+        const q = query(collection(db, "productos"), orderBy("creado", "desc"));
+        const snap = await getDocs(q);
+        productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
+        render(productos);
+    } catch (e) { console.error("Error cargando:", e); }
 }
 
 function render(lista) {
@@ -467,7 +542,7 @@ function crearCard(p) {
                 <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
-                ${!p.vendido ? <a class="btn-wa" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> Preguntar</a> : ''}
+                ${!p.vendido ? <a class="btn-wa" href="https://wa.me/503${p.telefono}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Preguntar</a> : ''}
                 ${esMio && !p.vendido ? <button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Marcar Agotado</button> : ''}
                 ${esMio ? <button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button> : ''}
             </div>
