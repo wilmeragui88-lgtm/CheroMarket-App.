@@ -559,15 +559,13 @@ Object.keys(svData).forEach(d => {
 verificarPerfil();
 cargar();
 </script>
-  // Verificamos si el navegador soporta Service Workers
+<script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('sw.js')
         .then(function(registration) {
-          // Si sale este mensaje en consola, ¡todo va bien!
-          console.log('ServiceWorker registrado con éxito en el ámbito: ', registration.scope);
+          console.log('ServiceWorker registrado con éxito');
         }, function(err) {
-          // Si hay un error, aparecerá aquí
           console.log('Fallo en el registro del ServiceWorker: ', err);
         });
     });
