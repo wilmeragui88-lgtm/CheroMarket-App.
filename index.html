@@ -256,6 +256,24 @@
             <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
             <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
         </div>
+        
+        <input id="perfilNombre" placeholder="Nombre de tu negocio o personal">
+        <input id="perfilTelefono" type="number" placeholder="WhatsApp (sin el +503)">
+        
+        <button onclick="crearCuenta()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">
+            Crear cuenta nueva
+        </button>
+
+        <div style="margin-top:15px; border-top:1px solid #ddd; padding-top:10px; text-align:center">
+            <span style="font-size:12px; color:var(--mut)">¿Ya tienes cuenta?</span><br>
+            <button onclick="iniciarSesionCorreo()" style="color:var(--azul); background:none; border:none; text-decoration:underline; cursor:pointer; font-weight:bold">
+                Entrar con mi correo
+            </button>
+        </div>
+        
+        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none; margin-top:10px">Cerrar</button>
+    </div>
+        </div>
         <input id="perfilNombre" placeholder="Tu nombre o negocio">
         <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
         <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
@@ -264,10 +282,66 @@
     </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+const auth = getAuth(app);
+// --- REGISTRO DE NUEVA CUENTA ---
+window.crearCuenta = async () => {
+    const email = prompt("Ingresa tu correo electrónico:");
+    const pass = prompt("Crea una contraseña (mínimo 6 caracteres):");
+    const nombre = document.getElementById('perfilNombre').value;
+    const tel = document.getElementById('perfilTelefono').value;
+
+    if(!email || pass.length < 6 || !nombre || !tel) {
+        return alert("Por favor completa todos los campos (la clave debe ser de 6+ letras/números)");
+    }
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        // Guardamos sus datos en Firestore usando su UID de cuenta
+        await setDoc(doc(db, "usuarios", user.uid), {
+            nombre: nombre,
+            telefono: tel,
+            foto: fotoPerfilBase64,
+            email: email
+        });
+
+        localStorage.setItem("mi_id_usuario", user.uid);
+        alert("¡Cuenta creada exitosamente, Chero!");
+        location.reload();
+    } catch (error) {
+        alert("Error al crear cuenta: " + error.message);
+    }
+};
+
+// --- INICIAR SESIÓN (Recuperar cuenta en otro cel) ---
+window.iniciarSesionCorreo = async () => {
+    const email = prompt("Ingresa tu correo:");
+    const pass = prompt("Ingresa tu contraseña:");
+
+    if(!email || !pass) return;
+
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        // Traemos sus datos desde la nube
+        const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+        if (docSnap.exists()) {
+            const d = docSnap.data();
+            localStorage.setItem("mi_id_usuario", user.uid);
+            localStorage.setItem("p_nombre", d.nombre);
+            localStorage.setItem("p_tel", d.telefono);
+            localStorage.setItem("p_foto", d.foto);
+            alert("¡Bienvenido de nuevo, " + d.nombre + "!");
+            location.reload();
+        }
+    } catch (error) {
+        alert("Correo o contraseña incorrectos.");
+    }
+}
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
     authDomain:"cheromarket.firebaseapp.com",
@@ -552,8 +626,45 @@ Object.keys(svData).forEach(d => {
     dSelect.innerHTML += `<option value="${d}">${d}</option>`;
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
-verificarPerfil();
-cargar();
+// --- VIGILANTE DE SESIÓN ACTIVA ---
+// Este código reemplaza el final de tu script anterior
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // 1. Si hay usuario, recuperamos su ID único de Firebase
+        localStorage.setItem("mi_id_usuario", user.uid);
+        console.log("Sesión activa de: ", user.uid);
+
+        // 2. Bajamos sus datos de la nube si no están en el celular
+        const docRef = doc(db, "usuarios", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const d = docSnap.data();
+            localStorage.setItem("p_nombre", d.nombre);
+            localStorage.setItem("p_tel", d.telefono);
+            localStorage.setItem("p_foto", d.foto);
+            fotoPerfilBase64 = d.foto; 
+        }
+        
+        // 3. Quitamos el mensaje de "Perfil Incompleto" automáticamente
+        verificarPerfil();
+    } else {
+        console.log("No hay sesión iniciada.");
+    }
+    
+    // 4. Cargamos los productos siempre, sin importar si está logueado o no
+    cargar();
+});
+
+// Esto mantiene los departamentos funcionando correctamente
+const dSelect = document.getElementById('depto');
+const fDepto = document.getElementById('filtroDepto');
+if(dSelect && fDepto) {
+    Object.keys(svData).forEach(d => {
+        dSelect.innerHTML += <option value="${d}">${d}</option>;
+        fDepto.innerHTML += <option value="${d}">${d}</option>;
+    });
+
 </script>
 </body>
 </html>
