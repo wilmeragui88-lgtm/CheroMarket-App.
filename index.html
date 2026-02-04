@@ -212,7 +212,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -259,7 +259,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// FUNCIONES DE ACCESO SEPARADAS
+// FUNCIONES DE ACCESO
 window.entrarApp = async () => {
     const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPass').value;
     if(!e || !p) return alert("Hey chero, pon tu correo y clave.");
@@ -284,7 +284,7 @@ window.cerrarSesion = async () => {
     }
 };
 
-// GESTIÓN DE PRODUCTOS (IGUAL QUE TU CÓDIGO)
+// GESTIÓN DE PRODUCTOS
 window.publicar = async () => {
     const t = document.getElementById('titulo').value, p = document.getElementById('precio').value;
     const cant = document.getElementById('cantidad').value;
@@ -341,8 +341,8 @@ function crearCard(p) {
 
     return `
         <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
-            <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
-            <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
+            <button class="btn-fav ${esFav?'active':''}" onclick="event.stopPropagation(); toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-share-post" onclick="event.stopPropagation(); compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
             ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
             
             <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" onclick="verImagenFull(this.src)">
@@ -372,20 +372,23 @@ function crearCard(p) {
 // PERFIL Y UTILIDADES
 window.guardarPerfil = async () => {
     const n = document.getElementById('perfilNombre').value, t = document.getElementById('perfilTelefono').value;
-    await setDoc(doc(db, "usuarios", MI_ID), { nombre: n, telefono: t, foto: fotoPerfilBase64 }, { merge: true });
+    if(!n || !t) return alert("Completa tus datos, chero.");
+    await setDoc(doc(db, "usuarios", MI_ID), { nombre: n, telefono: t, foto: fotoPerfilBase64, perfilCompletado: true }, { merge: true });
     localStorage.setItem("p_nombre", n); localStorage.setItem("p_tel", t); localStorage.setItem("p_foto", fotoPerfilBase64);
     verificarPerfil(); document.getElementById('modalPerfil').style.display = "none";
+    alert("Perfil Guardado ✅");
 };
 
 window.verificarPerfil = () => {
     const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
-    document.getElementById("bannerPerfil").style.display = (n && t) ? "none" : "block";
-    return (n && t);
+    const incompleto = (!n || n === "" || !t || t === "");
+    document.getElementById("bannerPerfil").style.display = incompleto ? "block" : "none";
+    return !incompleto;
 };
 
 window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
-window.abrir = () => !verificarPerfil() ? abrirPerfil() : document.getElementById('modal').style.display = "block";
+window.abrir = () => !verificarPerfil() ? (alert("Completa tu perfil primero"), abrirPerfil()) : document.getElementById('modal').style.display = "block";
 window.cerrar = () => document.getElementById('modal').style.display = "none";
 window.abrirPerfil = () => {
     document.getElementById('perfilNombre').value = localStorage.getItem("p_nombre") || "";
@@ -396,16 +399,24 @@ window.abrirPerfil = () => {
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
 window.verImagenFull = (src) => { document.getElementById('fotoGrande').src = src; document.getElementById('visorFotoInterno').style.display = 'flex'; };
 window.marcarVendido = async (id) => { if(confirm("¿Marcar como agotado?")) { await updateDoc(doc(db,"productos",id), {vendido:true, cantidad: 0}); cargar(); } };
-window.eliminar = async (id) => { if(confirm("¿Eliminar?")) { await updateDoc(doc(db,"productos",id), {oculto:true}); cargar(); } };
+window.eliminar = async (id) => { if(confirm("¿Eliminar este anuncio permanentemente?")) { await deleteDoc(doc(db,"productos",id)); cargar(); } };
 window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value, m = document.getElementById('muni');
     m.innerHTML = '<option value="">Municipio</option>';
     if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
+
+// --- FUNCIÓN FAVORITOS ---
 window.toggleFavorito = (id) => {
-    favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
-    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos)); render(productos);
+    if(favoritos.includes(id)) {
+        favoritos = favoritos.filter(f => f !== id);
+    } else {
+        favoritos.push(id);
+    }
+    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
+    render(productos);
 };
+
 window.setCat = (c, b) => {
     state.categoria = c;
     document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
@@ -413,6 +424,7 @@ window.setCat = (c, b) => {
     filtrar();
 };
 window.verFavoritos = (b) => setCat("Favoritos", b);
+
 window.filtrar = () => {
     const txt = document.getElementById('buscar').value.toLowerCase();
     const dep = document.getElementById('filtroDepto').value;
@@ -433,7 +445,7 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
     feed.innerHTML = `<div class="header-catalogo">
         <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
         <h2>${nombreVendedor}</h2>
-        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
+        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer">Ver todo el Market</button>
     </div>`;
     filtrados.forEach(p => feed.innerHTML += crearCard(p));
     window.scrollTo(0,0);
@@ -444,10 +456,15 @@ window.verMisAnuncios = () => {
     verCatalogo(MI_ID, localStorage.getItem("p_nombre"), fotoPerfilBase64);
 };
 
+// --- FUNCIÓN COMPARTIR ---
 window.compartirPost = async (titulo, precio, muni) => {
-    const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 ${titulo}\n💰 $${precio}\n📍 ${muni}`;
-    if (navigator.share) { try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {} }
-    else { navigator.clipboard.writeText(texto + " " + window.location.href); alert("¡Enlace copiado!"); }
+    const texto = `¡Mira este chero-precio en CheroMarketApp! 🇸🇻\n📦 ${titulo}\n💰 $${precio}\n📍 ${muni}`;
+    if (navigator.share) { 
+        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {} 
+    } else { 
+        navigator.clipboard.writeText(texto + " " + window.location.href); 
+        alert("¡Enlace copiado al portapapeles!"); 
+    }
 };
 
 // MANEJO FOTOS
@@ -487,7 +504,7 @@ document.getElementById('fotoPerfilFile').onchange = e => {
     reader.readAsDataURL(e.target.files[0]);
 };
 
-// INIT
+// INIT DEPTO SELECTS
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
