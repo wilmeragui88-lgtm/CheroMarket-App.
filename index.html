@@ -1,161 +1,494 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="manifest" href="manifest.json">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheroMarketApp · Pro 🇸🇻</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root{
+            --azul:#0047AB; --naranja:#FF8C00; --verde:#25D366;
+            --fondo:#f0f2f5; --card:#fff; --txt:#333; --mut:#777; --b:#ddd; --rojo:#c62828
+        }
+        [data-theme=dark]{
+            --fondo:#121212; --card:#1e1e1e; --txt:#eee; --mut:#aaa; --b:#333; --azul:#4c8cff
+        }
+        body{margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--fondo); color:var(--txt); padding-bottom:80px}
+        header{background:var(--card); border-bottom:3px solid var(--azul); padding:15px; text-align:center; position:sticky; top:0; z-index:9}
+        h1{margin:0; color:var(--azul); font-size: 22px;}
+        .sub{font-size:12px; color:var(--mut); margin-bottom: 10px;}
+
+        .alerta-perfil{background: #fff3cd; color: #856404; padding: 12px; font-size: 13px; text-align: center; border-bottom: 1px solid #ffeeba; display: none; position: sticky; top: 0; z-index: 10;}
+
+        .buscador-cont{max-width:500px; margin:10px auto; display:flex; gap:8px; position:relative; padding: 0 10px;}
+        .buscador{flex:1; padding:12px 12px 12px 35px; border-radius:25px; border:1px solid var(--b); background:var(--fondo); color: var(--txt)}
+        .search-icon{position:absolute; left:22px; top:15px; color:var(--mut)}
+        .input-precio{width: 80px; padding: 12px; border-radius: 25px; border: 1px solid var(--b); background: var(--fondo); color: var(--txt); text-align: center;}
+        
+        .filtro-depto-cont{max-width:500px; margin: 5px auto; padding: 0 10px;}
+        #filtroDepto{width:100%; padding: 10px; border-radius: 12px; border: 1px solid var(--azul); background: var(--card); color: var(--azul); font-weight: bold;}
+
+        .categorias{display:flex; gap:8px; overflow-x:auto; padding:10px; max-width:500px; margin:auto; scrollbar-width: none;}
+        .cat{padding:8px 14px; border:none; border-radius:20px; font-weight:600; background:var(--b); color: var(--txt); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px}
+        .cat.active{background:var(--azul); color:white}
+        .cat-fav{background: #ffeaa7 !important; color: #d63031 !important;}
+
+        .perfil-img-cont{text-align:center; position:relative; width:80px; margin:auto}
+        .foto-perfil{width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--azul); background:#eee; cursor:pointer}
+        .header-catalogo{grid-column: 1 / -1; background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 1px solid var(--azul); margin-bottom: 10px;}
+
+        .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
+        .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
+        .foto-principal{height:160px; width:100%; object-fit:cover; background:#eee; cursor: pointer;}
+        
+        .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b);}
+        .mini-foto{width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer;}
+
+        .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
+        .btn-fav.active {color: #ff4757;}
+        .btn-share-post {position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--azul);}
+
+        .info{padding:10px; display:flex; flex-direction:column; gap:4px; flex:1}
+        .tags-cont{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px}
+        .tag{font-size:9px; border:1px solid var(--azul); color:var(--azul); padding:1px 6px; border-radius:4px; font-weight: bold;}
+        .tag-envio{font-size:9px; background:var(--azul); color:white; padding:1px 6px; border-radius:4px; font-weight: bold;}
+        .tag-stock{font-size:10px; color:var(--verde); font-weight:bold; margin-top:2px}
+        
+        .titulo{font-weight:600; font-size:15px; line-height: 1.2; margin-top: 4px;}
+        .precio{color:var(--naranja); font-size:18px; font-weight:800}
+        .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
+        .vendedor-link {font-size: 11px; color: var(--azul); text-decoration: underline; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 4px;}
+
+        .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
+        .btn-vendido-accion{background:var(--azul); color:white; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:8px}
+        .btn-eliminar-accion{background:none; color:var(--rojo); border:none; padding:5px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:5px}
+        .btn-add{position:fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:var(--naranja); color:white; font-size:28px; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:10; cursor:pointer}
+        
+        #modal, #modalPerfil{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:99; overflow-y:auto; padding:20px}
+        .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
+        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
+        
+        #visorFotoInterno{position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; display:none; justify-content:center; align-items:center; flex-direction:column}
+        #fotoGrande{max-width:95%; max-height:80%; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5)}
+        .btn-cerrar-visor{position:absolute; top:30px; right:20px; color:white; font-size:30px; cursor:pointer; background:none; border:none}
+
+        .subir-fotos-grid{display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px;}
+        .foto-input-box{border: 2px dashed var(--azul); border-radius: 8px; height: 80px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--fondo);}
+        .foto-input-box input{opacity: 0; position: absolute; inset: 0; z-index: 2; cursor: pointer;}
+        .foto-input-box img{width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; display:none}
+
+        .sidebar{position:fixed; top:0; right:-280px; width:280px; height:100%; background:var(--card); box-shadow:-5px 0 15px rgba(0,0,0,0.3); z-index:100; transition:0.3s; padding:20px; box-sizing:border-box}
+        .sidebar.active{right:0}
+        .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
+        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.7); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
+        .seccion-titulo{grid-column: 1 / -1; font-size: 14px; font-weight: bold; color: var(--mut); margin-top: 15px; border-bottom: 1px solid var(--b); padding-bottom: 5px;}
+    </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0047AB">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1162/1162456.png">
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#317EFB">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="CheroMarket">
+<link rel="apple-touch-icon" href="icon-192.jpg">
+
+</head>
+<body data-theme="light">
+
+<div id="bannerPerfil" class="alerta-perfil">
+    ⚠️ <strong>Perfil Incompleto:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Configura tu perfil</a> para vender.
+</div>
+
+<header>
+    <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    <h1>🇸🇻 CheroMarketApp</h1>
+    <div class="sub">Compra y vende entre salvadoreños</div>
+
+    <div class="buscador-cont">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input id="buscar" class="buscador" placeholder="¿Qué buscas?" oninput="filtrar()">
+        <input id="precioMax" class="input-precio" type="number" placeholder="$ Máx" oninput="filtrar()">
+        <button class="btn-theme" style="background:none; border:none; cursor:pointer; color:var(--azul)" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
+    </div>
+
+    <div class="filtro-depto-cont">
+        <select id="filtroDepto" onchange="filtrar()">
+            <option value="">📍 Todo El Salvador</option>
+        </select>
+    </div>
+
+    <div class="categorias">
+        <button class="cat active" onclick="setCat('Todos',this)"><i class="fa-solid fa-border-all"></i> Todos</button>
+        <button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tecnología</button>
+        <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
+        <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
+        <button class="cat cat-fav" onclick="verFavoritos(this)"><i class="fa-solid fa-heart"></i> Favoritos</button>
+        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user-circle"></i> Mi Perfil</button>
+    </div>
+</header>
+     
+<div id="sidebar" class="sidebar">
+    <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
+    <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
+  
+  <div style="max-height: 450px; overflow-y: auto; scrollbar-width: thin;">
+    
+    <details style="border-bottom: 1px solid #eee;" open>
+      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
+        <span style="margin-right: 12px; font-size: 1.2em;">📜</span> Términos y Condiciones de CheroMarketApp
+      </summary>
+      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
+        <h4 style="margin-top: 0;">1. Aceptación de los Términos</h4>
+        <p>Al descargar, instalar o usar CheroMarketApp, el usuario acepta cumplir con estos términos. Si no está de acuerdo, debe abstenerse de utilizar la plataforma.</p>
+        
+        <h4>2. Descripción del Servicio</h4>
+        <p>CheroMarketApp es una plataforma intermediaria que permite a los usuarios publicar anuncios de productos o servicios para su compra y venta en el territorio de El Salvador. La aplicación no es dueña, no vende, ni garantiza los artículos publicados por terceros.</p>
+        
+        <h4>3. Registro y Seguridad</h4>
+        <ul>
+          <li>Solo podrán registrarse personas mayores de 18 años.</li>
+          <li>El usuario es responsable de mantener la confidencialidad de sus credenciales de acceso.</li>
+          <li>Cualquier actividad realizada bajo la cuenta del usuario será su responsabilidad exclusiva.</li>
+        </ul>
+        
+        <h4>4. Reglas de Publicación y Uso</h4>
+        <p>Queda estrictamente prohibido publicar artículos ilegales según las leyes de la República de El Salvador, contenido ofensivo o productos falsificados.</p>
+        
+        <h4>5. Responsabilidad en las Transacciones</h4>
+        <p>CheroMarketApp no participa en la negociación ni entrega. El contacto y la transacción financiera ocurren exclusivamente entre comprador y vendedor.</p>
+        
+        <h4>6. Privacidad de Datos</h4>
+        <p>El uso de datos personales se rige por nuestra Política de Privacidad, cumpliendo con los estándares de protección de datos en el país.</p>
+        
+        <h4>7. Suspensión y Terminación</h4>
+        <p>Nos reservamos el derecho de suspender cuentas que infrinjan estos términos sin previo aviso.</p>
+        
+        <h4>8. Modificaciones</h4>
+        <p>Podemos actualizar estos términos en cualquier momento notificando cambios significativos.</p>
+        
+        <h4>9. Jurisdicción y Ley Aplicable</h4>
+        <p>Leyes de la República de El Salvador. Disputas ante tribunales de San Salvador.</p>
+      </div>
+    </details>
+
+    <details style="border-bottom: 1px solid #eee;">
+      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
+        <span style="margin-right: 12px; font-size: 1.2em;">⚖️</span> Política de Privacidad
+      </summary>
+      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
+        <p><em>Última actualización: 22 de enero de 2026</em></p>
+        <h4>1. Información que Recopilamos</h4>
+        <p>Recolectamos información de registro (nombre, email, teléfono), contenido del usuario (fotos, mensajes), datos de ubicación y del dispositivo.</p>
+        
+        <h4>2. Uso de la Información</h4>
+        <p>Para facilitar anuncios, personalizar tu experiencia en El Salvador, enviar notificaciones y mantener la seguridad.</p>
+        
+        <h4>3. Cómo Compartimos tu Información</h4>
+        <p>Tu nombre y teléfono pueden ser visibles en anuncios. No vendemos tus datos a terceros con fines publicitarios.</p>
+        
+        <h4>4. Tus Derechos</h4>
+        <p>Puedes editar tu perfil, solicitar la eliminación de tu cuenta o gestionar permisos de ubicación y cámara desde tu dispositivo.</p>
+      </div>
+    </details>
+
+    <details style="border-bottom: 1px solid #eee;">
+      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #e8f4fd; color: #0056b3; display: flex; align-items: center; list-style: none;">
+        <span style="margin-right: 12px; font-size: 1.2em;">🛡️</span> Guía de Seguridad para Cheros
+      </summary>
+      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; background-color: #fafcfe;">
+        <p><strong>🤝 Negocios Seguros:</strong> Reúnete en centros comerciales o gasolineras con cámaras. Ve acompañado y de día.</p>
+        <p><strong>💰 Pagos:</strong> <strong>NUNCA</strong> envíes dinero por adelantado. Verifica el saldo disponible en tu banco antes de entregar el producto.</p>
+        <p><strong>📦 Verificación:</strong> Prueba los electrónicos y revisa documentos de vehículos en el VMT antes de pagar.</p>
+      </div>
+    </details>
+
+  </div>
+
+  <div style="padding: 20px; text-align: center; background-color: #ffffff; border-top: 1px solid #eee;">
+    <button type="button" onclick="alert('Gracias por aceptar los términos de CheroMarketApp')" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); transition: background 0.3s;">
+      Acepto todos los Términos y Condiciones
+    </button>
+    <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
+  </div>
+
+</div>
+        <p>Versión 2.0 Pro · 2026</p>
+    </div>
+</div>
+
+<div id="feed" class="feed"></div>
+<button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
+
+<div id="visorFotoInterno" onclick="cerrarVisor()">
+    <button class="btn-cerrar-visor"><i class="fa-solid fa-xmark"></i></button>
+    <img id="fotoGrande" src="" onclick="event.stopPropagation()">
+</div>
+
+<div id="modal">
+    <div class="modal-content">
+        <h3>Nuevo Anuncio</h3>
+        <input id="titulo" placeholder="¿Qué vendes?">
+        <textarea id="descripcion" placeholder="Detalles del producto..."></textarea>
+        <div style="display:flex;gap:10px">
+            <input id="precio" type="number" placeholder="Precio $" style="flex:1">
+            <input id="cantidad" type="number" placeholder="Stock" value="1" style="width: 50px; text-align: center;">
+            <select id="estado" style="flex:1">
+                <option value="Nuevo">Nuevo</option>
+                <option value="Usado">Usado</option>
+                <option value="Otros Productos">Otros Productos</option>
+            </select>
+        </div>
+        <select id="opcionEnvio">
+            <option value="Solo entrega local">Solo entrega local</option>
+            <option value="Envíos a todo el país">Envíos a todo el país</option>
+        </select>
+        <div class="subir-fotos-grid">
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2"><i class="fa-solid fa-camera"></i></div>
+        </div>
+        <select id="categoria">
+            <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
+        </select>
+        <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
+        <select id="muni"><option value="">Municipio</option></select>
+        <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
+        <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
+    </div>
+</div>
+
+<div id="modalPerfil">
+    <div class="modal-content">
+        <h3>Mi Perfil de Vendedor</h3>
+        <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
+            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
+            <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+        </div>
+        <input id="perfilNombre" placeholder="Tu nombre o negocio">
+        <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
+        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
+        <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
+        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
+    </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
-    authDomain: "cheromarket.firebaseapp.com",
-    projectId: "cheromarket",
-    storageBucket: "cheromarket.firebasestorage.app",
-    messagingSenderId: "777368646513",
-    appId: "1:777368646513:web:42b49dad96c2dcf76b7cd0"
+    apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
+    authDomain:"cheromarket.firebaseapp.com",
+    projectId:"cheromarket",
+    storageBucket:"cheromarket.firebasestorage.app",
+    messagingSenderId:"777368646513",
+    appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
-// Datos de El Salvador
-const svData = {"Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],"Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],"Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],"Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],"La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],"San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],"Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],"La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],"Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],"San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],"Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],"San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],"Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],"La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]};
-
-setPersistence(auth, browserLocalPersistence);
+const svData = {
+"Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
+"Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
+"Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
+"Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+"La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+"San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
+"Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
+"La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
+"Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
+"San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+"Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
+"San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
+"Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+"La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
+};
 
 let productos = [];
 let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
-let MI_ID = null;
+const MI_ID = localStorage.getItem("mi_id_usuario") || "u_" + Math.random().toString(36).substr(2, 9);
+localStorage.setItem("mi_id_usuario", MI_ID);
+
 let fotosAnuncio = ["", "", ""];
 let fotoPerfilBase64 = localStorage.getItem("p_foto") || "";
 
-// MONITOR DE SESIÓN
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        MI_ID = user.uid;
-        document.getElementById('modalLogin').style.display = 'none';
-        
-        // Recuperar datos del perfil desde Firestore
-        const docRef = doc(db, "usuarios", user.uid);
-        const dSnap = await getDoc(docRef);
-        
-        if (dSnap.exists()) {
-            const data = dSnap.data();
-            localStorage.setItem("p_nombre", data.nombre || "");
-            localStorage.setItem("p_tel", data.telefono || "");
-            if(data.foto) {
-                fotoPerfilBase64 = data.foto;
-                localStorage.setItem("p_foto", data.foto);
-            }
-        }
-        verificarPerfil();
-        cargar();
-    } else {
-        document.getElementById('modalLogin').style.display = 'flex';
-    }
+window.verImagenFull = (src) => {
+    document.getElementById('fotoGrande').src = src;
+    document.getElementById('visorFotoInterno').style.display = 'flex';
+};
+window.cerrarVisor = () => document.getElementById('visorFotoInterno').style.display = 'none';
+
+document.querySelectorAll('.foto-item').forEach(input => {
+    input.onchange = e => {
+        const file = e.target.files[0];
+        const idx = e.target.dataset.idx;
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 800; let w = img.width, h = img.height;
+                if (w > MAX) { h *= MAX/w; w = MAX; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                const b64 = canvas.toDataURL('image/jpeg', 0.7);
+                fotosAnuncio[idx] = b64;
+                const prev = document.getElementById(`p-${idx}`);
+                prev.src = b64; prev.style.display = "block";
+            };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
 });
 
-// FUNCIONES DE ACCESO
-window.entrarApp = async () => {
-    const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPass').value;
-    if(!e || !p) return alert("Hey chero, pon tu correo y clave.");
-    try { await signInWithEmailAndPassword(auth, e, p); } 
-    catch (err) { alert("❌ Datos incorrectos o usuario no existe."); }
+document.getElementById('fotoPerfilFile').onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 200; canvas.height = 200;
+            canvas.getContext('2d').drawImage(img, 0, 0, 200, 200);
+            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64;
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
 };
 
-window.registrarApp = async () => {
-    const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPass').value;
-    if(!e || p.length < 6) return alert("Escribe un correo válido y clave de min. 6 caracteres");
-    try { 
-        await createUserWithEmailAndPassword(auth, e, p); 
-        alert("✅ ¡Cuenta creada con éxito! Ahora configura tu perfil.");
-    } catch (err) { alert("Error: " + err.message); }
+window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
+window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
+window.abrir = () => !verificarPerfil() ? abrirPerfil() : document.getElementById('modal').style.display = "block";
+window.cerrar = () => {
+    document.getElementById('modal').style.display = "none";
+    fotosAnuncio = ["", "", ""];
+    document.querySelectorAll('.foto-input-box img').forEach(i => i.style.display="none");
 };
 
-window.cerrarSesion = async () => {
-    if(confirm("¿Cerrar sesión?")) {
-        await signOut(auth);
-        localStorage.clear();
-        location.reload();
-    }
-};
-
-// GESTIÓN DE PERFIL (CORREGIDA)
-window.guardarPerfil = async () => {
-    if (!MI_ID) return alert("Debes iniciar sesión primero.");
-
-    const n = document.getElementById('perfilNombre').value.trim();
-    const t = document.getElementById('perfilTelefono').value.trim();
-
-    if (!n || !t) return alert("Por favor, pon tu nombre y WhatsApp.");
-
-    try {
-        await setDoc(doc(db, "usuarios", MI_ID), {
-            nombre: n,
-            telefono: t,
-            foto: fotoPerfilBase64,
-            actualizado: Date.now()
-        }, { merge: true });
-
-        localStorage.setItem("p_nombre", n);
-        localStorage.setItem("p_tel", t);
-        localStorage.setItem("p_foto", fotoPerfilBase64);
-
-        verificarPerfil();
-        document.getElementById('modalPerfil').style.display = "none";
-        alert("¡Perfil guardado, chero! ✅");
-    } catch (err) {
-        console.error(err);
-        alert("Error al guardar: " + err.message);
-    }
-};
-
-window.verificarPerfil = () => {
+function verificarPerfil() {
     const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
-    const incompleto = (!n || n === "" || !t || t === "");
-    document.getElementById("bannerPerfil").style.display = incompleto ? "block" : "none";
-    return !incompleto;
+    document.getElementById("bannerPerfil").style.display = (n && t) ? "none" : "block";
+    return (n && t);
+}
+window.abrirPerfil = () => {
+    document.getElementById('perfilNombre').value = localStorage.getItem("p_nombre") || "";
+    document.getElementById('perfilTelefono').value = localStorage.getItem("p_tel") || "";
+    document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64 || "https://via.placeholder.com/80";
+    document.getElementById('modalPerfil').style.display = "block";
+};
+window.guardarPerfil = () => {
+    localStorage.setItem("p_nombre", document.getElementById('perfilNombre').value);
+    localStorage.setItem("p_tel", document.getElementById('perfilTelefono').value);
+    localStorage.setItem("p_foto", fotoPerfilBase64);
+    verificarPerfil(); document.getElementById('modalPerfil').style.display = "none";
+};
+window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
+
+window.actualizarMunicipios = () => {
+    const d = document.getElementById('depto').value;
+    const m = document.getElementById('muni');
+    m.innerHTML = '<option value="">Municipio</option>';
+    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
 
-// PUBLICAR
 window.publicar = async () => {
     const t = document.getElementById('titulo').value, p = document.getElementById('precio').value;
     const cant = document.getElementById('cantidad').value;
     const fotosFinales = fotosAnuncio.filter(f => f !== "");
-    
     if(!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
-    if(!verificarPerfil()) return alert("Configura tu perfil antes de vender.");
-
+    
     await addDoc(collection(db,"productos"), {
-        titulo: t, 
-        descripcion: document.getElementById('descripcion').value,
+        titulo: t, descripcion: document.getElementById('descripcion').value,
         precio: parseFloat(p).toFixed(2), 
         cantidad: parseInt(cant) || 1,
         fotos: fotosFinales,
         categoria: document.getElementById('categoria').value,
         entrega: document.getElementById('opcionEnvio').value,
-        depto: document.getElementById('depto').value, 
-        muni: document.getElementById('muni').value,
-        vendedor: localStorage.getItem("p_nombre"), 
-        telefono: localStorage.getItem("p_tel"),
+        depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
+        vendedor: localStorage.getItem("p_nombre"), telefono: localStorage.getItem("p_tel"),
         fotoPerfilVendedor: fotoPerfilBase64,
-        creado: Date.now(), 
-        duenoId: MI_ID, 
-        vendido: false, 
-        oculto: false
+        creado: Date.now(), duenoId: MI_ID, vendido: (parseInt(cant) <= 0), oculto: false
     });
-    alert("¡Publicado con éxito! 🚀");
     location.reload();
 };
 
-// ... RESTO DE TUS FUNCIONES (cargar, render, filtrar, etc.) ...
+window.compartirPost = async (titulo, precio, muni) => {
+    const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 ${titulo}\n💰 $${precio}\n📍 ${muni}`;
+    if (navigator.share) {
+        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
+    } else {
+        navigator.clipboard.writeText(texto + " " + window.location.href);
+        alert("¡Enlace copiado!");
+    }
+};
+
+window.marcarVendido = async (id) => {
+    if(confirm("¿Marcar como agotado?")) { await updateDoc(doc(db,"productos",id), {vendido:true, cantidad: 0}); cargar(); }
+};
+
+window.eliminar = async (id) => {
+    if(confirm("¿Eliminar anuncio?")) { await updateDoc(doc(db,"productos",id), {oculto:true}); cargar(); }
+};
+
+window.filtrar = () => {
+    const txt = document.getElementById('buscar').value.toLowerCase();
+    const dep = document.getElementById('filtroDepto').value;
+    const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
+    const filtrados = productos.filter(p => {
+        const cTxt = p.titulo.toLowerCase().includes(txt) || p.muni.toLowerCase().includes(txt);
+        const cDep = dep === "" || p.depto === dep;
+        const cPre = parseFloat(p.precio) <= pMax;
+        const cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
+        return cTxt && cDep && cPre && cCat;
+    });
+    render(filtrados);
+};
+
+window.setCat = (c, b) => {
+    state.categoria = c;
+    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    filtrar();
+};
+
+window.toggleFavorito = (id) => {
+    favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
+    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
+    render(productos);
+};
+
+window.verFavoritos = (b) => setCat("Favoritos", b);
+
+window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
+    const filtrados = productos.filter(p => p.duenoId === idVendedor);
+    const feed = document.getElementById('feed');
+    feed.innerHTML = `<div class="header-catalogo">
+        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
+        <h2>${nombreVendedor}</h2>
+        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
+    </div>`;
+    filtrados.forEach(p => feed.innerHTML += crearCard(p));
+    window.scrollTo(0,0);
+};
+
+window.verMisAnuncios = () => {
+    cerrarPerfil();
+    verCatalogo(MI_ID, localStorage.getItem("p_nombre"), fotoPerfilBase64);
+};
+
 async function cargar() {
     const q = query(collection(db, "productos"), orderBy("creado", "desc"));
     const snap = await getDocs(q);
@@ -180,6 +513,7 @@ function crearCard(p) {
     const esMio = p.duenoId === MI_ID;
     const esEnvio = p.entrega === "Envíos a todo el país";
     const fotos = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [p.foto] : []);
+    const cantDisp = p.cantidad || (p.vendido ? 0 : 1);
     
     let miniHTML = "";
     if(fotos.length > 1) {
@@ -190,21 +524,26 @@ function crearCard(p) {
 
     return `
         <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
-            <button class="btn-fav ${esFav?'active':''}" onclick="event.stopPropagation(); toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
-            <button class="btn-share-post" onclick="event.stopPropagation(); compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
+            <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
             ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
+            
             <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" onclick="verImagenFull(this.src)">
             ${miniHTML}
+
             <div class="info">
                 <div class="tags-cont">
                     <span class="tag">${p.categoria}</span>
-                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">${p.entrega}</span>
+                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">
+                        <i class="fa-solid ${esEnvio?'fa-truck-fast':'fa-handshake'}"></i> ${p.entrega || 'Local'}
+                    </span>
                 </div>
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
+                <div class="tag-stock">${p.vendido ? 'No disponible' : cantDisp + ' disponibles'}</div>
                 <div class="loc">${p.muni}, ${p.depto}</div>
                 <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
-                    <i class="fa-solid fa-store"></i> Ver tienda de ${p.vendedor}
+                    <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
                 ${!p.vendido ? `<a class="btn-wa" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> Preguntar</a>` : ''}
                 ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Marcar Agotado</button>` : ''}
@@ -213,46 +552,28 @@ function crearCard(p) {
         </div>`;
 }
 
-// UI Helpers
-window.abrirPerfil = () => {
-    document.getElementById('perfilNombre').value = localStorage.getItem("p_nombre") || "";
-    document.getElementById('perfilTelefono').value = localStorage.getItem("p_tel") || "";
-    document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64 || "https://via.placeholder.com/80";
-    document.getElementById('modalPerfil').style.display = "block";
-};
-window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
-window.abrir = () => !verificarPerfil() ? (alert("Completa tu perfil primero"), abrirPerfil()) : document.getElementById('modal').style.display = "block";
-window.cerrar = () => document.getElementById('modal').style.display = "none";
-window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
-window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
-
-// Manejo de fotos de perfil
-document.getElementById('fotoPerfilFile').onchange = e => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 200; canvas.height = 200;
-            canvas.getContext('2d').drawImage(img, 0, 0, 200, 200);
-            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.8);
-            document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64;
-        };
-        img.src = ev.target.result;
-    };
-    reader.readAsDataURL(e.target.files[0]);
-};
-
-// Init select de departamentos
+// Inicialización
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
     dSelect.innerHTML += `<option value="${d}">${d}</option>`;
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
-window.actualizarMunicipios = () => {
-    const d = document.getElementById('depto').value, m = document.getElementById('muni');
-    m.innerHTML = '<option value="">Municipio</option>';
-    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
-};
+verificarPerfil();
+cargar();
 </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js')
+        .then(function(registration) {
+          console.log('ServiceWorker registrado con éxito');
+        }, function(err) {
+          console.log('Fallo en el registro del ServiceWorker: ', err);
+        });
+    });
+  }
+</script>
+
+</body>
+</html>
