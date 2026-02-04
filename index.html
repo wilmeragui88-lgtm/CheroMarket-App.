@@ -382,24 +382,54 @@ function crearCard(p) {
 // PERFIL Y UTILIDADES
 window.guardarPerfil = async () => {
 
-    // 1️⃣ LEER INPUTS
-    const n = document.getElementById('perfilNombre').value,
-          t = document.getElementById('perfilTelefono').value;
+    // 🔐 PROTECCIÓN DE SESIÓN
+    if (!MI_ID) {
+        alert("⏳ Espera un momento, sesión no lista.");
+        return;
+    }
 
-    // 2️⃣ VALIDAR
-    if (!n || !t) return alert("Completa tus datos, chero.");
+    const n = document.getElementById('perfilNombre').value.trim();
+    const t = document.getElementById('perfilTelefono').value.trim();
 
-    // 3️⃣ GUARDAR EN FIRESTORE (LO MÁS IMPORTANTE)
-    await setDoc(
-        doc(db, "usuarios", MI_ID),
-        {
+    if (!n || !t) {
+        alert("Completa tus datos, chero.");
+        return;
+    }
+
+    try {
+        await setDoc(
+            doc(db, "usuarios", MI_ID),
+            {
+                nombre: n,
+                telefono: t,
+                foto: fotoPerfilBase64 || "",
+                perfilCompletado: true,
+                actualizado: Date.now()
+            },
+            { merge: true }
+        );
+
+        // 💾 CACHE
+        localStorage.setItem("p_nombre", n);
+        localStorage.setItem("p_tel", t);
+        localStorage.setItem("p_foto", fotoPerfilBase64 || "");
+
+        // 🧠 MEMORIA VIVA
+        window.PERFIL = {
             nombre: n,
             telefono: t,
-            foto: fotoPerfilBase64,
-            perfilCompletado: true
-        },
-        { merge: true }
-    );
+            foto: fotoPerfilBase64 || ""
+        };
+
+        verificarPerfil();
+        document.getElementById('modalPerfil').style.display = "none";
+        alert("Perfil Guardado ✅");
+
+    } catch (err) {
+        console.error("Error guardando perfil:", err);
+        alert("❌ No se pudo guardar el perfil");
+    }
+};
 
     // 4️⃣ CACHE LOCAL (NO CRÍTICO)
     localStorage.setItem("p_nombre", n);
