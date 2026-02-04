@@ -381,11 +381,45 @@ function crearCard(p) {
 
 // PERFIL Y UTILIDADES
 window.guardarPerfil = async () => {
-    const n = document.getElementById('perfilNombre').value, t = document.getElementById('perfilTelefono').value;
-    if(!n || !t) return alert("Completa tus datos, chero.");
-    await setDoc(doc(db, "usuarios", MI_ID), { nombre: n, telefono: t, foto: fotoPerfilBase64, perfilCompletado: true }, { merge: true });
-    localStorage.setItem("p_nombre", n); localStorage.setItem("p_tel", t); localStorage.setItem("p_foto", fotoPerfilBase64);
-    verificarPerfil(); document.getElementById('modalPerfil').style.display = "none";
+
+    // 1️⃣ LEER INPUTS
+    const n = document.getElementById('perfilNombre').value,
+          t = document.getElementById('perfilTelefono').value;
+
+    // 2️⃣ VALIDAR
+    if (!n || !t) return alert("Completa tus datos, chero.");
+
+    // 3️⃣ GUARDAR EN FIRESTORE (LO MÁS IMPORTANTE)
+    await setDoc(
+        doc(db, "usuarios", MI_ID),
+        {
+            nombre: n,
+            telefono: t,
+            foto: fotoPerfilBase64,
+            perfilCompletado: true
+        },
+        { merge: true }
+    );
+
+    // 4️⃣ CACHE LOCAL (NO CRÍTICO)
+    localStorage.setItem("p_nombre", n);
+    localStorage.setItem("p_tel", t);
+    localStorage.setItem("p_foto", fotoPerfilBase64);
+
+    // 5️⃣ 🔥 MEMORIA VIVA DE LA APP (ESTO ES LO QUE FALTABA)
+    window.PERFIL = {
+        nombre: n,
+        telefono: t,
+        foto: fotoPerfilBase64
+    };
+
+    // 6️⃣ VALIDAR PERFIL
+    verificarPerfil();
+
+    // 7️⃣ CERRAR MODAL
+    document.getElementById('modalPerfil').style.display = "none";
+
+    // 8️⃣ CONFIRMACIÓN
     alert("Perfil Guardado ✅");
 };
 
