@@ -1,214 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <link rel="manifest" href="manifest.json">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CheroMarketApp · Pro 🇸🇻</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        :root{
-            --azul:#0047AB; --naranja:#FF8C00; --verde:#25D366;
-            --fondo:#f0f2f5; --card:#fff; --txt:#333; --mut:#777; --b:#ddd; --rojo:#c62828
-        }
-        [data-theme=dark]{
-            --fondo:#121212; --card:#1e1e1e; --txt:#eee; --mut:#aaa; --b:#333; --azul:#4c8cff
-        }
-        body{margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--fondo); color:var(--txt); padding-bottom:80px}
-        header{background:var(--card); border-bottom:3px solid var(--azul); padding:15px; text-align:center; position:sticky; top:0; z-index:9}
-        h1{margin:0; color:var(--azul); font-size: 22px;}
-        .sub{font-size:12px; color:var(--mut); margin-bottom: 10px;}
-
-        .alerta-perfil{background: #fff3cd; color: #856404; padding: 12px; font-size: 13px; text-align: center; border-bottom: 1px solid #ffeeba; display: none; position: sticky; top: 0; z-index: 10;}
-
-        .buscador-cont{max-width:500px; margin:10px auto; display:flex; gap:8px; position:relative; padding: 0 10px;}
-        .buscador{flex:1; padding:12px 12px 12px 35px; border-radius:25px; border:1px solid var(--b); background:var(--fondo); color: var(--txt)}
-        .search-icon{position:absolute; left:22px; top:15px; color:var(--mut)}
-        .input-precio{width: 80px; padding: 12px; border-radius: 25px; border: 1px solid var(--b); background: var(--fondo); color: var(--txt); text-align: center;}
-        
-        .filtro-depto-cont{max-width:500px; margin: 5px auto; padding: 0 10px;}
-        #filtroDepto{width:100%; padding: 10px; border-radius: 12px; border: 1px solid var(--azul); background: var(--card); color: var(--azul); font-weight: bold;}
-
-        .categorias{display:flex; gap:8px; overflow-x:auto; padding:10px; max-width:500px; margin:auto; scrollbar-width: none;}
-        .cat{padding:8px 14px; border:none; border-radius:20px; font-weight:600; background:var(--b); color: var(--txt); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px}
-        .cat.active{background:var(--azul); color:white}
-        .cat-fav{background: #ffeaa7 !important; color: #d63031 !important;}
-
-        .perfil-img-cont{text-align:center; position:relative; width:80px; margin:auto}
-        .foto-perfil{width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--azul); background:#eee; cursor:pointer}
-        .header-catalogo{grid-column: 1 / -1; background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 1px solid var(--azul); margin-bottom: 10px;}
-
-        .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
-        .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
-        .foto-principal{height:160px; width:100%; object-fit:cover; background:#eee; cursor: pointer;}
-        
-        .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b);}
-        .mini-foto{width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer;}
-
-        .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
-        .btn-fav.active {color: #ff4757;}
-        .btn-share-post {position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--azul);}
-
-        .info{padding:10px; display:flex; flex-direction:column; gap:4px; flex:1}
-        .tags-cont{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px}
-        .tag{font-size:9px; border:1px solid var(--azul); color:var(--azul); padding:1px 6px; border-radius:4px; font-weight: bold;}
-        .tag-envio{font-size:9px; background:var(--azul); color:white; padding:1px 6px; border-radius:4px; font-weight: bold;}
-        .tag-stock{font-size:10px; color:var(--verde); font-weight:bold; margin-top:2px}
-        
-        .titulo{font-weight:600; font-size:15px; line-height: 1.2; margin-top: 4px;}
-        .precio{color:var(--naranja); font-size:18px; font-weight:800}
-        .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
-        .vendedor-link {font-size: 11px; color: var(--azul); text-decoration: underline; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 4px;}
-
-        .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
-        .btn-vendido-accion{background:var(--azul); color:white; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:8px}
-        .btn-eliminar-accion{background:none; color:var(--rojo); border:none; padding:5px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:5px}
-        .btn-add{position:fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:var(--naranja); color:white; font-size:28px; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:10; cursor:pointer}
-        
-        #modal, #modalPerfil, #modalLogin{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:100; overflow-y:auto; padding:20px}
-        #modalLogin{display:flex; align-items:center; justify-content:center; background:var(--fondo); z-index:10000}
-        .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
-        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
-        
-        #visorFotoInterno{position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; display:none; justify-content:center; align-items:center; flex-direction:column}
-        #fotoGrande{max-width:95%; max-height:80%; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5)}
-
-        .subir-fotos-grid{display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px;}
-        .foto-input-box{border: 2px dashed var(--azul); border-radius: 8px; height: 80px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--fondo);}
-        .foto-input-box input{opacity: 0; position: absolute; inset: 0; z-index: 2; cursor: pointer;}
-        .foto-input-box img{width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; display:none}
-
-        .sidebar{position:fixed; top:0; right:-280px; width:280px; height:100%; background:var(--card); box-shadow:-5px 0 15px rgba(0,0,0,0.3); z-index:100; transition:0.3s; padding:20px; box-sizing:border-box}
-        .sidebar.active{right:0}
-        .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
-        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.7); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
-        .seccion-titulo{grid-column: 1 / -1; font-size: 14px; font-weight: bold; color: var(--mut); margin-top: 15px; border-bottom: 1px solid var(--b); padding-bottom: 5px;}
-    </style>
-</head>
-<body data-theme="light">
-
-<div id="bannerPerfil" class="alerta-perfil">
-    ⚠️ <strong>Perfil Incompleto:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Configura tu perfil</a> para vender.
-</div>
-
-<header>
-    <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-    <h1>🇸🇻 CheroMarketApp</h1>
-    <div class="sub">Compra y vende entre salvadoreños</div>
-
-    <div class="buscador-cont">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input id="buscar" class="buscador" placeholder="¿Qué buscas?" oninput="filtrar()">
-        <input id="precioMax" class="input-precio" type="number" placeholder="$ Máx" oninput="filtrar()">
-        <button style="background:none; border:none; cursor:pointer; color:var(--azul)" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
-    </div>
-
-    <div class="filtro-depto-cont">
-        <select id="filtroDepto" onchange="filtrar()">
-            <option value="">📍 Todo El Salvador</option>
-        </select>
-    </div>
-
-    <div class="categorias">
-        <button class="cat active" onclick="setCat('Todos',this)"><i class="fa-solid fa-border-all"></i> Todos</button>
-        <button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tecnología</button>
-        <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
-        <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
-        <button class="cat cat-fav" onclick="verFavoritos(this)"><i class="fa-solid fa-heart"></i> Favoritos</button>
-        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user-circle"></i> Mi Perfil</button>
-    </div>
-</header>
-     
-<div id="sidebar" class="sidebar">
-    <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
-    <button onclick="cerrarSesion()" style="width:100%; padding:12px; background:var(--rojo); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom: 20px;">
-        <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
-    </button>
-    <p style="font-size:12px; color:var(--mut); text-align:center;">Versión 2.0 Pro · 2026</p>
-</div>
-
-<div id="feed" class="feed"></div>
-<button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
-
-<div id="modalLogin">
-    <div class="modal-content" style="text-align:center; max-width:350px;">
-        <img src="https://cdn-icons-png.flaticon.com/512/1162/1162456.png" style="width:70px; margin:auto;">
-        <h2 style="color:var(--azul); margin-top:10px;">¡Qué ondas, Chero!</h2>
-        <p style="font-size:14px; color:var(--mut);">Inicia sesión para ver lo último en el market.</p>
-        
-        <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
-            <input id="loginEmail" type="email" placeholder="Correo electrónico">
-            <input id="loginPass" type="password" placeholder="Contraseña">
-            
-            <button onclick="entrarApp()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">
-                <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
-            </button>
-            
-            <div style="display:flex; align-items:center; margin: 5px 0;">
-                <hr style="flex:1; border:0; border-top:1px solid var(--b);">
-                <span style="margin:0 10px; font-size:12px; color:var(--mut);">¿Eres nuevo?</span>
-                <hr style="flex:1; border:0; border-top:1px solid var(--b);">
-            </div>
-
-            <button onclick="registrarApp()" style="background:white; color:var(--azul); border:2px solid var(--azul); padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">
-                Crear Cuenta Nueva
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="visorFotoInterno" onclick="this.style.display='none'">
-    <img id="fotoGrande" src="">
-</div>
-
-<div id="modal">
-    <div class="modal-content">
-        <h3>Nuevo Anuncio</h3>
-        <input id="titulo" placeholder="¿Qué vendes?">
-        <textarea id="descripcion" placeholder="Detalles del producto..."></textarea>
-        <div style="display:flex;gap:10px">
-            <input id="precio" type="number" placeholder="Precio $" style="flex:1">
-            <input id="cantidad" type="number" placeholder="Stock" value="1" style="width: 50px; text-align: center;">
-            <select id="estado" style="flex:1">
-                <option value="Nuevo">Nuevo</option>
-                <option value="Usado">Usado</option>
-                <option value="Otros Productos">Otros Productos</option>
-            </select>
-        </div>
-        <select id="opcionEnvio">
-            <option value="Solo entrega local">Solo entrega local</option>
-            <option value="Envíos a todo el país">Envíos a todo el país</option>
-        </select>
-        <div class="subir-fotos-grid">
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0"><i class="fa-solid fa-camera"></i></div>
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1"><i class="fa-solid fa-camera"></i></div>
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2"><i class="fa-solid fa-camera"></i></div>
-        </div>
-        <select id="categoria">
-            <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
-        </select>
-        <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
-        <select id="muni"><option value="">Municipio</option></select>
-        <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
-        <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
-    </div>
-</div>
-
-<div id="modalPerfil">
-    <div class="modal-content">
-        <h3>Mi Perfil de Vendedor</h3>
-        <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
-            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
-            <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
-        </div>
-        <input id="perfilNombre" placeholder="Tu nombre o negocio">
-        <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
-        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
-        <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
-        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
-    </div>
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -223,27 +12,27 @@ import {
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
-    authDomain:"cheromarket.firebaseapp.com",
-    projectId:"cheromarket",
-    storageBucket:"cheromarket.firebasestorage.app",
-    messagingSenderId:"777368646513",
-    appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
+    apiKey: "AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
+    authDomain: "cheromarket.firebaseapp.com",
+    projectId: "cheromarket",
+    storageBucket: "cheromarket.firebasestorage.app",
+    messagingSenderId: "777368646513",
+    appId: "1:777368646513:web:42b49dad96c2dcf76b7cd0"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Datos de El Salvador
 const svData = {"Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],"Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],"Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],"Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],"La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],"San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],"Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],"La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],"Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],"San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],"Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],"San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],"Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],"La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]};
-// 🔐 Persistencia de sesión (regreso automático)
-setPersistence(auth, browserLocalPersistence)
-  .catch(err => console.error("Persistencia error:", err));
+
+setPersistence(auth, browserLocalPersistence);
+
 let productos = [];
 let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
 let MI_ID = null;
-
 let fotosAnuncio = ["", "", ""];
 let fotoPerfilBase64 = localStorage.getItem("p_foto") || "";
 
@@ -252,7 +41,11 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         MI_ID = user.uid;
         document.getElementById('modalLogin').style.display = 'none';
-        const dSnap = await getDoc(doc(db, "usuarios", user.uid));
+        
+        // Recuperar datos del perfil desde Firestore
+        const docRef = doc(db, "usuarios", user.uid);
+        const dSnap = await getDoc(docRef);
+        
         if (dSnap.exists()) {
             const data = dSnap.data();
             localStorage.setItem("p_nombre", data.nombre || "");
@@ -282,7 +75,7 @@ window.registrarApp = async () => {
     if(!e || p.length < 6) return alert("Escribe un correo válido y clave de min. 6 caracteres");
     try { 
         await createUserWithEmailAndPassword(auth, e, p); 
-        alert("✅ ¡Cuenta creada con éxito!");
+        alert("✅ ¡Cuenta creada con éxito! Ahora configura tu perfil.");
     } catch (err) { alert("Error: " + err.message); }
 };
 
@@ -294,28 +87,75 @@ window.cerrarSesion = async () => {
     }
 };
 
-// GESTIÓN DE PRODUCTOS
+// GESTIÓN DE PERFIL (CORREGIDA)
+window.guardarPerfil = async () => {
+    if (!MI_ID) return alert("Debes iniciar sesión primero.");
+
+    const n = document.getElementById('perfilNombre').value.trim();
+    const t = document.getElementById('perfilTelefono').value.trim();
+
+    if (!n || !t) return alert("Por favor, pon tu nombre y WhatsApp.");
+
+    try {
+        await setDoc(doc(db, "usuarios", MI_ID), {
+            nombre: n,
+            telefono: t,
+            foto: fotoPerfilBase64,
+            actualizado: Date.now()
+        }, { merge: true });
+
+        localStorage.setItem("p_nombre", n);
+        localStorage.setItem("p_tel", t);
+        localStorage.setItem("p_foto", fotoPerfilBase64);
+
+        verificarPerfil();
+        document.getElementById('modalPerfil').style.display = "none";
+        alert("¡Perfil guardado, chero! ✅");
+    } catch (err) {
+        console.error(err);
+        alert("Error al guardar: " + err.message);
+    }
+};
+
+window.verificarPerfil = () => {
+    const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
+    const incompleto = (!n || n === "" || !t || t === "");
+    document.getElementById("bannerPerfil").style.display = incompleto ? "block" : "none";
+    return !incompleto;
+};
+
+// PUBLICAR
 window.publicar = async () => {
     const t = document.getElementById('titulo').value, p = document.getElementById('precio').value;
     const cant = document.getElementById('cantidad').value;
     const fotosFinales = fotosAnuncio.filter(f => f !== "");
-    if(!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
     
+    if(!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
+    if(!verificarPerfil()) return alert("Configura tu perfil antes de vender.");
+
     await addDoc(collection(db,"productos"), {
-        titulo: t, descripcion: document.getElementById('descripcion').value,
+        titulo: t, 
+        descripcion: document.getElementById('descripcion').value,
         precio: parseFloat(p).toFixed(2), 
         cantidad: parseInt(cant) || 1,
         fotos: fotosFinales,
         categoria: document.getElementById('categoria').value,
         entrega: document.getElementById('opcionEnvio').value,
-        depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
-        vendedor: localStorage.getItem("p_nombre"), telefono: localStorage.getItem("p_tel"),
+        depto: document.getElementById('depto').value, 
+        muni: document.getElementById('muni').value,
+        vendedor: localStorage.getItem("p_nombre"), 
+        telefono: localStorage.getItem("p_tel"),
         fotoPerfilVendedor: fotoPerfilBase64,
-        creado: Date.now(), duenoId: MI_ID, vendido: (parseInt(cant) <= 0), oculto: false
+        creado: Date.now(), 
+        duenoId: MI_ID, 
+        vendido: false, 
+        oculto: false
     });
+    alert("¡Publicado con éxito! 🚀");
     location.reload();
 };
 
+// ... RESTO DE TUS FUNCIONES (cargar, render, filtrar, etc.) ...
 async function cargar() {
     const q = query(collection(db, "productos"), orderBy("creado", "desc"));
     const snap = await getDocs(q);
@@ -340,7 +180,6 @@ function crearCard(p) {
     const esMio = p.duenoId === MI_ID;
     const esEnvio = p.entrega === "Envíos a todo el país";
     const fotos = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [p.foto] : []);
-    const cantDisp = p.cantidad || (p.vendido ? 0 : 1);
     
     let miniHTML = "";
     if(fotos.length > 1) {
@@ -354,23 +193,18 @@ function crearCard(p) {
             <button class="btn-fav ${esFav?'active':''}" onclick="event.stopPropagation(); toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
             <button class="btn-share-post" onclick="event.stopPropagation(); compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
             ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
-            
             <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" onclick="verImagenFull(this.src)">
             ${miniHTML}
-
             <div class="info">
                 <div class="tags-cont">
                     <span class="tag">${p.categoria}</span>
-                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">
-                        <i class="fa-solid ${esEnvio?'fa-truck-fast':'fa-handshake'}"></i> ${p.entrega || 'Local'}
-                    </span>
+                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">${p.entrega}</span>
                 </div>
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
-                <div class="tag-stock">${p.vendido ? 'No disponible' : cantDisp + ' disponibles'}</div>
                 <div class="loc">${p.muni}, ${p.depto}</div>
                 <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
-                    <i class="fa-solid fa-store"></i> Ver tienda
+                    <i class="fa-solid fa-store"></i> Ver tienda de ${p.vendedor}
                 </div>
                 ${!p.vendido ? `<a class="btn-wa" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> Preguntar</a>` : ''}
                 ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Marcar Agotado</button>` : ''}
@@ -379,91 +213,7 @@ function crearCard(p) {
         </div>`;
 }
 
-// PERFIL Y UTILIDADES
-window.guardarPerfil = async () => {
-
-    // 🔐 PROTECCIÓN DE SESIÓN
-    if (!MI_ID) {
-        alert("⏳ Espera un momento, sesión no lista.");
-        return;
-    }
-
-    const n = document.getElementById('perfilNombre').value.trim();
-    const t = document.getElementById('perfilTelefono').value.trim();
-
-    if (!n || !t) {
-        alert("Completa tus datos, chero.");
-        return;
-    }
-
-    try {
-        await setDoc(
-            doc(db, "usuarios", MI_ID),
-            {
-                nombre: n,
-                telefono: t,
-                foto: fotoPerfilBase64 || "",
-                perfilCompletado: true,
-                actualizado: Date.now()
-            },
-            { merge: true }
-        );
-
-        // 💾 CACHE
-        localStorage.setItem("p_nombre", n);
-        localStorage.setItem("p_tel", t);
-        localStorage.setItem("p_foto", fotoPerfilBase64 || "");
-
-        // 🧠 MEMORIA VIVA
-        window.PERFIL = {
-            nombre: n,
-            telefono: t,
-            foto: fotoPerfilBase64 || ""
-        };
-
-        verificarPerfil();
-        document.getElementById('modalPerfil').style.display = "none";
-        alert("Perfil Guardado ✅");
-
-    } catch (err) {
-        console.error("Error guardando perfil:", err);
-        alert("❌ No se pudo guardar el perfil");
-    }
-};
-
-    // 4️⃣ CACHE LOCAL (NO CRÍTICO)
-    localStorage.setItem("p_nombre", n);
-    localStorage.setItem("p_tel", t);
-    localStorage.setItem("p_foto", fotoPerfilBase64);
-
-    // 5️⃣ 🔥 MEMORIA VIVA DE LA APP (ESTO ES LO QUE FALTABA)
-    window.PERFIL = {
-        nombre: n,
-        telefono: t,
-        foto: fotoPerfilBase64
-    };
-
-    // 6️⃣ VALIDAR PERFIL
-    verificarPerfil();
-
-    // 7️⃣ CERRAR MODAL
-    document.getElementById('modalPerfil').style.display = "none";
-
-    // 8️⃣ CONFIRMACIÓN
-    alert("Perfil Guardado ✅");
-};
-
-window.verificarPerfil = () => {
-    const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
-    const incompleto = (!n || n === "" || !t || t === "");
-    document.getElementById("bannerPerfil").style.display = incompleto ? "block" : "none";
-    return !incompleto;
-};
-
-window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
-window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
-window.abrir = () => !verificarPerfil() ? (alert("Completa tu perfil primero"), abrirPerfil()) : document.getElementById('modal').style.display = "block";
-window.cerrar = () => document.getElementById('modal').style.display = "none";
+// UI Helpers
 window.abrirPerfil = () => {
     document.getElementById('perfilNombre').value = localStorage.getItem("p_nombre") || "";
     document.getElementById('perfilTelefono').value = localStorage.getItem("p_tel") || "";
@@ -471,97 +221,12 @@ window.abrirPerfil = () => {
     document.getElementById('modalPerfil').style.display = "block";
 };
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
-window.verImagenFull = (src) => { document.getElementById('fotoGrande').src = src; document.getElementById('visorFotoInterno').style.display = 'flex'; };
-window.marcarVendido = async (id) => { if(confirm("¿Marcar como agotado?")) { await updateDoc(doc(db,"productos",id), {vendido:true, cantidad: 0}); cargar(); } };
-window.eliminar = async (id) => { if(confirm("¿Eliminar este anuncio permanentemente?")) { await deleteDoc(doc(db,"productos",id)); cargar(); } };
-window.actualizarMunicipios = () => {
-    const d = document.getElementById('depto').value, m = document.getElementById('muni');
-    m.innerHTML = '<option value="">Municipio</option>';
-    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
-};
+window.abrir = () => !verificarPerfil() ? (alert("Completa tu perfil primero"), abrirPerfil()) : document.getElementById('modal').style.display = "block";
+window.cerrar = () => document.getElementById('modal').style.display = "none";
+window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
+window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
 
-// --- FUNCIÓN FAVORITOS ---
-window.toggleFavorito = (id) => {
-    if(favoritos.includes(id)) {
-        favoritos = favoritos.filter(f => f !== id);
-    } else {
-        favoritos.push(id);
-    }
-    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
-    render(productos);
-};
-
-window.setCat = (c, b) => {
-    state.categoria = c;
-    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    filtrar();
-};
-window.verFavoritos = (b) => setCat("Favoritos", b);
-
-window.filtrar = () => {
-    const txt = document.getElementById('buscar').value.toLowerCase();
-    const dep = document.getElementById('filtroDepto').value;
-    const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
-    const filtrados = productos.filter(p => {
-        const cTxt = p.titulo.toLowerCase().includes(txt) || p.muni.toLowerCase().includes(txt);
-        const cDep = dep === "" || p.depto === dep;
-        const cPre = parseFloat(p.precio) <= pMax;
-        const cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
-        return cTxt && cDep && cPre && cCat;
-    });
-    render(filtrados);
-};
-
-window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
-    const filtrados = productos.filter(p => p.duenoId === idVendedor);
-    const feed = document.getElementById('feed');
-    feed.innerHTML = `<div class="header-catalogo">
-        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
-        <h2>${nombreVendedor}</h2>
-        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer">Ver todo el Market</button>
-    </div>`;
-    filtrados.forEach(p => feed.innerHTML += crearCard(p));
-    window.scrollTo(0,0);
-};
-
-window.verMisAnuncios = () => {
-    cerrarPerfil();
-    verCatalogo(MI_ID, localStorage.getItem("p_nombre"), fotoPerfilBase64);
-};
-
-// --- FUNCIÓN COMPARTIR ---
-window.compartirPost = async (titulo, precio, muni) => {
-    const texto = `¡Mira este chero-precio en CheroMarketApp! 🇸🇻\n📦 ${titulo}\n💰 $${precio}\n📍 ${muni}`;
-    if (navigator.share) { 
-        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {} 
-    } else { 
-        navigator.clipboard.writeText(texto + " " + window.location.href); 
-        alert("¡Enlace copiado al portapapeles!"); 
-    }
-};
-
-// MANEJO FOTOS
-document.querySelectorAll('.foto-item').forEach(input => {
-    input.onchange = e => {
-        const reader = new FileReader();
-        reader.onload = ev => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 600; canvas.height = 600;
-                canvas.getContext('2d').drawImage(img, 0, 0, 600, 600);
-                const b64 = canvas.toDataURL('image/jpeg', 0.7);
-                fotosAnuncio[e.target.dataset.idx] = b64;
-                const prev = document.getElementById(`p-${e.target.dataset.idx}`);
-                prev.src = b64; prev.style.display = "block";
-            };
-            img.src = ev.target.result;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    };
-});
-
+// Manejo de fotos de perfil
 document.getElementById('fotoPerfilFile').onchange = e => {
     const reader = new FileReader();
     reader.onload = ev => {
@@ -578,13 +243,16 @@ document.getElementById('fotoPerfilFile').onchange = e => {
     reader.readAsDataURL(e.target.files[0]);
 };
 
-// INIT DEPTO SELECTS
+// Init select de departamentos
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
     dSelect.innerHTML += `<option value="${d}">${d}</option>`;
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
+window.actualizarMunicipios = () => {
+    const d = document.getElementById('depto').value, m = document.getElementById('muni');
+    m.innerHTML = '<option value="">Municipio</option>';
+    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
+};
 </script>
-</body>
-</html>
