@@ -280,7 +280,17 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signInAnonymously 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+import { 
+  getDoc, 
+  setDoc 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
     authDomain:"cheromarket.firebaseapp.com",
@@ -292,8 +302,19 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
+const auth = getAuth(app);
+let MI_ID = null;
 const svData = {
+signInAnonymously(auth);
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    MI_ID = user.uid;
+    await cargarPerfil();
+    await cargar();
+  }
+});
+    
 "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
 "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
 "Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
@@ -313,8 +334,6 @@ const svData = {
 let productos = [];
 let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
-const MI_ID = localStorage.getItem("mi_id_usuario") || "u_" + Math.random().toString(36).substr(2, 9);
-localStorage.setItem("mi_id_usuario", MI_ID);
 
 let fotosAnuncio = ["", "", ""];
 let fotoPerfilBase64 = localStorage.getItem("p_foto") || "";
@@ -378,21 +397,58 @@ window.cerrar = () => {
 };
 
 function verificarPerfil() {
-    const n = localStorage.getItem("p_nombre"), t = localStorage.getItem("p_tel");
+    const n = perfilNombre.value;
+    const t = perfilTelefono.value;
     document.getElementById("bannerPerfil").style.display = (n && t) ? "none" : "block";
     return (n && t);
 }
+
+async function cargarPerfil() {
+    const ref = doc(db, "vendedores", MI_ID);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+        const p = snap.data();
+        perfilNombre.value = p.nombre || "";
+        perfilTelefono.value = p.telefono || "";
+        fotoPerfilBase64 = p.foto || "";
+        imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
+        document.getElementById("bannerPerfil").style.display = (p.nombre && p.telefono) ? "none" : "block";
+    }
+}
+ async function cargarPerfil() {
+  const ref = doc(db, "vendedores", MI_ID);
+  const snap = await getDoc(ref);
+
+  if (snap.exists()) {
+    const p = snap.data();
+    perfilNombre.value = p.nombre || "";
+    perfilTelefono.value = p.telefono || "";
+    fotoPerfilBase64 = p.foto || "";
+    imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
+    document.getElementById("bannerPerfil").style.display = "none";
+  } else {
+    document.getElementById("bannerPerfil").style.display = "block";
+  }
+}   
 window.abrirPerfil = () => {
     document.getElementById('perfilNombre').value = localStorage.getItem("p_nombre") || "";
     document.getElementById('perfilTelefono').value = localStorage.getItem("p_tel") || "";
     document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64 || "https://via.placeholder.com/80";
     document.getElementById('modalPerfil').style.display = "block";
 };
-window.guardarPerfil = () => {
-    localStorage.setItem("p_nombre", document.getElementById('perfilNombre').value);
-    localStorage.setItem("p_tel", document.getElementById('perfilTelefono').value);
-    localStorage.setItem("p_foto", fotoPerfilBase64);
-    verificarPerfil(); document.getElementById('modalPerfil').style.display = "none";
+window.guardarPerfil = async () => {
+  if (!MI_ID) return alert("Usuario no autenticado");
+
+  await setDoc(doc(db, "vendedores", MI_ID), {
+    nombre: perfilNombre.value,
+    telefono: perfilTelefono.value,
+    foto: fotoPerfilBase64,
+    actualizado: Date.now()
+  }, { merge: true });
+
+  cerrarPerfil();
+  await cargarPerfil();
 };
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
 
@@ -404,23 +460,38 @@ window.actualizarMunicipios = () => {
 };
 
 window.publicar = async () => {
-    const t = document.getElementById('titulo').value, p = document.getElementById('precio').value;
+    const t = document.getElementById('titulo').value;
+    const p = document.getElementById('precio').value;
     const cant = document.getElementById('cantidad').value;
     const fotosFinales = fotosAnuncio.filter(f => f !== "");
-    if(!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
-    
-    await addDoc(collection(db,"productos"), {
-        titulo: t, descripcion: document.getElementById('descripcion').value,
-        precio: parseFloat(p).toFixed(2), 
+
+    if (!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
+
+    // Obtener el perfil del vendedor desde Firestore
+    const perfilSnap = await getDoc(doc(db, "vendedores", MI_ID));
+    if (!perfilSnap.exists()) return alert("Completa tu perfil primero");
+
+    const perfil = perfilSnap.data();
+
+    await addDoc(collection(db, "productos"), {
+        titulo: t,
+        descripcion: document.getElementById('descripcion').value,
+        precio: parseFloat(p).toFixed(2),
         cantidad: parseInt(cant) || 1,
         fotos: fotosFinales,
         categoria: document.getElementById('categoria').value,
         entrega: document.getElementById('opcionEnvio').value,
-        depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
-        vendedor: localStorage.getItem("p_nombre"), telefono: localStorage.getItem("p_tel"),
-        fotoPerfilVendedor: fotoPerfilBase64,
-        creado: Date.now(), duenoId: MI_ID, vendido: (parseInt(cant) <= 0), oculto: false
+        depto: document.getElementById('depto').value,
+        muni: document.getElementById('muni').value,
+        vendedor: perfil.nombre,
+        telefono: perfil.telefono,
+        fotoPerfilVendedor: perfil.foto,
+        creado: Date.now(),
+        duenoId: MI_ID,
+        vendido: (parseInt(cant) <= 0),
+        oculto: false
     });
+
     location.reload();
 };
 
