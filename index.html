@@ -133,21 +133,7 @@
 </header>
      
 <div id="sidebar" class="sidebar">
-   <button onclick="loginGoogle()" style="
-  width:100%;
-  padding:12px;
-  background:#fff;
-  border:1px solid #ddd;
-  border-radius:8px;
-  font-weight:bold;
-  cursor:pointer;
-">
-  <i class="fa-brands fa-google"></i> Entrar con Google
-</button>
-<button onclick="logout()" style="width:100%; margin-top:10px;">
-  Cerrar sesión
-</button>
-     <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
+    <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
     <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
   
   <div style="max-height: 450px; overflow-y: auto; scrollbar-width: thin;">
@@ -294,41 +280,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } 
-window.loginGoogle = async () => {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
 
-    // Guardar datos del usuario
-    localStorage.setItem("mi_id_usuario", user.uid);
-    localStorage.setItem("p_nombre", user.displayName || "");
-    localStorage.setItem("p_tel", user.phoneNumber || "");
-    localStorage.setItem("p_foto", user.photoURL || "");
-
-    alert("Bienvenido " + user.displayName);
-    location.reload();
-
-  } catch (error) {
-    alert("Error al iniciar sesión");
-    console.error(error);
-  }
-};
-window.logout = async () => {
-  await signOut(auth);
-  localStorage.clear();
-  location.reload();
-};
-auth.onAuthStateChanged(user => {
-  if (user) {
-    localStorage.setItem("mi_id_usuario", user.uid);
-    localStorage.setItem("p_nombre", user.displayName || "");
-    localStorage.setItem("p_foto", user.photoURL || "");
-    verificarPerfil();
-  }
-});
-
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
     authDomain:"cheromarket.firebaseapp.com",
@@ -340,8 +292,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
 
 const svData = {
 "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
@@ -363,7 +313,7 @@ const svData = {
 let productos = [];
 let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
-const MI_ID = localStorage.getItem("mi_id_usuario");
+const MI_ID = localStorage.getItem("mi_id_usuario") || "u_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("mi_id_usuario", MI_ID);
 
 let fotosAnuncio = ["", "", ""];
