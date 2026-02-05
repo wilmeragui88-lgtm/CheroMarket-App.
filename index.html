@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="manifest" href="manifest.json">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CheroMarketApp · Pro 🇸🇻</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0047AB">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1162/1162456.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="CheroMarket">
     <style>
         :root{
             --azul:#0047AB; --naranja:#FF8C00; --verde:#25D366;
@@ -85,18 +89,6 @@
         .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.7); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
         .seccion-titulo{grid-column: 1 / -1; font-size: 14px; font-weight: bold; color: var(--mut); margin-top: 15px; border-bottom: 1px solid var(--b); padding-bottom: 5px;}
     </style>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0047AB">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1162/1162456.png">
-<link rel="manifest" href="manifest.json">
-
-<meta name="theme-color" content="#317EFB">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="CheroMarket">
-<link rel="apple-touch-icon" href="icon-192.jpg">
-
 </head>
 <body data-theme="light">
 
@@ -131,7 +123,7 @@
         <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user-circle"></i> Mi Perfil</button>
     </div>
 </header>
-     
+
 <div id="sidebar" class="sidebar">
     <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
     <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
@@ -226,7 +218,7 @@
 
 <div id="visorFotoInterno" onclick="cerrarVisor()">
     <button class="btn-cerrar-visor"><i class="fa-solid fa-xmark"></i></button>
-    <img id="fotoGrande" src="" onclick="event.stopPropagation()">
+    <img id="fotoGrande" src="" alt="Imagen ampliada" onclick="event.stopPropagation()">
 </div>
 
 <div id="modal">
@@ -248,9 +240,9 @@
             <option value="Envíos a todo el país">Envíos a todo el país</option>
         </select>
         <div class="subir-fotos-grid">
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0"><i class="fa-solid fa-camera"></i></div>
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1"><i class="fa-solid fa-camera"></i></div>
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0" alt="Foto 1"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1" alt="Foto 2"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2" alt="Foto 3"><i class="fa-solid fa-camera"></i></div>
         </div>
         <select id="categoria">
             <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
@@ -266,7 +258,7 @@
     <div class="modal-content">
         <h3>Mi Perfil de Vendedor</h3>
         <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
-            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
+            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80" alt="Foto de perfil">
             <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
         </div>
         <input id="perfilNombre" placeholder="Tu nombre o negocio">
@@ -279,18 +271,9 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signInAnonymously 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { 
-  getDoc, 
-  setDoc 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
     authDomain:"cheromarket.firebaseapp.com",
@@ -305,30 +288,20 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 let MI_ID = null;
 const svData = {
-signInAnonymously(auth);
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    MI_ID = user.uid;
-    await cargarPerfil();
-    await cargar();
-  }
-});
-    
-"Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
-"Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
-"Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
-"Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
-"La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
-"San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
-"Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
-"La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
-"Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
-"San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
-"Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
-"San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
-"Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
-"La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
+    "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
+    "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
+    "Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
+    "Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+    "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+    "San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
+    "Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
+    "La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
+    "Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
+    "San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+    "Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
+    "San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
+    "Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+    "La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
 };
 
 let productos = [];
@@ -336,7 +309,31 @@ let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
 
 let fotosAnuncio = ["", "", ""];
-let fotoPerfilBase64 = localStorage.getItem("p_foto") || "";
+let fotoPerfilBase64 = "";
+
+const perfilNombreInput = document.getElementById('perfilNombre');
+const perfilTelefonoInput = document.getElementById('perfilTelefono');
+const imgPerfilPrevia = document.getElementById('imgPerfilPrevia');
+const bannerPerfil = document.getElementById('bannerPerfil');
+
+// Inicialización de autenticación
+(async () => {
+  try {
+    await signInAnonymously(auth);
+  } catch (error) {
+    console.error("Error en autenticación anónima:", error);
+  }
+})();
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    MI_ID = user.uid;
+    await cargarPerfil();
+    await cargar();
+  } else {
+    console.error("Usuario no autenticado");
+  }
+});
 
 window.verImagenFull = (src) => {
     document.getElementById('fotoGrande').src = src;
@@ -380,7 +377,7 @@ document.getElementById('fotoPerfilFile').onchange = e => {
             canvas.width = 200; canvas.height = 200;
             canvas.getContext('2d').drawImage(img, 0, 0, 200, 200);
             fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.8);
-            document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64;
+            imgPerfilPrevia.src = fotoPerfilBase64;
         };
         img.src = ev.target.result;
     };
@@ -389,7 +386,13 @@ document.getElementById('fotoPerfilFile').onchange = e => {
 
 window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
-window.abrir = () => !verificarPerfil() ? abrirPerfil() : document.getElementById('modal').style.display = "block";
+window.abrir = () => {
+    if (!verificarPerfil()) {
+        abrirPerfil();
+    } else {
+        document.getElementById('modal').style.display = "block";
+    }
+};
 window.cerrar = () => {
     document.getElementById('modal').style.display = "none";
     fotosAnuncio = ["", "", ""];
@@ -397,52 +400,38 @@ window.cerrar = () => {
 };
 
 function verificarPerfil() {
-    const n = perfilNombre.value;
-    const t = perfilTelefono.value;
-    document.getElementById("bannerPerfil").style.display = (n && t) ? "none" : "block";
-    return (n && t);
+    const n = perfilNombreInput.value;
+    const t = perfilTelefonoInput.value;
+    bannerPerfil.style.display = (n && t) ? "none" : "block";
+    return !!(n && t);
 }
 
 async function cargarPerfil() {
-    const ref = doc(db, "vendedores", MI_ID);
-    const snap = await getDoc(ref);
-
-    if (snap.exists()) {
-        const p = snap.data();
-        perfilNombre.value = p.nombre || "";
-        perfilTelefono.value = p.telefono || "";
-        fotoPerfilBase64 = p.foto || "";
-        imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
-        document.getElementById("bannerPerfil").style.display = (p.nombre && p.telefono) ? "none" : "block";
-    }
-}
- async function cargarPerfil() {
   const ref = doc(db, "vendedores", MI_ID);
   const snap = await getDoc(ref);
 
   if (snap.exists()) {
     const p = snap.data();
-    perfilNombre.value = p.nombre || "";
-    perfilTelefono.value = p.telefono || "";
+    perfilNombreInput.value = p.nombre || "";
+    perfilTelefonoInput.value = p.telefono || "";
     fotoPerfilBase64 = p.foto || "";
     imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
-    document.getElementById("bannerPerfil").style.display = "none";
+    bannerPerfil.style.display = (p.nombre && p.telefono) ? "none" : "block";
   } else {
-    document.getElementById("bannerPerfil").style.display = "block";
+    bannerPerfil.style.display = "block";
   }
-}   
+}
+
 window.abrirPerfil = () => {
-    document.getElementById('perfilNombre').value = localStorage.getItem("p_nombre") || "";
-    document.getElementById('perfilTelefono').value = localStorage.getItem("p_tel") || "";
-    document.getElementById('imgPerfilPrevia').src = fotoPerfilBase64 || "https://via.placeholder.com/80";
+    // No es necesario cargar de localStorage, ya que cargarPerfil() lo hace de Firestore
     document.getElementById('modalPerfil').style.display = "block";
 };
 window.guardarPerfil = async () => {
   if (!MI_ID) return alert("Usuario no autenticado");
 
   await setDoc(doc(db, "vendedores", MI_ID), {
-    nombre: perfilNombre.value,
-    telefono: perfilTelefono.value,
+    nombre: perfilNombreInput.value,
+    telefono: perfilTelefonoInput.value,
     foto: fotoPerfilBase64,
     actualizado: Date.now()
   }, { merge: true });
@@ -460,9 +449,11 @@ window.actualizarMunicipios = () => {
 };
 
 window.publicar = async () => {
+    if (!MI_ID) return alert("Usuario no autenticado");
+
     const t = document.getElementById('titulo').value;
     const p = document.getElementById('precio').value;
-    const cant = document.getElementById('cantidad').value;
+    const cant = parseInt(document.getElementById('cantidad').value) || 1;
     const fotosFinales = fotosAnuncio.filter(f => f !== "");
 
     if (!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
@@ -477,7 +468,7 @@ window.publicar = async () => {
         titulo: t,
         descripcion: document.getElementById('descripcion').value,
         precio: parseFloat(p).toFixed(2),
-        cantidad: parseInt(cant) || 1,
+        cantidad: cant,
         fotos: fotosFinales,
         categoria: document.getElementById('categoria').value,
         entrega: document.getElementById('opcionEnvio').value,
@@ -488,7 +479,7 @@ window.publicar = async () => {
         fotoPerfilVendedor: perfil.foto,
         creado: Date.now(),
         duenoId: MI_ID,
-        vendido: (parseInt(cant) <= 0),
+        vendido: (cant <= 0),
         oculto: false
     });
 
@@ -546,7 +537,7 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
     const filtrados = productos.filter(p => p.duenoId === idVendedor);
     const feed = document.getElementById('feed');
     feed.innerHTML = `<div class="header-catalogo">
-        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
+        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil" alt="Foto de vendedor">
         <h2>${nombreVendedor}</h2>
         <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
     </div>`;
@@ -556,7 +547,8 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
 
 window.verMisAnuncios = () => {
     cerrarPerfil();
-    verCatalogo(MI_ID, localStorage.getItem("p_nombre"), fotoPerfilBase64);
+    // Usamos valores de Firestore en lugar de localStorage
+    verCatalogo(MI_ID, perfilNombreInput.value, fotoPerfilBase64);
 };
 
 async function cargar() {
@@ -568,14 +560,15 @@ async function cargar() {
 
 function render(lista) {
     const feed = document.getElementById('feed');
-    feed.innerHTML = "";
+    let html = [];
     const disp = lista.filter(p => !p.vendido);
     const vend = lista.filter(p => p.vendido);
-    disp.forEach(p => feed.innerHTML += crearCard(p));
+    disp.forEach(p => html.push(crearCard(p)));
     if(vend.length > 0) {
-        feed.innerHTML += `<div class="seccion-titulo">AGOTADOS / VENDIDOS (${vend.length})</div>`;
-        vend.forEach(p => feed.innerHTML += crearCard(p));
+        html.push(`<div class="seccion-titulo">AGOTADOS / VENDIDOS (${vend.length})</div>`);
+        vend.forEach(p => html.push(crearCard(p)));
     }
+    feed.innerHTML = html.join('');
 }
 
 function crearCard(p) {
@@ -588,7 +581,7 @@ function crearCard(p) {
     let miniHTML = "";
     if(fotos.length > 1) {
         miniHTML = `<div class="miniaturas-cont">
-            ${fotos.map(f => `<img src="${f}" class="mini-foto" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
+            ${fotos.map(f => `<img src="${f}" class="mini-foto" alt="Miniatura" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
         </div>`;
     }
 
@@ -598,7 +591,7 @@ function crearCard(p) {
             <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
             ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
             
-            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" onclick="verImagenFull(this.src)">
+            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" alt="${p.titulo}" onclick="verImagenFull(this.src)">
             ${miniHTML}
 
             <div class="info">
@@ -629,8 +622,6 @@ Object.keys(svData).forEach(d => {
     dSelect.innerHTML += `<option value="${d}">${d}</option>`;
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
-verificarPerfil();
-cargar();
 </script>
 <script>
   if ('serviceWorker' in navigator) {
