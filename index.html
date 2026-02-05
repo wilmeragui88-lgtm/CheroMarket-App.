@@ -431,27 +431,41 @@ window.actualizarMunicipios = () => {
     m.innerHTML = '<option value="">Municipio</option>';
     if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value=""></option>`);
 };
-
 window.publicar = async () => {
+    // Verificamos que esté logueado con Google para que las reglas lo dejen pasar
+    if (!usuarioActual) {
+        alert("Debes vincular tu cuenta con Google en el Perfil para poder publicar.");
+        abrirPerfil();
+        return;
+    }
+
     const t = document.getElementById('titulo').value, p = document.getElementById('precio').value;
     const cant = document.getElementById('cantidad').value;
     const fotosFinales = fotosAnuncio.filter(f => f !== "");
+    
     if(!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
     
     await addDoc(collection(db,"productos"), {
-        titulo: t, descripcion: document.getElementById('descripcion').value,
+        titulo: t,
+        descripcion: document.getElementById('descripcion').value,
         precio: parseFloat(p).toFixed(2), 
         cantidad: parseInt(cant) || 1,
         fotos: fotosFinales,
         categoria: document.getElementById('categoria').value,
         entrega: document.getElementById('opcionEnvio').value,
-        depto: document.getElementById('depto').value, muni: document.getElementById('muni').value,
-        vendedor: localStorage.getItem("p_nombre"), telefono: localStorage.getItem("p_tel"),
+        depto: document.getElementById('depto').value, 
+        muni: document.getElementById('muni').value,
+        vendedor: localStorage.getItem("p_nombre"), 
+        telefono: localStorage.getItem("p_tel"),
         fotoPerfilVendedor: fotoPerfilBase64,
-        creado: Date.now(), duenoId: MI_ID, vendido: (parseInt(cant) <= 0), oculto: false
+        creado: Date.now(), 
+        duenoId: usuarioActual.uid, // <--- IMPORTANTE: Usamos el UID de Google
+        vendido: (parseInt(cant) <= 0), 
+        oculto: false
     });
     location.reload();
 };
+
 
 window.compartirPost = async (titulo, precio, muni) => {
     const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 \n💰 $\n📍 `;
