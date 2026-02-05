@@ -275,12 +275,21 @@
         <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
         <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
         <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
+<button onclick="iniciarSesion()" style="background:#4285F4; color:white; padding:10px; border:none; border-radius:8px; margin-bottom:10px">
+        <i class="fa-brands fa-google"></i> Vincular con Google
+    </button>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+    getFirestore, collection, addDoc, getDocs, doc, 
+    query, orderBy, updateDoc, setDoc, getDoc 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+    getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -291,8 +300,27 @@ const firebaseConfig = {
     appId:"1:777368646513:web:42b49dad96c2dcf76b7cd0"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+let usuarioActual = null;
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        usuarioActual = user;
+        const docRef = doc(db, "usuarios", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const d = docSnap.data();
+            localStorage.setItem("p_nombre", d.nombre);
+            localStorage.setItem("p_tel", d.tel);
+            localStorage.setItem("p_foto", d.foto);
+            fotoPerfilBase64 = d.foto;
+        }
+        verificarPerfil();
+    }
+    cargar(); 
+});
+
 
 const svData = {
 "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
@@ -342,7 +370,7 @@ document.querySelectorAll('.foto-item').forEach(input => {
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                 const b64 = canvas.toDataURL('image/jpeg', 0.7);
                 fotosAnuncio[idx] = b64;
-                const prev = document.getElementById(`p-${idx}`);
+                const prev = document.getElementById(`p-`);
                 prev.src = b64; prev.style.display = "block";
             };
             img.src = ev.target.result;
@@ -401,7 +429,7 @@ window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value;
     const m = document.getElementById('muni');
     m.innerHTML = '<option value="">Municipio</option>';
-    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
+    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value=""></option>`);
 };
 
 window.publicar = async () => {
@@ -426,7 +454,7 @@ window.publicar = async () => {
 };
 
 window.compartirPost = async (titulo, precio, muni) => {
-    const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 ${titulo}\n💰 $${precio}\n📍 ${muni}`;
+    const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 \n💰 $\n📍 `;
     if (navigator.share) {
         try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
     } else {
@@ -476,8 +504,8 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
     const filtrados = productos.filter(p => p.duenoId === idVendedor);
     const feed = document.getElementById('feed');
     feed.innerHTML = `<div class="header-catalogo">
-        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil">
-        <h2>${nombreVendedor}</h2>
+        <img src="//via.placeholder.com/80'" class="foto-perfil">
+        <h2></h2>
         <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
     </div>`;
     filtrados.forEach(p => feed.innerHTML += crearCard(p));
@@ -503,7 +531,7 @@ function render(lista) {
     const vend = lista.filter(p => p.vendido);
     disp.forEach(p => feed.innerHTML += crearCard(p));
     if(vend.length > 0) {
-        feed.innerHTML += `<div class="seccion-titulo">AGOTADOS / VENDIDOS (${vend.length})</div>`;
+        feed.innerHTML += `<div class="seccion-titulo">AGOTADOS / VENDIDOS ()</div>`;
         vend.forEach(p => feed.innerHTML += crearCard(p));
     }
 }
@@ -518,36 +546,36 @@ function crearCard(p) {
     let miniHTML = "";
     if(fotos.length > 1) {
         miniHTML = `<div class="miniaturas-cont">
-            ${fotos.map(f => `<img src="${f}" class="mini-foto" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
+            " class="mini-foto" onclick="this.closest('.card').querySelector('.foto-principal').src=''">`).join('')}
         </div>`;
     }
 
     return `
-        <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
-            <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
-            <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
-            ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
+        <div class="card" style="0.6' : ''">
+            <button class="btn-fav ''" onclick="toggleFavorito('')"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-share-post" onclick="compartirPost('', '', '')"><i class="fa-solid fa-share-nodes"></i></button>
+             ''
             
-            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" onclick="verImagenFull(this.src)">
-            ${miniHTML}
+            <img class="foto-principal" src="//via.placeholder.com/160'" onclick="verImagenFull(this.src)">
+            
 
             <div class="info">
                 <div class="tags-cont">
-                    <span class="tag">${p.categoria}</span>
-                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">
-                        <i class="fa-solid ${esEnvio?'fa-truck-fast':'fa-handshake'}"></i> ${p.entrega || 'Local'}
+                    <span class="tag"></span>
+                    <span class="tag-envio" style="background:'var(--mut)'">
+                        <i class="fa-solid 'fa-handshake'"></i> 
                     </span>
                 </div>
-                <div class="titulo">${p.titulo}</div>
-                <div class="precio">$${p.precio}</div>
-                <div class="tag-stock">${p.vendido ? 'No disponible' : cantDisp + ' disponibles'}</div>
-                <div class="loc">${p.muni}, ${p.depto}</div>
-                <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
+                <div class="titulo"></div>
+                <div class="precio">$</div>
+                <div class="tag-stock"> cantDisp + ' disponibles'</div>
+                <div class="loc">, </div>
+                <div class="vendedor-link" onclick="verCatalogo('', '', '')">
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
-                ${!p.vendido ? `<a class="btn-wa" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> Preguntar</a>` : ''}
-                ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Marcar Agotado</button>` : ''}
-                ${esMio ? `<button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button>` : ''}
+                ${!p.vendido ? `<a class="btn-wa" href="https://wa.me/503"><i class="fa-brands fa-whatsapp"></i> Preguntar</a>` : ''}
+                ')">Marcar Agotado</button>` : ''}
+                ')">Eliminar</button>` : ''}
             </div>
         </div>`;
 }
@@ -556,8 +584,8 @@ function crearCard(p) {
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
-    dSelect.innerHTML += `<option value="${d}">${d}</option>`;
-    fDepto.innerHTML += `<option value="${d}">${d}</option>`;
+    dSelect.innerHTML += `<option value=""></option>`;
+    fDepto.innerHTML += `<option value=""></option>`;
 });
 verificarPerfil();
 cargar();
@@ -573,7 +601,40 @@ cargar();
         });
     });
   }
+window.iniciarSesion = async () => {
+    try {
+        await signInWithPopup(auth, provider);
+        alert("¡Cuenta vinculada con Google!");
+    } catch (error) {
+        alert("Error: " + error.message);
+    }
+};
+
+window.guardarPerfil = async () => {
+    if (!usuarioActual) {
+        alert("Primero toca el botón 'Vincular con Google'");
+        return;
+    }
+    const nombre = document.getElementById('perfilNombre').value;
+    const tel = document.getElementById('perfilTelefono').value;
+
+    const datos = {
+        nombre: nombre,
+        tel: tel,
+        foto: fotoPerfilBase64,
+        uid: usuarioActual.uid
+    };
+
+    await setDoc(doc(db, "usuarios", usuarioActual.uid), datos);
+    localStorage.setItem("p_nombre", nombre);
+    localStorage.setItem("p_tel", tel);
+    localStorage.setItem("p_foto", fotoPerfilBase64);
+
+    verificarPerfil();
+    cerrarPerfil();
+    alert("Perfil guardado en la nube ☁️");
+};
+
 </script>
 
 </body>
-</html>
