@@ -265,6 +265,14 @@
         <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
         <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
         <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
+        <hr style="margin: 15px 0; border-color: var(--b);">
+        <h4 style="text-align:center; color:var(--mut);">Sincroniza en todos tus dispositivos</h4>
+        <input id="emailVincular" type="email" placeholder="Tu correo electrónico">
+        <input id="passwordVincular" type="password" placeholder="Contraseña (mínimo 6 caracteres)">
+        <button id="btnVincular" style="background:var(--naranja); color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">
+          Vincular Cuenta (Sincronizar)
+        </button>
+        <div id="msgVincular" style="font-size:13px; color:var(--mut); text-align:center; margin-top:8px;"></div>
         <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
     </div>
 </div>
@@ -272,7 +280,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInAnonymously, linkWithCredential, EmailAuthProvider, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -621,6 +629,65 @@ const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
     dSelect.innerHTML += `<option value="${d}">${d}</option>`;
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
+});
+
+// Función para mostrar mensaje en el modal
+function mostrarMensajeVincular(texto, esError = false) {
+  const msg = document.getElementById('msgVincular');
+  msg.textContent = texto;
+  msg.style.color = esError ? 'var(--rojo)' : 'var(--verde)';
+}
+
+// Evento del botón Vincular
+document.getElementById('btnVincular').addEventListener('click', async () => {
+  const email = document.getElementById('emailVincular').value.trim();
+  const password = document.getElementById('passwordVincular').value;
+
+  if (!email || !password || password.length < 6) {
+    mostrarMensajeVincular("Ingresa un correo válido y contraseña de al menos 6 caracteres", true);
+    return;
+  }
+
+  if (!MI_ID || !auth.currentUser) {
+    mostrarMensajeVincular("No hay usuario autenticado. Intenta de nuevo.", true);
+    return;
+  }
+
+  const credential = EmailAuthProvider.credential(email, password);
+
+  try {
+    // Intentamos vincular directamente a la cuenta anónima actual
+    await linkWithCredential(auth.currentUser, credential);
+    
+    mostrarMensajeVincular("¡Éxito! Tu cuenta ahora está vinculada. Puedes iniciar sesión con este correo y contraseña en cualquier dispositivo.");
+    
+    // Opcional: recargar perfil o mostrar botón de "Cerrar sesión" si quieres
+    await cargarPerfil(); // Para refrescar si es necesario
+
+  } catch (error) {
+    console.error("Error al vincular:", error.code, error.message);
+
+    if (error.code === 'auth/credential-already-in-use') {
+      // El correo ya existe → podemos intentar iniciar sesión y luego vincular (merge)
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // Si llega aquí, ya inició sesión con la cuenta existente
+        mostrarMensajeVincular("¡Cuenta existente detectada! Ahora estás logueado con ella. Tus datos se sincronizarán.");
+      } catch (signInError) {
+        if (signInError.code === 'auth/wrong-password') {
+          mostrarMensajeVincular("Contraseña incorrecta para este correo. Intenta de nuevo o usa otra cuenta.", true);
+        } else {
+          mostrarMensajeVincular("Error al conectar: " + signInError.message, true);
+        }
+      }
+    } else if (error.code === 'auth/email-already-in-use') {
+      mostrarMensajeVincular("Este correo ya está registrado. Intenta iniciar sesión o usa otro correo.", true);
+    } else if (error.code === 'auth/weak-password') {
+      mostrarMensajeVincular("La contraseña es muy débil. Usa al menos 6 caracteres con letras y números.", true);
+    } else {
+      mostrarMensajeVincular("Error inesperado: " + error.message, true);
+    }
+  }
 });
 </script>
 <script>
