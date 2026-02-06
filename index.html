@@ -325,7 +325,6 @@ const perfilTelefonoInput = document.getElementById('perfilTelefono');
 const imgPerfilPrevia = document.getElementById('imgPerfilPrevia');
 const bannerPerfil = document.getElementById('bannerPerfil');
 
-// ESCUCHA DE CAMBIOS DE AUTH (SIN ANÓNIMO)
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     MI_ID = user.uid;
@@ -404,8 +403,8 @@ window.abrir = () => {
     if (!MI_ID) {
         alert("Debes iniciar sesión para publicar.");
         abrirPerfil();
-    } else if (!verificarPerfil()) {
-        alert("Completa tu nombre y teléfono para vender.");
+    } else if (!perfilNombreInput.value || !perfilTelefonoInput.value) {
+        alert("Completa tu nombre y teléfono en 'Mi Perfil' para poder vender.");
         abrirPerfil();
     } else {
         document.getElementById('modal').style.display = "block";
@@ -427,17 +426,18 @@ function verificarPerfil() {
 
 async function cargarPerfil() {
   if(!MI_ID) return;
-  const ref = doc(db, "vendedores", MI_ID);
-  const snap = await getDoc(ref);
-
-  if (snap.exists()) {
-    const p = snap.data();
-    perfilNombreInput.value = p.nombre || "";
-    perfilTelefonoInput.value = p.telefono || "";
-    fotoPerfilBase64 = p.foto || "";
-    imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
-    verificarPerfil();
-  }
+  try {
+    const ref = doc(db, "vendedores", MI_ID);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const p = snap.data();
+      perfilNombreInput.value = p.nombre || "";
+      perfilTelefonoInput.value = p.telefono || "";
+      fotoPerfilBase64 = p.foto || "";
+      imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
+      verificarPerfil();
+    }
+  } catch(e) { console.error("Error cargando perfil:", e); }
 }
 
 window.abrirPerfil = () => {
@@ -446,16 +446,16 @@ window.abrirPerfil = () => {
 
 window.guardarPerfil = async () => {
   if (!MI_ID) return alert("Inicia sesión primero para guardar tu perfil.");
-
-  await setDoc(doc(db, "vendedores", MI_ID), {
-    nombre: perfilNombreInput.value,
-    telefono: perfilTelefonoInput.value,
-    foto: fotoPerfilBase64,
-    actualizado: Date.now()
-  }, { merge: true });
-
-  alert("Perfil actualizado correctamente.");
-  verificarPerfil();
+  try {
+    await setDoc(doc(db, "vendedores", MI_ID), {
+      nombre: perfilNombreInput.value,
+      telefono: perfilTelefonoInput.value,
+      foto: fotoPerfilBase64,
+      actualizado: Date.now()
+    }, { merge: true });
+    alert("Perfil actualizado correctamente.");
+    verificarPerfil();
+  } catch(e) { alert("Error al guardar perfil: " + e.message); }
 };
 
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
@@ -470,38 +470,55 @@ window.actualizarMunicipios = () => {
 window.publicar = async () => {
     if (!MI_ID) return alert("Inicia sesión.");
 
-    const t = document.getElementById('titulo').value;
+    const btn = event.target;
+    const originalText = btn.textContent;
+
+    const t = document.getElementById('titulo').value.trim();
     const p = document.getElementById('precio').value;
     const cant = parseInt(document.getElementById('cantidad').value) || 1;
     const fotosFinales = fotosAnuncio.filter(f => f !== "");
+    const dep = document.getElementById('depto').value;
+    const mun = document.getElementById('muni').value;
 
-    if (!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
+    if (!t || !p || fotosFinales.length === 0 || !dep || !mun) {
+        return alert("Por favor rellena todos los campos y sube al menos una foto.");
+    }
 
-    const perfilSnap = await getDoc(doc(db, "vendedores", MI_ID));
-    if (!perfilSnap.exists()) return alert("Completa tu perfil primero");
+    try {
+        btn.disabled = true;
+        btn.textContent = "Publicando...";
 
-    const perfil = perfilSnap.data();
+        // Usamos los datos actuales de los inputs del perfil para asegurar que no falle si el doc de vendedor no carga
+        const nombreVend = perfilNombreInput.value;
+        const telVend = perfilTelefonoInput.value;
 
-    await addDoc(collection(db, "productos"), {
-        titulo: t,
-        descripcion: document.getElementById('descripcion').value,
-        precio: parseFloat(p).toFixed(2),
-        cantidad: cant,
-        fotos: fotosFinales,
-        categoria: document.getElementById('categoria').value,
-        entrega: document.getElementById('opcionEnvio').value,
-        depto: document.getElementById('depto').value,
-        muni: document.getElementById('muni').value,
-        vendedor: perfil.nombre,
-        telefono: perfil.telefono,
-        fotoPerfilVendedor: perfil.foto,
-        creado: Date.now(),
-        duenoId: MI_ID,
-        vendido: (cant <= 0),
-        oculto: false
-    });
+        await addDoc(collection(db, "productos"), {
+            titulo: t,
+            descripcion: document.getElementById('descripcion').value,
+            precio: parseFloat(p).toFixed(2),
+            cantidad: cant,
+            fotos: fotosFinales,
+            categoria: document.getElementById('categoria').value,
+            entrega: document.getElementById('opcionEnvio').value,
+            depto: dep,
+            muni: mun,
+            vendedor: nombreVend,
+            telefono: telVend,
+            fotoPerfilVendedor: fotoPerfilBase64,
+            creado: Date.now(),
+            duenoId: MI_ID,
+            vendido: (cant <= 0),
+            oculto: false
+        });
 
-    location.reload();
+        alert("¡Anuncio publicado con éxito!");
+        location.reload();
+    } catch (error) {
+        console.error(error);
+        alert("Error al publicar: " + error.message);
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
 };
 
 window.compartirPost = async (titulo, precio, muni) => {
@@ -515,11 +532,21 @@ window.compartirPost = async (titulo, precio, muni) => {
 };
 
 window.marcarVendido = async (id) => {
-    if(confirm("¿Marcar como agotado?")) { await updateDoc(doc(db,"productos",id), {vendido:true, cantidad: 0}); cargar(); }
+    if(confirm("¿Marcar como agotado?")) { 
+        try {
+            await updateDoc(doc(db,"productos",id), {vendido:true, cantidad: 0}); 
+            cargar(); 
+        } catch(e) { alert("Error: " + e.message); }
+    }
 };
 
 window.eliminar = async (id) => {
-    if(confirm("¿Eliminar anuncio?")) { await updateDoc(doc(db,"productos",id), {oculto:true}); cargar(); }
+    if(confirm("¿Eliminar anuncio?")) { 
+        try {
+            await updateDoc(doc(db,"productos",id), {oculto:true}); 
+            cargar(); 
+        } catch(e) { alert("Error: " + e.message); }
+    }
 };
 
 window.filtrar = () => {
@@ -527,7 +554,7 @@ window.filtrar = () => {
     const dep = document.getElementById('filtroDepto').value;
     const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
     const filtrados = productos.filter(p => {
-        const cTxt = p.titulo.toLowerCase().includes(txt) || p.muni.toLowerCase().includes(txt);
+        const cTxt = p.titulo.toLowerCase().includes(txt) || (p.muni && p.muni.toLowerCase().includes(txt));
         const cDep = dep === "" || p.depto === dep;
         const cPre = parseFloat(p.precio) <= pMax;
         const cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
@@ -570,10 +597,12 @@ window.verMisAnuncios = () => {
 };
 
 async function cargar() {
-    const q = query(collection(db, "productos"), orderBy("creado", "desc"));
-    const snap = await getDocs(q);
-    productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
-    render(productos);
+    try {
+        const q = query(collection(db, "productos"), orderBy("creado", "desc"));
+        const snap = await getDocs(q);
+        productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
+        render(productos);
+    } catch(e) { console.error("Error cargando productos:", e); }
 }
 
 function render(lista) {
@@ -586,7 +615,7 @@ function render(lista) {
         html.push(`<div class="seccion-titulo">AGOTADOS / VENDIDOS (${vend.length})</div>`);
         vend.forEach(p => html.push(crearCard(p)));
     }
-    feed.innerHTML = html.join('');
+    feed.innerHTML = html.join('') || '<p style="text-align:center; padding:20px;">No hay productos para mostrar.</p>';
 }
 
 function crearCard(p) {
@@ -622,7 +651,7 @@ function crearCard(p) {
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
                 <div class="tag-stock">${p.vendido ? 'No disponible' : cantDisp + ' disponibles'}</div>
-                <div class="loc">${p.muni}, ${p.depto}</div>
+                <div class="loc">${p.muni || ''}, ${p.depto || ''}</div>
                 <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
@@ -656,16 +685,16 @@ document.getElementById('btnVincular').addEventListener('click', async () => {
   }
 
   try {
-    // Intentar Login
     await signInWithEmailAndPassword(auth, email, password);
     mostrarMensajeVincular("¡Bienvenido de nuevo!");
+    setTimeout(() => cerrarPerfil(), 1000);
   } catch (error) {
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
       try {
-        // Intentar Registro si no existe
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
         await sendEmailVerification(userCred.user);
         mostrarMensajeVincular("Cuenta creada. ¡Verifica tu correo!");
+        setTimeout(() => cerrarPerfil(), 2000);
       } catch (regError) {
         mostrarMensajeVincular("Error: " + regError.message, true);
       }
@@ -675,5 +704,3 @@ document.getElementById('btnVincular').addEventListener('click', async () => {
   }
 });
 </script>
-</body>
-</html>
