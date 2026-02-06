@@ -93,7 +93,7 @@
 <body data-theme="light">
 
 <div id="bannerPerfil" class="alerta-perfil">
-    ⚠️ <strong>Perfil Incompleto:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Configura tu perfil</a> para vender.
+    ⚠️ <strong>Acceso Restringido:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Inicia sesión o regístrate</a> para vender y crear tu perfil.
 </div>
 
 <header>
@@ -263,29 +263,25 @@
         </div>
         <input id="perfilNombre" placeholder="Tu nombre o negocio">
         <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
-        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Guardar Perfil</button>
+        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Actualizar Datos</button>
         <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
         <hr style="margin: 15px 0; border-color: var(--b);">
-        <h4 style="text-align:center; color:var(--mut);">Sincroniza en todos tus dispositivos</h4>
+        <h4 id="authTitulo" style="text-align:center; color:var(--mut);">Acceso a la Cuenta</h4>
         <input id="emailVincular" type="email" placeholder="Tu correo electrónico">
         <input id="passwordVincular" type="password" placeholder="Contraseña (mínimo 6 caracteres)">
         <button id="btnVincular" style="background:var(--naranja); color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">
-          Vincular Cuenta (Sincronizar)
+          Iniciar Sesión / Registrarme
         </button>
+        <button id="btnCerrarSesion" style="background:var(--rojo); color:white; padding:10px; border:none; border-radius:8px; margin-top:5px; display:none" onclick="cerrarSesion()">Cerrar Sesión</button>
         <div id="msgVincular" style="font-size:13px; color:var(--mut); text-align:center; margin-top:8px;"></div>
-        
-        <button id="btnCerrarSesion" onclick="cerrarSesion()" style="background:none; color:var(--rojo); padding:10px; border:1px solid var(--rojo); border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer">
-          <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
-        </button>
-
-        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none; margin-top:10px">Cerrar Ventana</button>
+        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInAnonymously, linkWithCredential, EmailAuthProvider, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -329,25 +325,29 @@ const perfilTelefonoInput = document.getElementById('perfilTelefono');
 const imgPerfilPrevia = document.getElementById('imgPerfilPrevia');
 const bannerPerfil = document.getElementById('bannerPerfil');
 
-// Inicialización de autenticación
-(async () => {
-  try {
-    // Si no hay usuario logueado, inicia sesión anónima
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        MI_ID = user.uid;
-        // Mostrar botón de cerrar sesión solo si NO es anónimo
-        document.getElementById('btnCerrarSesion').style.display = user.isAnonymous ? 'none' : 'block';
-        await cargarPerfil();
-        await cargar();
-      } else {
-        await signInAnonymously(auth);
-      }
-    });
-  } catch (error) {
-    console.error("Error en autenticación:", error);
+// ESCUCHA DE CAMBIOS DE AUTH (SIN ANÓNIMO)
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    MI_ID = user.uid;
+    document.getElementById('emailVincular').style.display = "none";
+    document.getElementById('passwordVincular').style.display = "none";
+    document.getElementById('btnVincular').style.display = "none";
+    document.getElementById('btnCerrarSesion').style.display = "block";
+    document.getElementById('authTitulo').textContent = "Sesión activa: " + user.email;
+    await cargarPerfil();
+  } else {
+    MI_ID = null;
+    document.getElementById('emailVincular').style.display = "block";
+    document.getElementById('passwordVincular').style.display = "block";
+    document.getElementById('btnVincular').style.display = "block";
+    document.getElementById('btnCerrarSesion').style.display = "none";
+    document.getElementById('authTitulo').textContent = "Acceso a la Cuenta";
+    bannerPerfil.style.display = "block";
   }
-})();
+  await cargar();
+});
+
+window.cerrarSesion = () => { if(confirm("¿Cerrar sesión?")) signOut(auth); };
 
 window.verImagenFull = (src) => {
     document.getElementById('fotoGrande').src = src;
@@ -401,7 +401,11 @@ document.getElementById('fotoPerfilFile').onchange = e => {
 window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
 window.abrir = () => {
-    if (!verificarPerfil()) {
+    if (!MI_ID) {
+        alert("Debes iniciar sesión para publicar.");
+        abrirPerfil();
+    } else if (!verificarPerfil()) {
+        alert("Completa tu nombre y teléfono para vender.");
         abrirPerfil();
     } else {
         document.getElementById('modal').style.display = "block";
@@ -416,8 +420,9 @@ window.cerrar = () => {
 function verificarPerfil() {
     const n = perfilNombreInput.value;
     const t = perfilTelefonoInput.value;
-    bannerPerfil.style.display = (n && t) ? "none" : "block";
-    return !!(n && t);
+    const ok = !!(MI_ID && n && t);
+    bannerPerfil.style.display = ok ? "none" : "block";
+    return ok;
 }
 
 async function cargarPerfil() {
@@ -431,13 +436,7 @@ async function cargarPerfil() {
     perfilTelefonoInput.value = p.telefono || "";
     fotoPerfilBase64 = p.foto || "";
     imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
-    bannerPerfil.style.display = (p.nombre && p.telefono) ? "none" : "block";
-  } else {
-    // Si no hay datos, limpiamos los campos (importante al cerrar sesión)
-    perfilNombreInput.value = "";
-    perfilTelefonoInput.value = "";
-    imgPerfilPrevia.src = "https://via.placeholder.com/80";
-    bannerPerfil.style.display = "block";
+    verificarPerfil();
   }
 }
 
@@ -446,8 +445,8 @@ window.abrirPerfil = () => {
 };
 
 window.guardarPerfil = async () => {
-  if (!MI_ID) return alert("Cargando sistema...");
-  
+  if (!MI_ID) return alert("Inicia sesión primero para guardar tu perfil.");
+
   await setDoc(doc(db, "vendedores", MI_ID), {
     nombre: perfilNombreInput.value,
     telefono: perfilTelefonoInput.value,
@@ -455,24 +454,11 @@ window.guardarPerfil = async () => {
     actualizado: Date.now()
   }, { merge: true });
 
-  alert("Perfil actualizado correctamente");
+  alert("Perfil actualizado correctamente.");
   verificarPerfil();
 };
 
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
-
-// FUNCIÓN PARA CERRAR SESIÓN
-window.cerrarSesion = async () => {
-  if(confirm("¿Estás seguro que deseas cerrar sesión?")){
-    try {
-      await signOut(auth);
-      alert("Sesión cerrada.");
-      location.reload(); // Recarga para limpiar todo el estado
-    } catch (error) {
-      alert("Error al salir: " + error.message);
-    }
-  }
-};
 
 window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value;
@@ -482,7 +468,8 @@ window.actualizarMunicipios = () => {
 };
 
 window.publicar = async () => {
-    if (!MI_ID) return alert("Usuario no autenticado");
+    if (!MI_ID) return alert("Inicia sesión.");
+
     const t = document.getElementById('titulo').value;
     const p = document.getElementById('precio').value;
     const cant = parseInt(document.getElementById('cantidad').value) || 1;
@@ -577,6 +564,7 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
 };
 
 window.verMisAnuncios = () => {
+    if(!MI_ID) return alert("Inicia sesión.");
     cerrarPerfil();
     verCatalogo(MI_ID, perfilNombreInput.value, fotoPerfilBase64);
 };
@@ -645,7 +633,6 @@ function crearCard(p) {
         </div>`;
 }
 
-// Geografía
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
@@ -659,27 +646,28 @@ function mostrarMensajeVincular(texto, esError = false) {
   msg.style.color = esError ? 'var(--rojo)' : 'var(--verde)';
 }
 
-// VINVULACIÓN / LOGIN
 document.getElementById('btnVincular').addEventListener('click', async () => {
   const email = document.getElementById('emailVincular').value.trim();
   const password = document.getElementById('passwordVincular').value;
 
   if (!email || !password || password.length < 6) {
-    return mostrarMensajeVincular("Email y Password (min 6 caracteres)", true);
+    mostrarMensajeVincular("Ingresa un correo válido y contraseña (mín 6 caracteres)", true);
+    return;
   }
 
   try {
-    const credential = EmailAuthProvider.credential(email, password);
-    await linkWithCredential(auth.currentUser, credential);
-    mostrarMensajeVincular("¡Cuenta vinculada con éxito!");
-    await guardarPerfil();
+    // Intentar Login
+    await signInWithEmailAndPassword(auth, email, password);
+    mostrarMensajeVincular("¡Bienvenido de nuevo!");
   } catch (error) {
-    if (error.code === 'auth/credential-already-in-use' || error.code === 'auth/email-already-in-use') {
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        mostrarMensajeVincular("Bienvenido de nuevo.");
-      } catch (logErr) {
-        mostrarMensajeVincular("Password incorrecto o error de red", true);
+        // Intentar Registro si no existe
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        await sendEmailVerification(userCred.user);
+        mostrarMensajeVincular("Cuenta creada. ¡Verifica tu correo!");
+      } catch (regError) {
+        mostrarMensajeVincular("Error: " + regError.message, true);
       }
     } else {
       mostrarMensajeVincular("Error: " + error.message, true);
