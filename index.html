@@ -364,11 +364,15 @@ document.querySelectorAll('.foto-item').forEach(input => {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX = 800; let w = img.width, h = img.height;
+                // COMPRESIÓN EXTREMA: Bajamos a 600px de ancho máximo
+                const MAX = 600; 
+                let w = img.width, h = img.height;
                 if (w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                const b64 = canvas.toDataURL('image/jpeg', 0.7);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                // CALIDAD 0.4: Reduce el peso drásticamente conservando lo visual
+                const b64 = canvas.toDataURL('image/jpeg', 0.4);
                 fotosAnuncio[idx] = b64;
                 const prev = document.getElementById(`p-${idx}`);
                 prev.src = b64; prev.style.display = "block";
@@ -387,9 +391,9 @@ document.getElementById('fotoPerfilFile').onchange = e => {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            canvas.width = 200; canvas.height = 200;
-            canvas.getContext('2d').drawImage(img, 0, 0, 200, 200);
-            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            canvas.width = 150; canvas.height = 150;
+            canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
+            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.5);
             imgPerfilPrevia.src = fotoPerfilBase64;
         };
         img.src = ev.target.result;
@@ -488,10 +492,6 @@ window.publicar = async () => {
         btn.disabled = true;
         btn.textContent = "Publicando...";
 
-        // Usamos los datos actuales de los inputs del perfil para asegurar que no falle si el doc de vendedor no carga
-        const nombreVend = perfilNombreInput.value;
-        const telVend = perfilTelefonoInput.value;
-
         await addDoc(collection(db, "productos"), {
             titulo: t,
             descripcion: document.getElementById('descripcion').value,
@@ -502,8 +502,8 @@ window.publicar = async () => {
             entrega: document.getElementById('opcionEnvio').value,
             depto: dep,
             muni: mun,
-            vendedor: nombreVend,
-            telefono: telVend,
+            vendedor: perfilNombreInput.value,
+            telefono: perfilTelefonoInput.value,
             fotoPerfilVendedor: fotoPerfilBase64,
             creado: Date.now(),
             duenoId: MI_ID,
@@ -704,3 +704,5 @@ document.getElementById('btnVincular').addEventListener('click', async () => {
   }
 });
 </script>
+</body>
+</html>
