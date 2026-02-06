@@ -273,14 +273,19 @@
           Vincular Cuenta (Sincronizar)
         </button>
         <div id="msgVincular" style="font-size:13px; color:var(--mut); text-align:center; margin-top:8px;"></div>
-        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
+        
+        <button id="btnCerrarSesion" onclick="cerrarSesion()" style="background:none; color:var(--rojo); padding:10px; border:1px solid var(--rojo); border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer">
+          <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+        </button>
+
+        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none; margin-top:10px">Cerrar Ventana</button>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInAnonymously, linkWithCredential, EmailAuthProvider, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInAnonymously, linkWithCredential, EmailAuthProvider, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -327,21 +332,22 @@ const bannerPerfil = document.getElementById('bannerPerfil');
 // Inicialización de autenticación
 (async () => {
   try {
-    await signInAnonymously(auth);
+    // Si no hay usuario logueado, inicia sesión anónima
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        MI_ID = user.uid;
+        // Mostrar botón de cerrar sesión solo si NO es anónimo
+        document.getElementById('btnCerrarSesion').style.display = user.isAnonymous ? 'none' : 'block';
+        await cargarPerfil();
+        await cargar();
+      } else {
+        await signInAnonymously(auth);
+      }
+    });
   } catch (error) {
-    console.error("Error en autenticación anónima:", error);
+    console.error("Error en autenticación:", error);
   }
 })();
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    MI_ID = user.uid;
-    await cargarPerfil();
-    await cargar();
-  } else {
-    console.error("Usuario no autenticado");
-  }
-});
 
 window.verImagenFull = (src) => {
     document.getElementById('fotoGrande').src = src;
@@ -415,6 +421,7 @@ function verificarPerfil() {
 }
 
 async function cargarPerfil() {
+  if(!MI_ID) return;
   const ref = doc(db, "vendedores", MI_ID);
   const snap = await getDoc(ref);
 
@@ -426,17 +433,21 @@ async function cargarPerfil() {
     imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
     bannerPerfil.style.display = (p.nombre && p.telefono) ? "none" : "block";
   } else {
+    // Si no hay datos, limpiamos los campos (importante al cerrar sesión)
+    perfilNombreInput.value = "";
+    perfilTelefonoInput.value = "";
+    imgPerfilPrevia.src = "https://via.placeholder.com/80";
     bannerPerfil.style.display = "block";
   }
 }
 
 window.abrirPerfil = () => {
-    // No es necesario cargar de localStorage, ya que cargarPerfil() lo hace de Firestore
     document.getElementById('modalPerfil').style.display = "block";
 };
-window.guardarPerfil = async () => {
-  if (!MI_ID) return alert("Usuario no autenticado");
 
+window.guardarPerfil = async () => {
+  if (!MI_ID) return alert("Cargando sistema...");
+  
   await setDoc(doc(db, "vendedores", MI_ID), {
     nombre: perfilNombreInput.value,
     telefono: perfilTelefonoInput.value,
@@ -444,10 +455,24 @@ window.guardarPerfil = async () => {
     actualizado: Date.now()
   }, { merge: true });
 
-  cerrarPerfil();
-  await cargarPerfil();
+  alert("Perfil actualizado correctamente");
+  verificarPerfil();
 };
+
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
+
+// FUNCIÓN PARA CERRAR SESIÓN
+window.cerrarSesion = async () => {
+  if(confirm("¿Estás seguro que deseas cerrar sesión?")){
+    try {
+      await signOut(auth);
+      alert("Sesión cerrada.");
+      location.reload(); // Recarga para limpiar todo el estado
+    } catch (error) {
+      alert("Error al salir: " + error.message);
+    }
+  }
+};
 
 window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value;
@@ -458,7 +483,6 @@ window.actualizarMunicipios = () => {
 
 window.publicar = async () => {
     if (!MI_ID) return alert("Usuario no autenticado");
-
     const t = document.getElementById('titulo').value;
     const p = document.getElementById('precio').value;
     const cant = parseInt(document.getElementById('cantidad').value) || 1;
@@ -466,7 +490,6 @@ window.publicar = async () => {
 
     if (!t || !p || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
 
-    // Obtener el perfil del vendedor desde Firestore
     const perfilSnap = await getDoc(doc(db, "vendedores", MI_ID));
     if (!perfilSnap.exists()) return alert("Completa tu perfil primero");
 
@@ -555,7 +578,6 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
 
 window.verMisAnuncios = () => {
     cerrarPerfil();
-    // Usamos valores de Firestore en lugar de localStorage
     verCatalogo(MI_ID, perfilNombreInput.value, fotoPerfilBase64);
 };
 
@@ -623,7 +645,7 @@ function crearCard(p) {
         </div>`;
 }
 
-// Inicialización
+// Geografía
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
@@ -631,77 +653,39 @@ Object.keys(svData).forEach(d => {
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
 
-// Función para mostrar mensaje en el modal
 function mostrarMensajeVincular(texto, esError = false) {
   const msg = document.getElementById('msgVincular');
   msg.textContent = texto;
   msg.style.color = esError ? 'var(--rojo)' : 'var(--verde)';
 }
 
-// Evento del botón Vincular
+// VINVULACIÓN / LOGIN
 document.getElementById('btnVincular').addEventListener('click', async () => {
   const email = document.getElementById('emailVincular').value.trim();
   const password = document.getElementById('passwordVincular').value;
 
   if (!email || !password || password.length < 6) {
-    mostrarMensajeVincular("Ingresa un correo válido y contraseña de al menos 6 caracteres", true);
-    return;
+    return mostrarMensajeVincular("Email y Password (min 6 caracteres)", true);
   }
-
-  if (!MI_ID || !auth.currentUser) {
-    mostrarMensajeVincular("No hay usuario autenticado. Intenta de nuevo.", true);
-    return;
-  }
-
-  const credential = EmailAuthProvider.credential(email, password);
 
   try {
-    // Intentamos vincular directamente a la cuenta anónima actual
+    const credential = EmailAuthProvider.credential(email, password);
     await linkWithCredential(auth.currentUser, credential);
-    
-    mostrarMensajeVincular("¡Éxito! Tu cuenta ahora está vinculada. Puedes iniciar sesión con este correo y contraseña en cualquier dispositivo.");
-    
-    // Opcional: recargar perfil o mostrar botón de "Cerrar sesión" si quieres
-    await cargarPerfil(); // Para refrescar si es necesario
-
+    mostrarMensajeVincular("¡Cuenta vinculada con éxito!");
+    await guardarPerfil();
   } catch (error) {
-    console.error("Error al vincular:", error.code, error.message);
-
-    if (error.code === 'auth/credential-already-in-use') {
-      // El correo ya existe → podemos intentar iniciar sesión y luego vincular (merge)
+    if (error.code === 'auth/credential-already-in-use' || error.code === 'auth/email-already-in-use') {
       try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        // Si llega aquí, ya inició sesión con la cuenta existente
-        mostrarMensajeVincular("¡Cuenta existente detectada! Ahora estás logueado con ella. Tus datos se sincronizarán.");
-      } catch (signInError) {
-        if (signInError.code === 'auth/wrong-password') {
-          mostrarMensajeVincular("Contraseña incorrecta para este correo. Intenta de nuevo o usa otra cuenta.", true);
-        } else {
-          mostrarMensajeVincular("Error al conectar: " + signInError.message, true);
-        }
+        await signInWithEmailAndPassword(auth, email, password);
+        mostrarMensajeVincular("Bienvenido de nuevo.");
+      } catch (logErr) {
+        mostrarMensajeVincular("Password incorrecto o error de red", true);
       }
-    } else if (error.code === 'auth/email-already-in-use') {
-      mostrarMensajeVincular("Este correo ya está registrado. Intenta iniciar sesión o usa otro correo.", true);
-    } else if (error.code === 'auth/weak-password') {
-      mostrarMensajeVincular("La contraseña es muy débil. Usa al menos 6 caracteres con letras y números.", true);
     } else {
-      mostrarMensajeVincular("Error inesperado: " + error.message, true);
+      mostrarMensajeVincular("Error: " + error.message, true);
     }
   }
 });
 </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('sw.js')
-        .then(function(registration) {
-          console.log('ServiceWorker registrado con éxito');
-        }, function(err) {
-          console.log('Fallo en el registro del ServiceWorker: ', err);
-        });
-    });
-  }
-</script>
-
 </body>
 </html>
