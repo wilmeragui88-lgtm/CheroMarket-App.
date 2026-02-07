@@ -1,44 +1,50 @@
 {
   "name": "CheroMarket",
   "short_name": "CheroMarket",
-  "description": "Aplicación móvil de comercio local para CheroMarket.",
-  "start_url": "index.html",
+  "description": "Aplicación móvil de comercio local CheroMarket",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#317EFB",
+
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
+  ],
+
+  "screenshots": [
+    {
+      "src": "screenshots/home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshots/menu.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshots/perfil.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshots/configuracion.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
   ]
 }
-
-"screenshots": [
-  {
-    "src": "screenshots/home.png",
-    "sizes": "1080x1920",
-    "type": "image/png"
-  },
-  {
-    "src": "screenshots/menu.png",
-    "sizes": "1080x1920",
-    "type": "image/png"
-  },
-  {
-    "src": "screenshots/perfil.png",
-    "sizes": "1080x1920",
-    "type": "image/png"
-  },
-  {
-    "src": "screenshots/configuracion.png",
-    "sizes": "1080x1920",
-    "type": "image/png"
-  }
-]
