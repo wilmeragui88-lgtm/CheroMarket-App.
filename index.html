@@ -656,12 +656,12 @@ function crearCard(p) {
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
                 ${!p.vendido 
-  ? `<a class="btn-wa" 
+  ? `<a class="btn-wa"
        target="_blank"
        href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(
-         `Hola ${p.nombre}, estoy interesado en tu producto`
+         `Hola, buen día. Me interesa su artículo. ¿Podrían brindarme más información y fotografías, por favor?`
        )}">
-       <i class="fa-brands fa-whatsapp"></i> Preguntar
+       <i class="fa-brands fa-whatsapp"></i> Consultar
      </a>`
   : ''
 }
