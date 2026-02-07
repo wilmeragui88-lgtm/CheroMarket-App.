@@ -714,11 +714,5 @@ document.getElementById('btnVincular').addEventListener('click', async () => {
 });
 </script>
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js")
-    .then(() => console.log("Service Worker listo 🚀"))
-    .catch(err => console.error("Error SW:", err));
-}
-</script>
 </body>
 </html>
