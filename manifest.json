@@ -19,3 +19,16 @@
     }
   ]
 }
+
+"screenshots": [
+  {
+    "src": "screenshots/home.png",
+    "sizes": "1080x1920",
+    "type": "image/png"
+  },
+  {
+    "src": "screenshots/menu.png",
+    "sizes": "1080x1920",
+    "type": "image/png"
+  }
+]
