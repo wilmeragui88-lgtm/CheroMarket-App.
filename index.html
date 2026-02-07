@@ -655,7 +655,16 @@ function crearCard(p) {
                 <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
-                ${!p.vendido ? `<a class="btn-wa" href="https://wa.me/503${p.telefono}"><i class="fa-brands fa-whatsapp"></i> Preguntar</a>` : ''}
+                ${!p.vendido 
+  ? `<a class="btn-wa" 
+       target="_blank"
+       href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(
+         `Hola ${p.nombre}, estoy interesado en tu producto`
+       )}">
+       <i class="fa-brands fa-whatsapp"></i> Preguntar
+     </a>`
+  : ''
+}
                 ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Marcar Agotado</button>` : ''}
                 ${esMio ? `<button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button>` : ''}
             </div>
