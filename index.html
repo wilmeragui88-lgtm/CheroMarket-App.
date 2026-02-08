@@ -223,7 +223,7 @@
 
 <div id="modal">
     <div class="modal-content">
-        <h3>Nuevo Anuncio</h3>
+        <h3 id="modalTitulo">Nuevo Anuncio</h3>
         <input id="titulo" placeholder="¿Qué vendes?">
         <textarea id="descripcion" placeholder="Detalles del producto..."></textarea>
         <div style="display:flex;gap:10px">
@@ -249,7 +249,7 @@
         </select>
         <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
         <select id="muni"><option value="">Municipio</option></select>
-        <button onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
+        <button id="btnPublicar" onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
         <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
     </div>
 </div>
@@ -296,6 +296,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 let MI_ID = null;
+let editandoID = null;
+
 const svData = {
     "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
     "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
@@ -364,14 +366,12 @@ document.querySelectorAll('.foto-item').forEach(input => {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                // COMPRESIÓN EXTREMA: Bajamos a 600px de ancho máximo
                 const MAX = 600; 
                 let w = img.width, h = img.height;
                 if (w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, w, h);
-                // CALIDAD 0.4: Reduce el peso drásticamente conservando lo visual
                 const b64 = canvas.toDataURL('image/jpeg', 0.4);
                 fotosAnuncio[idx] = b64;
                 const prev = document.getElementById(`p-${idx}`);
@@ -403,6 +403,7 @@ document.getElementById('fotoPerfilFile').onchange = e => {
 
 window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
+
 window.abrir = () => {
     if (!MI_ID) {
         alert("Debes iniciar sesión para publicar.");
@@ -411,13 +412,56 @@ window.abrir = () => {
         alert("Completa tu nombre y teléfono en 'Mi Perfil' para poder vender.");
         abrirPerfil();
     } else {
+        editandoID = null;
+        document.getElementById('modalTitulo').textContent = "Nuevo Anuncio";
+        document.getElementById('btnPublicar').textContent = "Publicar Ahora";
+        limpiarCampos();
         document.getElementById('modal').style.display = "block";
     }
 };
+
 window.cerrar = () => {
     document.getElementById('modal').style.display = "none";
+    editandoID = null;
+    limpiarCampos();
+};
+
+function limpiarCampos() {
+    document.getElementById('titulo').value = "";
+    document.getElementById('descripcion').value = "";
+    document.getElementById('precio').value = "";
+    document.getElementById('cantidad').value = "1";
     fotosAnuncio = ["", "", ""];
     document.querySelectorAll('.foto-input-box img').forEach(i => i.style.display="none");
+}
+
+window.abrirEditar = (id) => {
+    const p = productos.find(item => item.id === id);
+    if (!p) return;
+
+    editandoID = id;
+    document.getElementById('modalTitulo').textContent = "Editar mi Anuncio";
+    document.getElementById('btnPublicar').textContent = "Guardar Cambios";
+
+    document.getElementById('titulo').value = p.titulo;
+    document.getElementById('descripcion').value = p.descripcion;
+    document.getElementById('precio').value = p.precio;
+    document.getElementById('cantidad').value = p.cantidad || 1;
+    document.getElementById('categoria').value = p.categoria;
+    document.getElementById('opcionEnvio').value = p.entrega;
+    document.getElementById('depto').value = p.depto;
+    
+    actualizarMunicipios();
+    document.getElementById('muni').value = p.muni;
+
+    fotosAnuncio = [...p.fotos, "", ""].slice(0, 3);
+    fotosAnuncio.forEach((src, idx) => {
+        const img = document.getElementById(`p-${idx}`);
+        if (src) { img.src = src; img.style.display = "block"; }
+        else { img.style.display = "none"; }
+    });
+
+    document.getElementById('modal').style.display = "block";
 };
 
 function verificarPerfil() {
@@ -444,9 +488,7 @@ async function cargarPerfil() {
   } catch(e) { console.error("Error cargando perfil:", e); }
 }
 
-window.abrirPerfil = () => {
-    document.getElementById('modalPerfil').style.display = "block";
-};
+window.abrirPerfil = () => document.getElementById('modalPerfil').style.display = "block";
 
 window.guardarPerfil = async () => {
   if (!MI_ID) return alert("Inicia sesión primero para guardar tu perfil.");
@@ -474,9 +516,7 @@ window.actualizarMunicipios = () => {
 window.publicar = async () => {
     if (!MI_ID) return alert("Inicia sesión.");
 
-    const btn = event.target;
-    const originalText = btn.textContent;
-
+    const btn = document.getElementById('btnPublicar');
     const t = document.getElementById('titulo').value.trim();
     const p = document.getElementById('precio').value;
     const cant = parseInt(document.getElementById('cantidad').value) || 1;
@@ -485,14 +525,14 @@ window.publicar = async () => {
     const mun = document.getElementById('muni').value;
 
     if (!t || !p || fotosFinales.length === 0 || !dep || !mun) {
-        return alert("Por favor rellena todos los campos y sube al menos una foto.");
+        return alert("Por favor rellena todos los campos.");
     }
 
     try {
         btn.disabled = true;
-        btn.textContent = "Publicando...";
+        btn.textContent = "Procesando...";
 
-        await addDoc(collection(db, "productos"), {
+        const datos = {
             titulo: t,
             descripcion: document.getElementById('descripcion').value,
             precio: parseFloat(p).toFixed(2),
@@ -502,22 +542,30 @@ window.publicar = async () => {
             entrega: document.getElementById('opcionEnvio').value,
             depto: dep,
             muni: mun,
-            vendedor: perfilNombreInput.value,
-            telefono: perfilTelefonoInput.value,
-            fotoPerfilVendedor: fotoPerfilBase64,
-            creado: Date.now(),
-            duenoId: MI_ID,
             vendido: (cant <= 0),
-            oculto: false
-        });
+            actualizado: Date.now()
+        };
 
-        alert("¡Anuncio publicado con éxito!");
+        if (editandoID) {
+            await updateDoc(doc(db, "productos", editandoID), datos);
+            alert("¡Anuncio actualizado!");
+        } else {
+            await addDoc(collection(db, "productos"), {
+                ...datos,
+                vendedor: perfilNombreInput.value,
+                telefono: perfilTelefonoInput.value,
+                fotoPerfilVendedor: fotoPerfilBase64,
+                creado: Date.now(),
+                duenoId: MI_ID,
+                oculto: false
+            });
+            alert("¡Anuncio publicado!");
+        }
         location.reload();
     } catch (error) {
-        console.error(error);
-        alert("Error al publicar: " + error.message);
+        alert("Error: " + error.message);
         btn.disabled = false;
-        btn.textContent = originalText;
+        btn.textContent = editandoID ? "Guardar Cambios" : "Publicar Ahora";
     }
 };
 
@@ -532,16 +580,23 @@ window.compartirPost = async (titulo, precio, muni) => {
 };
 
 window.marcarVendido = async (id) => {
-    if(confirm("¿Marcar como agotado?")) { 
+    const p = productos.find(item => item.id === id);
+    const nuevoEstado = !p.vendido;
+    const m = nuevoEstado ? "¿Marcar como agotado?" : "¿Poner disponible de nuevo?";
+    
+    if(confirm(m)) { 
         try {
-            await updateDoc(doc(db,"productos",id), {vendido:true, cantidad: 0}); 
+            await updateDoc(doc(db,"productos",id), {
+                vendido: nuevoEstado, 
+                cantidad: nuevoEstado ? 0 : 1
+            }); 
             cargar(); 
         } catch(e) { alert("Error: " + e.message); }
     }
 };
 
 window.eliminar = async (id) => {
-    if(confirm("¿Eliminar anuncio?")) { 
+    if(confirm("¿Eliminar anuncio definitivamente?")) { 
         try {
             await updateDoc(doc(db,"productos",id), {oculto:true}); 
             cargar(); 
@@ -655,18 +710,24 @@ function crearCard(p) {
                 <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
-                ${!p.vendido 
-  ? `<a class="btn-wa"
-       target="_blank"
-       href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(
-         `Hola, buen día. Me interesa su artículo. ¿Podrían brindarme más información y fotografías, por favor?`
-       )}">
-       <i class="fa-brands fa-whatsapp"></i> Consultar
-     </a>`
-  : ''
-}
-                ${esMio && !p.vendido ? `<button class="btn-vendido-accion" onclick="marcarVendido('${p.id}')">Marcar Agotado</button>` : ''}
-                ${esMio ? `<button class="btn-eliminar-accion" onclick="eliminar('${p.id}')">Eliminar</button>` : ''}
+                
+                ${!p.vendido ? `
+                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(`Hola, buen día. Me interesa su artículo. ¿Podrían brindarme más información y fotografías, por favor?`)}">
+                    <i class="fa-brands fa-whatsapp"></i> Consultar
+                </a>` : ''}
+
+                ${esMio ? `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px">
+                    <button class="btn-vendido-accion" style="background:#555; margin-top:0" onclick="abrirEditar('${p.id}')">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    <button class="btn-vendido-accion" style="background:${p.vendido ? 'var(--verde)' : 'var(--azul)'}; margin-top:0" onclick="marcarVendido('${p.id}')">
+                        ${p.vendido ? 'Activar' : 'Agotado'}
+                    </button>
+                    <button class="btn-eliminar-accion" style="grid-column: span 2; border: 1px solid var(--rojo); padding:5px" onclick="eliminar('${p.id}')">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </button>
+                </div>` : ''}
             </div>
         </div>`;
 }
@@ -687,12 +748,10 @@ function mostrarMensajeVincular(texto, esError = false) {
 document.getElementById('btnVincular').addEventListener('click', async () => {
   const email = document.getElementById('emailVincular').value.trim();
   const password = document.getElementById('passwordVincular').value;
-
   if (!email || !password || password.length < 6) {
     mostrarMensajeVincular("Ingresa un correo válido y contraseña (mín 6 caracteres)", true);
     return;
   }
-
   try {
     await signInWithEmailAndPassword(auth, email, password);
     mostrarMensajeVincular("¡Bienvenido de nuevo!");
@@ -714,20 +773,14 @@ document.getElementById('btnVincular').addEventListener('click', async () => {
 });
 </script>
 <script>
-   <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker
         .register("./pwabuilder-sw.js")
-        .then((registration) => {
-          console.log("Service Worker registrado con éxito:", registration.scope);
-        })
-        .catch((error) => {
-          console.log("Fallo en el registro del Service Worker:", error);
-        });
+        .then((registration) => { console.log("SW registrado:", registration.scope); })
+        .catch((error) => { console.log("SW falló:", error); });
     });
   }
 </script>
- 
 </body>
 </html>
