@@ -1,31 +1,21 @@
-// 1. Nombre del cache (Cámbialo si haces cambios grandes en la web)
-const CACHE_NAME = "cheromarket-cache-v1";
+const CACHE_NAME = "cheromarket-v2";
 
-// 2. Archivos críticos para uso offline e instalación
-// Es vital incluir el manifest y los iconos para que aparezcan al instalar
+// Solo cacheamos lo que sí existe
 const assetsToCache = [
   "./",
   "./index.html",
-  "./manifest.json",
-  "./styles.css",     // Asegúrate de que el nombre coincida
-  "./script.js",     // Asegúrate de que el nombre coincida
-  "./icon-192.png",   // Requerido para el icono de Android/Chrome
-  "./icon-512.png"    // Requerido para el banner de instalación
+  "./manifest.json"
 ];
 
-// Instalación del Service Worker
 self.addEventListener("install", (event) => {
-  // Fuerza al SW a activarse sin esperar a que se cierre la pestaña
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("CheroMarket: Cacheando archivos críticos...");
-      return cache.addAll(assetsToCache);
+      return cache.addAll(assetsToCache).catch(err => console.log("Error en cache:", err));
     })
   );
 });
 
-// Limpieza de caches antiguos (Vital para que tus clientes vean actualizaciones)
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -36,12 +26,11 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Responder desde el cache o ir a internet
+// Estrategia: Ir a Internet primero, si falla usar Cache
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Si el archivo está en cache, lo devuelve; si no, lo busca en internet
-      return response || fetch(event.request);
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
     })
   );
 });
