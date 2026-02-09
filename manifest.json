@@ -2,11 +2,12 @@
   "name": "CheroMarket",
   "short_name": "CheroMarket",
   "description": "Aplicación móvil de comercio local para CheroMarket.",
-  "start_url": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#317EFB",
+  "theme_color": "#0047AB",
   "icons": [
     {
       "src": "icon-192.png",
