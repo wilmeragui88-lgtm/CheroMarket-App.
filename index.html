@@ -368,13 +368,30 @@ document.querySelectorAll('.foto-item').forEach(input => {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX = 600; 
+                const MAX = 800; // Bajado a 800px para pesos más bajos (ideal para móvil 2026)
                 let w = img.width, h = img.height;
                 if (w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, w, h);
-                const b64 = canvas.toDataURL('image/jpeg', 0.4);
+
+                // Prioridad: AVIF para compresión máxima (50% más pequeño que JPEG)
+                let formato = 'image/avif';
+                let calidad = 0.50; // Bajo para AVIF: ~80-180KB, calidad aceptable
+
+                // Fallback si AVIF no soportado (raro en 2026)
+                if (!canvas.toDataURL('image/avif').startsWith('data:image/avif')) {
+                    formato = 'image/webp';
+                    calidad = 0.68; // Para WebP: ~100-250KB
+                }
+
+                // Último fallback: JPEG
+                if (!canvas.toDataURL(formato).startsWith('data:image')) {
+                    formato = 'image/jpeg';
+                    calidad = 0.75; // ~150-350KB
+                }
+
+                const b64 = canvas.toDataURL(formato, calidad);
                 fotosAnuncio[idx] = b64;
                 const prev = document.getElementById(`p-${idx}`);
                 prev.src = b64; prev.style.display = "block";
@@ -393,9 +410,24 @@ document.getElementById('fotoPerfilFile').onchange = e => {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            canvas.width = 150; canvas.height = 150;
+            canvas.width = 150; canvas.height = 150; // Mantener pequeño para perfil
             canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
-            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.5);
+
+            // Mismo enfoque para perfil, pero calidad más baja ya que es pequeño
+            let formato = 'image/avif';
+            let calidad = 0.45; // Aún más bajo para AVIF en perfiles pequeños
+
+            if (!canvas.toDataURL('image/avif').startsWith('data:image/avif')) {
+                formato = 'image/webp';
+                calidad = 0.65;
+            }
+
+            if (!canvas.toDataURL(formato).startsWith('data:image')) {
+                formato = 'image/jpeg';
+                calidad = 0.70;
+            }
+
+            fotoPerfilBase64 = canvas.toDataURL(formato, calidad);
             imgPerfilPrevia.src = fotoPerfilBase64;
         };
         img.src = ev.target.result;
@@ -639,7 +671,7 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
     const filtrados = productos.filter(p => p.duenoId === idVendedor);
     const feed = document.getElementById('feed');
     feed.innerHTML = `<div class="header-catalogo">
-        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil" alt="Foto de vendedor">
+        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil" alt="Foto de vendedor" loading="lazy">
         <h2>${nombreVendedor}</h2>
         <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
     </div>`;
@@ -685,7 +717,7 @@ function crearCard(p) {
     let miniHTML = "";
     if(fotos.length > 1) {
         miniHTML = `<div class="miniaturas-cont">
-            ${fotos.map(f => `<img src="${f}" class="mini-foto" alt="Miniatura" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
+            ${fotos.map(f => `<img src="${f}" class="mini-foto" alt="Miniatura" loading="lazy" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
         </div>`;
     }
 
@@ -695,7 +727,7 @@ function crearCard(p) {
             <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
             ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
             
-            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" alt="${p.titulo}" onclick="verImagenFull(this.src)">
+            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" alt="${p.titulo}" loading="lazy" onclick="verImagenFull(this.src)">
             ${miniHTML}
 
             <div class="info">
