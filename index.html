@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -259,8 +260,6 @@
 <div id="modalPerfil">
     <div class="modal-content">
         <h3>Mi Perfil de Vendedor</h3>
-        <hr>
-<div id="seccionTienda"></div>
         <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
             <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80" alt="Foto de perfil">
             <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
@@ -281,135 +280,11 @@
         <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
     </div>
 </div>
+
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signOut 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  getDocs, 
-  doc, 
-  query, 
-  orderBy, 
-  updateDoc, 
-  getDoc, 
-  setDoc,
-  where
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-
-/* 🔥 CONFIG FIREBASE */
-const firebaseConfig = {
-  apiKey: "AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
-  authDomain: "cheromarket.firebaseapp.com",
-  databaseURL: "https://cheromarket-default-rtdb.firebaseio.com",
-  projectId: "cheromarket",
-  storageBucket: "cheromarket.firebasestorage.app",
-  messagingSenderId: "777368646513",
-  appId: "1:777368646513:web:42b49dad96c2dcf76b7cd0"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let MI_ID = null;
-
-
-/* 🔥 VERIFICAR TIENDA */
-async function verificarTienda(user) {
-  try {
-
-    const q = query(
-      collection(db, "tiendas"),
-      where("propietarioId", "==", user.uid)
-    );
-
-    const snapshot = await getDocs(q);
-    const contenedor = document.getElementById("seccionTienda");
-
-    if (!contenedor) return;
-
-    if (!snapshot.empty) {
-
-      const tienda = snapshot.docs[0].data();
-
-      contenedor.innerHTML = `
-        <h4 style="margin-top:10px;">🏪 ${tienda.nombreTienda}</h4>
-        <p style="font-size:13px;">Plan actual: <strong>${tienda.plan}</strong></p>
-        <button style="background:green; color:white; padding:10px; border:none; border-radius:8px; width:100%; margin-top:5px;"
-          onclick="alert('Aquí irá el panel de tienda')">
-          Administrar Mi Tienda
-        </button>
-      `;
-
-    } else {
-
-      contenedor.innerHTML = `
-        <button style="background:orange; color:white; padding:10px; border:none; border-radius:8px; width:100%; margin-top:10px;"
-          onclick="alert('Aquí abriremos el formulario para crear tienda')">
-          Crear Mi Tienda
-        </button>
-      `;
-    }
-
-  } catch (error) {
-    console.error("Error verificando tienda:", error);
-  }
-}
-
-
-/* 🔥 AUTH STATE */
-onAuthStateChanged(auth, async (user) => {
-
-  if (user) {
-
-    MI_ID = user.uid;
-
-    document.getElementById('emailVincular').style.display = "none";
-    document.getElementById('passwordVincular').style.display = "none";
-    document.getElementById('btnVincular').style.display = "none";
-    document.getElementById('btnCerrarSesion').style.display = "block";
-    document.getElementById('authTitulo').textContent = 
-      "Sesión activa: " + user.email;
-
-    if (typeof cargarPerfil === "function") {
-      await cargarPerfil();
-    }
-
-    await verificarTienda(user);
-
-  } else {
-
-    MI_ID = null;
-
-    document.getElementById('emailVincular').style.display = "block";
-    document.getElementById('passwordVincular').style.display = "block";
-    document.getElementById('btnVincular').style.display = "block";
-    document.getElementById('btnCerrarSesion').style.display = "none";
-    document.getElementById('authTitulo').textContent = "Acceso a la Cuenta";
-
-    const contenedor = document.getElementById("seccionTienda");
-    if (contenedor) contenedor.innerHTML = "";
-  }
-
-  if (typeof cargar === "function") {
-    await cargar();
-  }
-
-});
-
-</script>
+import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
