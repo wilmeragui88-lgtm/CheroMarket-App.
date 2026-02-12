@@ -549,27 +549,27 @@ window.publicar = async () => {
         };
 
         if (editandoID) {
-    await updateDoc(doc(db, "productos", editandoID), datos);
-    alert("¡Anuncio actualizado!");
-} else {
-    await addDoc(collection(db, "productos"), {
-        ...datos,
-        vendedor: perfilNombreInput.value,
-        telefono: perfilTelefonoInput.value,
-        fotoPerfilVendedor: fotoPerfilBase64,
-        creado: Date.now(),
-        duenoId: MI_ID,
-        oculto: false
-    });
-    alert("¡Anuncio publicado!");
-}
-
-btn.disabled = false;
-btn.textContent = editandoID ? "Guardar Cambios" : "Publicar Ahora";
-
-cerrar();          // 👈 Cierra el modal
-document.getElementById('sidebar').classList.remove('active'); // 👈 Fuerza cerrar menú
-await cargar();    // 👈 Recarga productos
+            await updateDoc(doc(db, "productos", editandoID), datos);
+            alert("¡Anuncio actualizado!");
+        } else {
+            await addDoc(collection(db, "productos"), {
+                ...datos,
+                vendedor: perfilNombreInput.value,
+                telefono: perfilTelefonoInput.value,
+                fotoPerfilVendedor: fotoPerfilBase64,
+                creado: Date.now(),
+                duenoId: MI_ID,
+                oculto: false
+            });
+            alert("¡Anuncio publicado!");
+        }
+        location.reload();
+    } catch (error) {
+        alert("Error: " + error.message);
+        btn.disabled = false;
+        btn.textContent = editandoID ? "Guardar Cambios" : "Publicar Ahora";
+    }
+};
 
 window.compartirPost = async (titulo, precio, muni) => {
     const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 ${titulo}\n💰 $${precio}\n📍 ${muni}`;
