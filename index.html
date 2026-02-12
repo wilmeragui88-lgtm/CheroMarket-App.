@@ -302,6 +302,12 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 let MI_ID = null;
 let editandoID = null;
+// Agrega esto dentro de tu lógica de inicio
+if (localStorage.getItem("terminos_aceptados") === "true") {
+    // Aquí podrías ocultar el botón de aceptar o marcar con un check verde
+    console.log("El usuario ya es un chero legal.");
+}
+
 
 const svData = {
     "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
