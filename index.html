@@ -563,7 +563,9 @@ window.publicar = async () => {
             });
             alert("¡Anuncio publicado!");
         }
-        location.reload();
+        cerrar();
+document.getElementById('sidebar').classList.remove('active');
+await cargar();
     } catch (error) {
         alert("Error: " + error.message);
         btn.disabled = false;
