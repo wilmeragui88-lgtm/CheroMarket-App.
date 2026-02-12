@@ -776,6 +776,20 @@ document.getElementById('btnVincular').addEventListener('click', async () => {
     }
   }
 });
+window.aceptarTerminos = () => {
+    // 1. Guardar en el navegador que ya aceptó (opcional por si quieres ocultar el banner)
+    localStorage.setItem("terminos_aceptados", "true");
+
+    // 2. Cerrar el menú lateral
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.remove('active');
+
+    // 3. (Opcional) Un pequeño aviso visual rápido que no bloquee la pantalla
+    console.log("Términos aceptados por el chero.");
+    
+    // Si quieres avisar sin el alert tradicional, puedes inyectar un mensaje temporal o simplemente dejar que se cierre.
+};
+
 </script>
 
 <script>
