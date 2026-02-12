@@ -94,11 +94,18 @@
     </style>
 </head>
 <body data-theme="light">
-
-<div id="bannerPerfil" class="alerta-perfil">
-    ⚠️ <strong>Acceso Restringido:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Inicia sesión o regístrate</a> para vender y crear tu perfil.
-</div>
-
+<header>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 10px;">
+        <button class="btn-menu" onclick="toggleMenu()" style="position: static;"><i class="fa-solid fa-bars"></i></button>
+        
+        <h1 style="flex: 1; margin-left: 10px; text-align: left;">🇸🇻 CheroMarket</h1>
+        
+        <div id="avatarHeader" onclick="abrirPerfil()" style="cursor: pointer; display: flex; align-items: center; gap: 8px; background: var(--fondo); padding: 5px 12px; border-radius: 25px; border: 1px solid var(--b);">
+            <img id="fotoAvatarHeader" src="https://via.placeholder.com/35" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid var(--azul);">
+            <span id="nombreHeader" style="font-size: 12px; font-weight: bold; color: var(--azul);">Mi Perfil</span>
+        </div>
+    </div>
+    
 <header>
     <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     <h1>🇸🇻 CheroMarketApp</h1>
