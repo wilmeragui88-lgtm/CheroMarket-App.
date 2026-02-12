@@ -98,10 +98,13 @@
     <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     <h1>🇸🇻 CheroMarketApp</h1>
     <div class="sub">Compra y vende entre salvadoreños</div>
-<div id="avatarHeader" onclick="abrirPerfil()" style="cursor: pointer; display: flex; align-items: center; gap: 10px; background: white; padding: 5px 12px; border-radius: 30px; border: 2px solid #0047AB; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <img id="fotoAvatarHeader" src="https://via.placeholder.com/35" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
-    <span id="nombreHeader" style="font-size: 13px; font-weight: bold; color: #0047AB;">Mi Perfil</span>
-</div>
+<div id="modalPerfil">
+    <div class="modal-content">
+        <h3>Mi Perfil de Vendedor</h3>
+        <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
+            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80" alt="Foto de perfil">
+            <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+        </div>
 
     <div class="buscador-cont">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
