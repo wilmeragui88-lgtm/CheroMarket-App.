@@ -714,9 +714,18 @@ function crearCard(p) {
                 </div>
                 
                 ${!p.vendido ? `
-                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(`Hola, buen día. Me interesa su artículo. ¿Podrían brindarme más información y fotografías, por favor?`)}">
-                    <i class="fa-brands fa-whatsapp"></i> Consultar
-                </a>` : ''}
+                <a class="btn-wa" target="_blank" 
+href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(
+`Hola 👋 me interesa tu publicación en CheroMarket 🇸🇻
+
+📦 Producto: ${p.titulo}
+💰 Precio: $${p.precio}
+📍 Ubicación: ${p.muni}, ${p.depto}
+
+¿Sigue disponible?`
+)}">
+<i class="fa-brands fa-whatsapp"></i> Consultar
+</a>
 
                 ${esMio ? `
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px">
