@@ -95,39 +95,10 @@
 </head>
 <body data-theme="light">
 <header>
-    <header>
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 15px;">
-        <button class="btn-menu" onclick="toggleMenu()" style="position: static; margin: 0;"><i class="fa-solid fa-bars"></i></button>
-        
-        <h1 style="flex: 1; margin-left: 15px; text-align: left; font-size: 20px;">🇸🇻 CheroMarket</h1>
-        
-        <div id="avatarHeader" onclick="abrirPerfil()" style="cursor: pointer; display: flex; align-items: center; gap: 8px; background: var(--fondo); padding: 4px 10px; border-radius: 25px; border: 1px solid var(--b); transition: 0.2s;">
-            <img id="fotoAvatarHeader" src="https://via.placeholder.com/35" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid var(--azul);">
-            <span id="nombreHeader" style="font-size: 11px; font-weight: bold; color: var(--azul); max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mi Perfil</span>
-        </div>
-    </div>
-
-    <div class="buscador-cont">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input id="buscar" class="buscador" placeholder="¿Qué buscas hoy?" oninput="filtrar()">
-        <input id="precioMax" class="input-precio" type="number" placeholder="$ Máx" oninput="filtrar()">
-        <button class="btn-theme" style="background:none; border:none; cursor:pointer; color:var(--azul)" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
-    </div>
-
-    <div class="filtro-depto-cont">
-        <select id="filtroDepto" onchange="filtrar()">
-            <option value="">📍 Todo El Salvador</option>
-        </select>
-    </div>
-
-    <div class="categorias">
-        <button class="cat active" onclick="setCat('Todos',this)"><i class="fa-solid fa-border-all"></i> Todos</button>
-        <button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tech</button>
-        <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
-        <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
-        <button class="cat cat-fav" onclick="verFavoritos(this)"><i class="fa-solid fa-heart"></i> Favoritos</button>
-    </div>
-</header>
+<div id="avatarHeader" onclick="abrirPerfil()" style="cursor: pointer; display: flex; align-items: center; gap: 10px; background: white; padding: 5px 12px; border-radius: 30px; border: 2px solid #0047AB; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <img id="fotoAvatarHeader" src="https://via.placeholder.com/35" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
+    <span id="nombreHeader" style="font-size: 13px; font-weight: bold; color: #0047AB;">Mi Perfil</span>
+</div>
 
 <header>
     <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
