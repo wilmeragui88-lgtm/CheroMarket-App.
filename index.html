@@ -122,7 +122,7 @@
         <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
         <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
         <button class="cat cat-fav" onclick="verFavoritos(this)"><i class="fa-solid fa-heart"></i> Favoritos</button>
-        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user-circle"></i> Mi Tienda</button>
+        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user-circle"></i> Mi Perfil</button>
     </div>
 </header>
 
@@ -211,7 +211,7 @@
   </div>
 
 </div>
-        <p>Versión 1.0 Pro · 2026</p>
+        <p>Versión 2.0 Pro · 2026</p>
     </div>
 </div>
 
@@ -714,18 +714,9 @@ function crearCard(p) {
                 </div>
                 
                 ${!p.vendido ? `
-                <a class="btn-wa" target="_blank" 
-href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(
-`Hola 👋 me interesa tu publicación en CheroMarket 🇸🇻
-
-📦 Producto: ${p.titulo}
-💰 Precio: $${p.precio}
-📍 Ubicación: ${p.muni}, ${p.depto}
-
-¿Sigue disponible?`
-)}">
-<i class="fa-brands fa-whatsapp"></i> Consultar
-</a>
+                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(`Hola, buen día. Me interesa su artículo. ¿Podrían brindarme más información y fotografías, por favor?`)}">
+                    <i class="fa-brands fa-whatsapp"></i> Consultar
+                </a>` : ''}
 
                 ${esMio ? `
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px">
