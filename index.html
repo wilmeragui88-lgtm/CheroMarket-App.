@@ -203,11 +203,11 @@
 
   </div>
 
-  <div style="padding: 20px; text-align: center; background-color: #ffffff; border-top: 1px solid #eee;">
-<button id="btnAceptarTerminos" type="button" onclick="confirmarTerminos()" style="...">
-        Acepto todos los Términos y Condiciones
-      </button>
-      <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
+  <div id="cont-btn-terminos" style="padding: 20px; text-align: center; background-color: #ffffff; border-top: 1px solid #eee;">
+    <button id="btnAceptarTerminos" type="button" onclick="confirmarTerminos()" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); transition: background 0.3s;">
+      Acepto todos los Términos y Condiciones
+    </button>
+    <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
   </div>
 
 </div>
@@ -376,7 +376,7 @@ document.querySelectorAll('.foto-item').forEach(input => {
                 ctx.drawImage(img, 0, 0, w, h);
                 const b64 = canvas.toDataURL('image/jpeg', 0.4);
                 fotosAnuncio[idx] = b64;
-                const prev = document.getElementById(`p-`);
+                const prev = document.getElementById(`p-${idx}`);
                 prev.src = b64; prev.style.display = "block";
             };
             img.src = ev.target.result;
@@ -458,7 +458,7 @@ window.abrirEditar = (id) => {
 
     fotosAnuncio = [...p.fotos, "", ""].slice(0, 3);
     fotosAnuncio.forEach((src, idx) => {
-        const img = document.getElementById(`p-`);
+        const img = document.getElementById(`p-${idx}`);
         if (src) { img.src = src; img.style.display = "block"; }
         else { img.style.display = "none"; }
     });
@@ -512,7 +512,7 @@ window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value;
     const m = document.getElementById('muni');
     m.innerHTML = '<option value="">Municipio</option>';
-    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value=""></option>`);
+    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
 
 window.publicar = async () => {
@@ -563,7 +563,9 @@ window.publicar = async () => {
             });
             alert("¡Anuncio publicado!");
         }
-        location.reload();
+        cerrar();
+        document.getElementById('sidebar').classList.remove('active');
+        await cargar();
     } catch (error) {
         alert("Error: " + error.message);
         btn.disabled = false;
@@ -572,7 +574,7 @@ window.publicar = async () => {
 };
 
 window.compartirPost = async (titulo, precio, muni) => {
-    const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 \n💰 $\n📍 `;
+    const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 ${titulo}\n💰 $${precio}\n📍 ${muni}`;
     if (navigator.share) {
         try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
     } else {
@@ -639,8 +641,8 @@ window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
     const filtrados = productos.filter(p => p.duenoId === idVendedor);
     const feed = document.getElementById('feed');
     feed.innerHTML = `<div class="header-catalogo">
-        <img src="//via.placeholder.com/80'" class="foto-perfil" alt="Foto de vendedor">
-        <h2></h2>
+        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil" alt="Foto de vendedor">
+        <h2>${nombreVendedor}</h2>
         <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
     </div>`;
     filtrados.forEach(p => feed.innerHTML += crearCard(p));
@@ -669,7 +671,7 @@ function render(lista) {
     const vend = lista.filter(p => p.vendido);
     disp.forEach(p => html.push(crearCard(p)));
     if(vend.length > 0) {
-        html.push(`<div class="seccion-titulo">AGOTADOS / VENDIDOS ()</div>`);
+        html.push(`<div class="seccion-titulo">AGOTADOS / VENDIDOS (${vend.length})</div>`);
         vend.forEach(p => html.push(crearCard(p)));
     }
     feed.innerHTML = html.join('') || '<p style="text-align:center; padding:20px;">No hay productos para mostrar.</p>';
@@ -685,59 +687,75 @@ function crearCard(p) {
     let miniHTML = "";
     if(fotos.length > 1) {
         miniHTML = `<div class="miniaturas-cont">
-            " class="mini-foto" alt="Miniatura" onclick="this.closest('.card').querySelector('.foto-principal').src=''">`).join('')}
+            ${fotos.map(f => `<img src="${f}" class="mini-foto" alt="Miniatura" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
         </div>`;
     }
 
     return `
-        <div class="card" style="0.6' : ''">
-            <button class="btn-fav ''" onclick="toggleFavorito('')"><i class="fa-solid fa-heart"></i></button>
-            <button class="btn-share-post" onclick="compartirPost('', '', '')"><i class="fa-solid fa-share-nodes"></i></button>
-             ''
+        <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
+            <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
+            ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
             
-            <img class="foto-principal" src="//via.placeholder.com/160'" alt="" onclick="verImagenFull(this.src)">
-            
+            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" alt="${p.titulo}" onclick="verImagenFull(this.src)">
+            ${miniHTML}
 
             <div class="info">
                 <div class="tags-cont">
-                    <span class="tag"></span>
-                    <span class="tag-envio" style="background:'var(--mut)'">
-                        <i class="fa-solid 'fa-handshake'"></i> 
+                    <span class="tag">${p.categoria}</span>
+                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">
+                        <i class="fa-solid ${esEnvio?'fa-truck-fast':'fa-handshake'}"></i> ${p.entrega || 'Local'}
                     </span>
                 </div>
-                <div class="titulo"></div>
-                <div class="precio">$</div>
-                <div class="tag-stock"> cantDisp + ' disponibles'</div>
-                <div class="loc">, </div>
-                <div class="vendedor-link" onclick="verCatalogo('', '', '')">
+                <div class="titulo">${p.titulo}</div>
+                <div class="precio">$${p.precio}</div>
+                <div class="tag-stock">${p.vendido ? 'No disponible' : cantDisp + ' disponibles'}</div>
+                <div class="loc">${p.muni || ''}, ${p.depto || ''}</div>
+                <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
                     <i class="fa-solid fa-store"></i> Ver tienda
                 </div>
                 
                 ${!p.vendido ? `
-                <a class="btn-wa" target="_blank" href="https://wa.me/503?text=">
+                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(`Hola, buen día. Me interesa su artículo. ¿Podrían brindarme más información y fotografías, por favor?`)}">
                     <i class="fa-brands fa-whatsapp"></i> Consultar
                 </a>` : ''}
 
-                grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px">
-                    <button class="btn-vendido-accion" style="background:#555; margin-top:0" onclick="abrirEditar('')">
+                ${esMio ? `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px">
+                    <button class="btn-vendido-accion" style="background:#555; margin-top:0" onclick="abrirEditar('${p.id}')">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="btn-vendido-accion" style="background: 'var(--azul)'; margin-top:0" onclick="marcarVendido('')">
-                         'Agotado'
+                    <button class="btn-vendido-accion" style="background:${p.vendido ? 'var(--verde)' : 'var(--azul)'}; margin-top:0" onclick="marcarVendido('${p.id}')">
+                        ${p.vendido ? 'Activar' : 'Agotado'}
                     </button>
-                    <button class="btn-eliminar-accion" style="grid-column: span 2; border: 1px solid var(--rojo); padding:5px" onclick="eliminar('')">
+                    <button class="btn-eliminar-accion" style="grid-column: span 2; border: 1px solid var(--rojo); padding:5px" onclick="eliminar('${p.id}')">
                         <i class="fa-solid fa-trash"></i> Eliminar
                     </button>
-                </div>` : ''
+                </div>` : ''}
             </div>
         </div>`;
+}
+
+// NUEVAS FUNCIONES PARA PERSISTENCIA DE TÉRMINOS
+window.confirmarTerminos = () => {
+    localStorage.setItem("terminos_aceptados", "true");
+    alert('Gracias por aceptar los términos de CheroMarketApp');
+    verificarEstadoTerminos();
+};
+
+function verificarEstadoTerminos() {
+    const aceptado = localStorage.getItem("terminos_aceptados");
+    const contBtn = document.getElementById('cont-btn-terminos');
+    if (aceptado === "true" && contBtn) {
+        contBtn.style.display = "none";
+    }
 }
 
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
 Object.keys(svData).forEach(d => {
-    dSelect.innerHTML += `<option value=""></option>`;
-    fDepto.innerHTML += `<option value=""></option>`;
+    dSelect.innerHTML += `<option value="${d}">${d}</option>`;
+    fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
 
 function mostrarMensajeVincular(texto, esError = false) {
@@ -772,25 +790,8 @@ document.getElementById('btnVincular').addEventListener('click', async () => {
     }
   }
 });
-// Función para guardar la aceptación
-window.confirmarTerminos = () => {
-    localStorage.setItem("terminos_aceptados", "true");
-    alert('Gracias por aceptar los términos de CheroMarketApp');
-    verificarEstadoTerminos();
-};
 
-// Función para verificar y ocultar el botón/sección
-function verificarEstadoTerminos() {
-    const aceptado = localStorage.getItem("terminos_aceptados");
-    const btn = document.getElementById('btnAceptarTerminos');
-    
-    if (aceptado === "true" && btn) {
-        btn.style.display = "none"; // Oculta el botón
-        // Opcional: Puedes cambiar el texto del header de términos a "Términos Aceptados ✅"
-    }
-}
-
-// Ejecutar la verificación al cargar la página
+// Inicialización de términos al cargar
 window.addEventListener('load', verificarEstadoTerminos);
 
 </script>
