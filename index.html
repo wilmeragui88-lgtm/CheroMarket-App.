@@ -260,24 +260,33 @@
 <div id="modalPerfil">
     <div class="modal-content">
         <h3>Mi Perfil de Vendedor</h3>
-        <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
-            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80" alt="Foto de perfil">
-            <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+        
+        <div id="areaPerfilLogueado" style="display:none">
+            <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
+                <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
+                <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+            </div>
+            <input id="perfilNombre" placeholder="Nombre o Negocio">
+            <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
+            <button onclick="guardarPerfil()" class="btn-auth" style="background:var(--verde); color:white">Actualizar Datos</button>
+            <button onclick="verMisAnuncios()" class="btn-auth" style="background:var(--azul); color:white">Mis Anuncios</button>
+            <hr>
+            <p id="txtSesion" style="font-size:12px; text-align:center; color:var(--mut)"></p>
+            <button onclick="cerrarSesion()" class="btn-auth" style="background:var(--rojo); color:white">Cerrar Sesión</button>
         </div>
-        <input id="perfilNombre" placeholder="Tu nombre o negocio">
-        <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
-        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Actualizar Datos</button>
-        <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
-        <hr style="margin: 15px 0; border-color: var(--b);">
-        <h4 id="authTitulo" style="text-align:center; color:var(--mut);">Acceso a la Cuenta</h4>
-        <input id="emailVincular" type="email" placeholder="Tu correo electrónico">
-        <input id="passwordVincular" type="password" placeholder="Contraseña (mínimo 6 caracteres)">
-        <button id="btnVincular" style="background:var(--naranja); color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">
-          Iniciar Sesión / Registrarme
-        </button>
-        <button id="btnCerrarSesion" style="background:var(--rojo); color:white; padding:10px; border:none; border-radius:8px; margin-top:5px; display:none" onclick="cerrarSesion()">Cerrar Sesión</button>
-        <div id="msgVincular" style="font-size:13px; color:var(--mut); text-align:center; margin-top:8px;"></div>
-        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
+
+        <div id="areaLogin">
+            <p style="text-align:center; font-size:14px">Ingresa para gestionar tus ventas.</p>
+            <input id="emailAuth" type="email" placeholder="Correo electrónico">
+            <input id="passAuth" type="password" placeholder="Contraseña">
+            <div class="auth-box">
+                <button onclick="manejarAuth('login')" class="btn-auth" style="background:var(--azul); color:white">ENTRAR A MI CUENTA</button>
+                <button onclick="manejarAuth('registro')" class="btn-auth" style="background:var(--naranja); color:white">CREAR CUENTA NUEVA</button>
+            </div>
+            <span class="link-pass" onclick="recuperarClave()">¿Olvidaste tu contraseña? Toca aquí</span>
+        </div>
+        
+        <button onclick="cerrarPerfil()" style="background:none; border:none; color:var(--mut); margin-top:10px">Cerrar</button>
     </div>
 </div>
 
