@@ -11,7 +11,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CheroMarket">
-    <link rel="apple-touch-icon" href="icon-192.png">
 
     <style>
         :root{
@@ -39,108 +38,117 @@
         .categorias{display:flex; gap:8px; overflow-x:auto; padding:10px; max-width:500px; margin:auto; scrollbar-width: none;}
         .cat{padding:8px 14px; border:none; border-radius:20px; font-weight:600; background:var(--b); color: var(--txt); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px}
         .cat.active{background:var(--azul); color:white}
-        .cat-fav{background: #ffeaa7 !important; color: #d63031 !important;}
 
         .perfil-img-cont{text-align:center; position:relative; width:80px; margin:auto}
         .foto-perfil{width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--azul); background:#eee; cursor:pointer}
-        .header-catalogo{grid-column: 1 / -1; background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 1px solid var(--azul); margin-bottom: 10px;}
 
         .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
-        .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
+        .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative;}
         .foto-principal{height:160px; width:100%; object-fit:cover; background:#eee; cursor: pointer;}
         
         .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b); overflow-x: auto;}
-        .mini-foto{width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer; flex-shrink: 0;}
-
-        .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
-        .btn-fav.active {color: #ff4757;}
-        .btn-share-post {position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--azul);}
+        .mini-foto{width: 35px; height: 35px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer; flex-shrink: 0;}
 
         .info{padding:10px; display:flex; flex-direction:column; gap:4px; flex:1}
-        .tags-cont{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px}
-        .tag{font-size:9px; border:1px solid var(--azul); color:var(--azul); padding:1px 6px; border-radius:4px; font-weight: bold;}
-        .tag-envio{font-size:9px; background:var(--azul); color:white; padding:1px 6px; border-radius:4px; font-weight: bold;}
         .tag-stock{font-size:10px; color:var(--verde); font-weight:bold; margin-top:2px}
-        
-        .titulo{font-weight:600; font-size:15px; line-height: 1.2; margin-top: 4px;}
         .precio{color:var(--naranja); font-size:18px; font-weight:800}
-        .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
-        .vendedor-link {font-size: 11px; color: var(--azul); text-decoration: underline; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 4px;}
+        .titulo{font-weight:600; font-size:14px; line-height: 1.2;}
 
         .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
-        .btn-vendido-accion{background:var(--azul); color:white; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:8px}
-        .btn-eliminar-accion{background:none; color:var(--rojo); border:none; padding:5px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:5px}
         .btn-add{position:fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:var(--naranja); color:white; font-size:28px; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:10; cursor:pointer}
         
-        #modal, #modalPerfil{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:99; overflow-y:auto; padding:20px}
+        /* MODALES */
+        #modal, #modalPerfil, #visorFotoInterno{position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:99; overflow-y:auto; padding:20px}
         .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
-        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
         
-        #visorFotoInterno{position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; display:none; justify-content:center; align-items:center; flex-direction:column}
-        #fotoGrande{max-width:95%; max-height:80%; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5)}
-        .btn-cerrar-visor{position:absolute; top:30px; right:20px; color:white; font-size:30px; cursor:pointer; background:none; border:none}
+        /* VISOR MULTIPLE */
+        #visorFotoInterno{ display:none; align-items:center; justify-content:center; padding:0; background:#000}
+        .visor-container{ position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center }
+        #fotoGrande{ max-width:100%; max-height:80vh; object-fit:contain }
+        .nav-visor{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.2); color:white; border:none; padding:15px; cursor:pointer; border-radius:50%; font-size:20px }
+        .btn-prev{ left:10px }
+        .btn-next{ right:10px }
+        .btn-cerrar-v{ position:absolute; top:20px; right:20px; color:white; font-size:30px; background:none; border:none }
 
-        .subir-fotos-grid{display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px;}
-        .foto-input-box{border: 2px dashed var(--azul); border-radius: 8px; height: 80px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--fondo);}
+        /* AUTH ESTILOS */
+        .auth-box{ border: 1px solid var(--b); padding: 15px; border-radius: 10px; margin-top: 10px; background: var(--fondo) }
+        .btn-auth{ padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; width: 100% }
+        .link-pass{ text-align:center; font-size:12px; color:var(--azul); cursor:pointer; margin-top:10px; display:block; text-decoration: underline; }
+
+        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--card); color:var(--txt); font-family:inherit}
+        .subir-fotos-grid{display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;}
+        .foto-input-box{border: 2px dashed var(--azul); border-radius: 8px; height: 70px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--fondo);}
         .foto-input-box input{opacity: 0; position: absolute; inset: 0; z-index: 2; cursor: pointer;}
-        .foto-input-box img{width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; display:none}
-
-        .sidebar{position:fixed; top:0; right:-280px; width:280px; height:100%; background:var(--card); box-shadow:-5px 0 15px rgba(0,0,0,0.3); z-index:100; transition:0.3s; padding:20px; box-sizing:border-box}
-        .sidebar.active{right:0}
-        .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
-        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.7); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
-        .seccion-titulo{grid-column: 1 / -1; font-size: 14px; font-weight: bold; color: var(--mut); margin-top: 15px; border-bottom: 1px solid var(--b); padding-bottom: 5px;}
+        .foto-input-box img{width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; display:none}
     </style>
 </head>
 <body data-theme="light">
 
 <div id="bannerPerfil" class="alerta-perfil">
-    ⚠️ <strong>Acceso Restringido:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Inicia sesión o regístrate</a> para vender y crear tu perfil.
+    ⚠️ <strong>¡Bienvenido!</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Inicia sesión o regístrate</a> para vender.
 </div>
 
 <header>
-    <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     <h1>🇸🇻 CheroMarketApp</h1>
-    <div class="sub">Compra y vende entre salvadoreños</div>
-
     <div class="buscador-cont">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input id="buscar" class="buscador" placeholder="¿Qué buscas?" oninput="filtrar()">
         <input id="precioMax" class="input-precio" type="number" placeholder="$ Máx" oninput="filtrar()">
-        <button class="btn-theme" style="background:none; border:none; cursor:pointer; color:var(--azul)" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
     </div>
-
     <div class="filtro-depto-cont">
-        <select id="filtroDepto" onchange="filtrar()">
-            <option value="">📍 Todo El Salvador</option>
-        </select>
+        <select id="filtroDepto" onchange="filtrar()"><option value="">📍 Todo El Salvador</option></select>
     </div>
-
     <div class="categorias">
-        <button class="cat active" onclick="setCat('Todos',this)"><i class="fa-solid fa-border-all"></i> Todos</button>
-        <button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tecnología</button>
-        <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
-        <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
-        <button class="cat cat-fav" onclick="verFavoritos(this)"><i class="fa-solid fa-heart"></i> Favoritos</button>
-        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user-circle"></i> Mi Perfil</button>
+        <button class="cat active" onclick="setCat('Todos',this)">Todos</button>
+        <button class="cat" onclick="setCat('Tecnología',this)">Tecnología</button>
+        <button class="cat" onclick="setCat('Ropa',this)">Ropa</button>
+        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()">Mi Perfil</button>
     </div>
 </header>
-
-<div id="sidebar" class="sidebar">
-    <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
-    <div style="font-size: 13px; color: var(--mut);">
-        <h4>Información</h4>
-        <p>Versión 2.0 Pro · 2026</p>
-        <p>CheroMarketApp es una plataforma segura para salvadoreños.</p>
-    </div>
-</div>
 
 <div id="feed" class="feed"></div>
 <button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
 
-<div id="visorFotoInterno" onclick="cerrarVisor()">
-    <button class="btn-cerrar-visor"><i class="fa-solid fa-xmark"></i></button>
-    <img id="fotoGrande" src="" alt="Imagen ampliada" onclick="event.stopPropagation()">
+<div id="visorFotoInterno">
+    <button class="btn-cerrar-v" onclick="cerrarVisor()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="visor-container">
+        <button class="nav-visor btn-prev" onclick="cambiarFotoVisor(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+        <img id="fotoGrande" src="">
+        <button class="nav-visor btn-next" onclick="cambiarFotoVisor(1)"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+</div>
+
+<div id="modalPerfil">
+    <div class="modal-content">
+        <h3>Mi Perfil de Vendedor</h3>
+        
+        <div id="areaPerfilLogueado" style="display:none">
+            <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
+                <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
+                <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+            </div>
+            <input id="perfilNombre" placeholder="Nombre o Negocio">
+            <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
+            <button onclick="guardarPerfil()" class="btn-auth" style="background:var(--verde); color:white">Actualizar Datos</button>
+            <button onclick="verMisAnuncios()" class="btn-auth" style="background:var(--azul); color:white">Mis Anuncios</button>
+            <hr>
+            <p id="txtSesion" style="font-size:12px; text-align:center; color:var(--mut)"></p>
+            <button onclick="cerrarSesion()" class="btn-auth" style="background:var(--rojo); color:white">Cerrar Sesión</button>
+        </div>
+
+        <div id="areaLogin">
+            <p style="text-align:center; font-size:14px">Ingresa para gestionar tus ventas.</p>
+            <input id="emailAuth" type="email" placeholder="Correo electrónico">
+            <input id="passAuth" type="password" placeholder="Contraseña">
+            <div class="auth-box">
+                <button onclick="manejarAuth('login')" class="btn-auth" style="background:var(--azul); color:white">ENTRAR A MI CUENTA</button>
+                <button onclick="manejarAuth('registro')" class="btn-auth" style="background:var(--naranja); color:white">CREAR CUENTA NUEVA</button>
+            </div>
+            <span class="link-pass" onclick="recuperarClave()">¿Olvidaste tu contraseña? Toca aquí</span>
+        </div>
+        
+        <button onclick="cerrarPerfil()" style="background:none; border:none; color:var(--mut); margin-top:10px">Cerrar</button>
+    </div>
 </div>
 
 <div id="modal">
@@ -150,24 +158,14 @@
         <textarea id="descripcion" placeholder="Detalles del producto..."></textarea>
         <div style="display:flex;gap:10px">
             <input id="precio" type="number" placeholder="Precio $" style="flex:1">
-            <input id="cantidad" type="number" placeholder="Stock" value="1" style="width: 50px; text-align: center;">
-            <select id="estado" style="flex:1">
-                <option value="Nuevo">Nuevo</option>
-                <option value="Usado">Usado</option>
-            </select>
+            <input id="cantidad" type="number" placeholder="Stock" value="1" style="width:60px">
         </div>
-        <select id="opcionEnvio">
-            <option value="Solo entrega local">Solo entrega local</option>
-            <option value="Envíos a todo el país">Envíos a todo el país</option>
-        </select>
         <div class="subir-fotos-grid">
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0" alt="Foto 1"><i class="fa-solid fa-camera"></i></div>
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1" alt="Foto 2"><i class="fa-solid fa-camera"></i></div>
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2" alt="Foto 3"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2"><i class="fa-solid fa-camera"></i></div>
         </div>
-        <select id="categoria">
-            <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
-        </select>
+        <select id="categoria"><option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option></select>
         <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
         <select id="muni"><option value="">Municipio</option></select>
         <button id="btnPublicar" onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
@@ -175,32 +173,10 @@
     </div>
 </div>
 
-<div id="modalPerfil">
-    <div class="modal-content">
-        <h3>Mi Perfil de Vendedor</h3>
-        <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
-            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80" alt="Foto de perfil">
-            <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
-        </div>
-        <input id="perfilNombre" placeholder="Tu nombre o negocio">
-        <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
-        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Actualizar Datos</button>
-        <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
-        <hr style="margin: 15px 0; border-color: var(--b);">
-        <h4 id="authTitulo" style="text-align:center; color:var(--mut);">Acceso a la Cuenta</h4>
-        <input id="emailVincular" type="email" placeholder="Tu correo electrónico">
-        <input id="passwordVincular" type="password" placeholder="Contraseña">
-        <button id="btnVincular" style="background:var(--naranja); color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">Iniciar Sesión / Registrarme</button>
-        <button id="btnCerrarSesion" style="background:var(--rojo); color:white; padding:10px; border:none; border-radius:8px; margin-top:5px; display:none" onclick="cerrarSesion()">Cerrar Sesión</button>
-        <div id="msgVincular" style="font-size:13px; color:var(--mut); text-align:center; margin-top:8px;"></div>
-        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
-    </div>
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -214,57 +190,71 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
 let MI_ID = null;
 let editandoID = null;
+let productos = [];
+let fotosAnuncio = ["", "", ""];
+let fotosVisorActual = [];
+let indiceVisor = 0;
 
 const svData = {
-    "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya"],
+    "Ahuachapán": ["Ahuachapán", "Atiquizaya", "Jujutla"],
     "Santa Ana": ["Santa Ana", "Metapán", "Chalchuapa"],
     "Sonsonate": ["Sonsonate", "Acajutla", "Izalco"],
-    "Chalatenango": ["Chalatenango", "La Palma"],
+    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Apopa"],
     "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Colón"],
-    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Apopa", "Ilopango"],
-    "Cuscatlán": ["Cojutepeque", "Suchitoto"],
-    "La Paz": ["Zacatecoluca", "Olocuilta"],
-    "Cabañas": ["Sensuntepeque", "Ilobasco"],
-    "San Vicente": ["San Vicente", "Tecoluca"],
-    "Usulután": ["Usulután", "Jiquilisco"],
     "San Miguel": ["San Miguel", "Chinameca"],
-    "Morazán": ["San Francisco Gotera", "Perquín"],
+    "Usulután": ["Usulután", "Jiquilisco"],
     "La Unión": ["La Unión", "Santa Rosa de Lima"]
 };
 
-let productos = [];
-let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
-const state = { categoria: "Todos" };
-
-let fotosAnuncio = ["", "", ""];
-let fotoPerfilBase64 = "";
-
-const perfilNombreInput = document.getElementById('perfilNombre');
-const perfilTelefonoInput = document.getElementById('perfilTelefono');
-const imgPerfilPrevia = document.getElementById('imgPerfilPrevia');
-const bannerPerfil = document.getElementById('bannerPerfil');
-
+// VIGILANTE DE SESIÓN
 onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    MI_ID = user.uid;
-    document.getElementById('emailVincular').style.display = "none";
-    document.getElementById('passwordVincular').style.display = "none";
-    document.getElementById('btnVincular').style.display = "none";
-    document.getElementById('btnCerrarSesion').style.display = "block";
-    document.getElementById('authTitulo').textContent = "Sesión activa: " + user.email;
-    await cargarPerfil();
-  } else {
-    MI_ID = null;
-    bannerPerfil.style.display = "block";
-  }
-  await cargar();
+    if (user) {
+        MI_ID = user.uid;
+        document.getElementById('areaLogin').style.display = "none";
+        document.getElementById('areaPerfilLogueado').style.display = "block";
+        document.getElementById('txtSesion').textContent = "Conectado como: " + user.email;
+        document.getElementById('bannerPerfil').style.display = "none";
+        await cargarPerfil();
+    } else {
+        MI_ID = null;
+        document.getElementById('areaLogin').style.display = "block";
+        document.getElementById('areaPerfilLogueado').style.display = "none";
+        document.getElementById('bannerPerfil').style.display = "block";
+    }
+    cargar();
 });
 
-window.cerrarSesion = () => { if(confirm("¿Cerrar sesión?")) signOut(auth); };
+// FUNCIONES DE ACCESO
+window.manejarAuth = async (tipo) => {
+    const email = document.getElementById('emailAuth').value;
+    const pass = document.getElementById('passAuth').value;
+    if(!email || !pass) return alert("Completa los campos.");
+    try {
+        if(tipo === 'login') {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } else {
+            const res = await createUserWithEmailAndPassword(auth, email, pass);
+            await setDoc(doc(db, "vendedores", res.user.uid), { nombre: "Nuevo Chero", telefono: "", foto: "" });
+        }
+        cerrarPerfil();
+    } catch (e) { alert("Error: " + e.message); }
+};
 
-// COMPRESIÓN DE FOTOS
+window.recuperarClave = async () => {
+    const email = document.getElementById('emailAuth').value;
+    if(!email) return alert("Escribe tu correo arriba para enviarte el enlace.");
+    try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Enlace de recuperación enviado a tu correo.");
+    } catch (e) { alert(e.message); }
+};
+
+window.cerrarSesion = () => { signOut(auth); cerrarPerfil(); };
+
+// COMPRESIÓN DE FOTOS (3 FOTOS)
 document.querySelectorAll('.foto-item').forEach(input => {
     input.onchange = e => {
         const file = e.target.files[0];
@@ -275,13 +265,9 @@ document.querySelectorAll('.foto-item').forEach(input => {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX = 500; 
-                let w = img.width, h = img.height;
-                if (w > MAX) { h *= MAX/w; w = MAX; }
-                canvas.width = w; canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, w, h);
-                const b64 = canvas.toDataURL('image/jpeg', 0.4);
+                canvas.width = 600; canvas.height = 600;
+                canvas.getContext('2d').drawImage(img, 0, 0, 600, 600);
+                const b64 = canvas.toDataURL('image/jpeg', 0.6);
                 fotosAnuncio[idx] = b64;
                 const prev = document.getElementById(`p-${idx}`);
                 prev.src = b64; prev.style.display = "block";
@@ -292,154 +278,43 @@ document.querySelectorAll('.foto-item').forEach(input => {
     };
 });
 
-document.getElementById('fotoPerfilFile').onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 120; canvas.height = 120;
-            canvas.getContext('2d').drawImage(img, 0, 0, 120, 120);
-            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.5);
-            imgPerfilPrevia.src = fotoPerfilBase64;
-        };
-        img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-};
-
-window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
-window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
-
-window.abrir = () => {
-    if (!MI_ID) return abrirPerfil();
-    editandoID = null;
-    document.getElementById('modalTitulo').textContent = "Nuevo Anuncio";
-    limpiarCampos();
-    document.getElementById('modal').style.display = "block";
-};
-
+// PUBLICAR E INVENTARIO
+window.abrir = () => { if(!MI_ID) return abrirPerfil(); editandoID = null; document.getElementById('modal').style.display = "block"; };
 window.cerrar = () => document.getElementById('modal').style.display = "none";
-
-function limpiarCampos() {
-    document.getElementById('titulo').value = "";
-    document.getElementById('descripcion').value = "";
-    document.getElementById('precio').value = "";
-    document.getElementById('cantidad').value = "1";
-    fotosAnuncio = ["", "", ""];
-    document.querySelectorAll('.foto-input-box img').forEach(i => i.style.display="none");
-}
-
-window.abrirEditar = (id) => {
-    const p = productos.find(item => item.id === id);
-    if (!p) return;
-    editandoID = id;
-    document.getElementById('modalTitulo').textContent = "Editar mi Anuncio";
-    document.getElementById('titulo').value = p.titulo;
-    document.getElementById('descripcion').value = p.descripcion;
-    document.getElementById('precio').value = p.precio;
-    document.getElementById('cantidad').value = p.cantidad || 1;
-    document.getElementById('categoria').value = p.categoria;
-    document.getElementById('depto').value = p.depto;
-    actualizarMunicipios();
-    document.getElementById('muni').value = p.muni;
-
-    fotosAnuncio = [...p.fotos, "", ""].slice(0,3);
-    fotosAnuncio.forEach((f,i) => {
-        if(f) {
-            document.getElementById(`p-${i}`).src = f;
-            document.getElementById(`p-${i}`).style.display = "block";
-        }
-    });
-    document.getElementById('modal').style.display = "block";
-};
-
-async function cargarPerfil() {
-  if(!MI_ID) return;
-  const snap = await getDoc(doc(db, "vendedores", MI_ID));
-  if (snap.exists()) {
-    const p = snap.data();
-    perfilNombreInput.value = p.nombre || "";
-    perfilTelefonoInput.value = p.telefono || "";
-    fotoPerfilBase64 = p.foto || "";
-    imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
-    bannerPerfil.style.display = "none";
-  }
-}
-
-window.guardarPerfil = async () => {
-  await setDoc(doc(db, "vendedores", MI_ID), {
-    nombre: perfilNombreInput.value,
-    telefono: perfilTelefonoInput.value,
-    foto: fotoPerfilBase64,
-    actualizado: Date.now()
-  }, { merge: true });
-  alert("Perfil guardado");
-};
-
 window.abrirPerfil = () => document.getElementById('modalPerfil').style.display = "block";
 window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
 
-window.actualizarMunicipios = () => {
-    const d = document.getElementById('depto').value;
-    const m = document.getElementById('muni');
-    m.innerHTML = '<option value="">Municipio</option>';
-    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
-};
-
 window.publicar = async () => {
     const btn = document.getElementById('btnPublicar');
-    const fotosFinales = fotosAnuncio.filter(f => f !== "");
-    const tit = document.getElementById('titulo').value.trim();
-    if (!tit || fotosFinales.length === 0) return alert("Faltan datos.");
+    const fFinales = fotosAnuncio.filter(f => f !== "");
+    if (!document.getElementById('titulo').value || fFinales.length === 0) return alert("Faltan datos");
 
     btn.disabled = true; btn.textContent = "Procesando...";
-    try {
-        const datos = {
-            titulo: tit,
-            descripcion: document.getElementById('descripcion').value,
-            precio: document.getElementById('precio').value,
-            cantidad: parseInt(document.getElementById('cantidad').value) || 1,
-            fotos: fotosFinales,
-            categoria: document.getElementById('categoria').value,
-            entrega: document.getElementById('opcionEnvio').value,
-            depto: document.getElementById('depto').value,
-            muni: document.getElementById('muni').value,
-            vendedor: perfilNombreInput.value,
-            telefono: perfilTelefonoInput.value,
-            fotoPerfilVendedor: fotoPerfilBase64,
-            duenoId: MI_ID,
-            actualizado: Date.now(),
-            vendido: false,
-            oculto: false
-        };
+    const datos = {
+        titulo: document.getElementById('titulo').value,
+        descripcion: document.getElementById('descripcion').value,
+        precio: document.getElementById('precio').value,
+        cantidad: document.getElementById('cantidad').value,
+        fotos: fFinales,
+        categoria: document.getElementById('categoria').value,
+        depto: document.getElementById('depto').value,
+        muni: document.getElementById('muni').value,
+        vendedor: document.getElementById('perfilNombre').value,
+        telefono: document.getElementById('perfilTelefono').value,
+        duenoId: MI_ID,
+        creado: Date.now(),
+        vendido: false,
+        oculto: false
+    };
 
-        if(editandoID) {
-            await updateDoc(doc(db, "productos", editandoID), datos);
-        } else {
-            datos.creado = Date.now();
-            await addDoc(collection(db, "productos"), datos);
-        }
-        cerrar(); await cargar();
-    } catch (e) { alert(e.message); }
+    if(editandoID) await updateDoc(doc(db, "productos", editandoID), datos);
+    else await addDoc(collection(db, "productos"), datos);
+
+    cerrar(); cargar();
     btn.disabled = false; btn.textContent = "Publicar Ahora";
 };
 
-window.marcarVendido = async (id) => {
-    const p = productos.find(item => item.id === id);
-    await updateDoc(doc(db, "productos", id), { vendido: !p.vendido });
-    cargar();
-};
-
-window.eliminar = async (id) => {
-    if(confirm("¿Eliminar?")) {
-        await updateDoc(doc(db, "productos", id), { oculto: true });
-        cargar();
-    }
-};
-
+// CARGA Y RENDER
 async function cargar() {
     const snap = await getDocs(query(collection(db, "productos"), orderBy("creado", "desc")));
     productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
@@ -448,118 +323,71 @@ async function cargar() {
 
 function render(lista) {
     const feed = document.getElementById('feed');
-    const disp = lista.filter(p => !p.vendido);
-    const vend = lista.filter(p => p.vendido);
-    
-    let html = disp.map(p => crearCard(p));
-    if(vend.length > 0) {
-        html.push(`<div class="seccion-titulo">AGOTADOS (${vend.length})</div>`);
-        html.push(...vend.map(p => crearCard(p)));
-    }
-    feed.innerHTML = html.join('') || '<p>No hay productos.</p>';
-}
-
-function crearCard(p) {
-    const esFav = favoritos.includes(p.id);
-    const esMio = p.duenoId === MI_ID;
-    const esEnvio = p.entrega === "Envíos a todo el país";
-    const fotos = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [p.foto] : []);
-    const cantDisp = p.cantidad || 1;
-    
-    let miniHTML = "";
-    if(fotos.length > 1) {
-        miniHTML = `<div class="miniaturas-cont">
-            ${fotos.map(f => `<img src="${f}" class="mini-foto" loading="lazy" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
-        </div>`;
-    }
-
-    return `
-        <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
-            <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
-            <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
-            ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
-            
-            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" loading="lazy" onclick="verImagenFull(this.src)">
-            ${miniHTML}
-
-            <div class="info">
-                <div class="tags-cont">
-                    <span class="tag">${p.categoria}</span>
-                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">
-                        <i class="fa-solid ${esEnvio?'fa-truck-fast':'fa-handshake'}"></i> ${esEnvio?'Envío':'Local'}
-                    </span>
-                </div>
-                <div class="titulo">${p.titulo}</div>
-                <div class="precio">$${p.precio}</div>
-                <div class="tag-stock">${p.vendido ? 'Agotado' : cantDisp + ' disponibles'}</div>
-                <div class="loc">📍 ${p.muni}, ${p.depto}</div>
-                
-                <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
-                    <i class="fa-solid fa-store"></i> Tienda de ${p.vendedor || 'Chero'}
-                </div>
-                
-                ${!p.vendido ? `
-                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola, me interesa: ${p.titulo}">
-                    <i class="fa-brands fa-whatsapp"></i> Consultar
-                </a>` : ''}
-
-                ${esMio ? `
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px">
-                    <button class="btn-vendido-accion" style="background:#555; margin-top:0" onclick="abrirEditar('${p.id}')">Editar</button>
-                    <button class="btn-vendido-accion" style="background:var(--azul); margin-top:0" onclick="marcarVendido('${p.id}')">${p.vendido?'Activar':'Agotado'}</button>
-                    <button class="btn-eliminar-accion" style="grid-column: span 2" onclick="eliminar('${p.id}')">Eliminar anuncio</button>
-                </div>` : ''}
+    feed.innerHTML = lista.map(p => `
+        <div class="card">
+            <img class="foto-principal" src="${p.fotos[0]}" onclick="verGaleria([${p.fotos.map(f=>`'${f}'`).join(',')}])">
+            <div class="miniaturas-cont">
+                ${p.fotos.map(f => `<img src="${f}" class="mini-foto" onclick="verGaleria([${p.fotos.map(f=>`'${f}'`).join(',')}])">`).join('')}
             </div>
-        </div>`;
+            <div class="info">
+                <div class="precio">$${p.precio}</div>
+                <div class="titulo">${p.titulo}</div>
+                <div class="tag-stock">${p.cantidad} disponibles</div>
+                <div style="font-size:10px; color:var(--mut)">📍 ${p.muni}</div>
+                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Me interesa ${p.titulo}"><i class="fa-brands fa-whatsapp"></i> Consultar</a>
+                ${p.duenoId === MI_ID ? `<button onclick="eliminar('${p.id}')" style="color:red; border:none; background:none; margin-top:5px; font-size:11px">Eliminar Mi Anuncio</button>` : ''}
+            </div>
+        </div>
+    `).join('');
 }
 
-window.toggleFavorito = (id) => {
-    favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
-    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
-    render(productos);
+// VISOR DE FOTOS LÓGICA
+window.verGaleria = (fotos) => {
+    fotosVisorActual = fotos;
+    indiceVisor = 0;
+    actualizarImagenVisor();
+    document.getElementById('visorFotoInterno').style.display = 'flex';
 };
 
-window.verImagenFull = (src) => { document.getElementById('fotoGrande').src = src; document.getElementById('visorFotoInterno').style.display = 'flex'; };
+function actualizarImagenVisor() {
+    document.getElementById('fotoGrande').src = fotosVisorActual[indiceVisor];
+}
+
+window.cambiarFotoVisor = (dir) => {
+    indiceVisor += dir;
+    if(indiceVisor < 0) indiceVisor = fotosVisorActual.length - 1;
+    if(indiceVisor >= fotosVisorActual.length) indiceVisor = 0;
+    actualizarImagenVisor();
+};
+
 window.cerrarVisor = () => document.getElementById('visorFotoInterno').style.display = 'none';
 
-window.compartirPost = (t, p, m) => {
-    const txt = `¡Mira este anuncio en CheroMarketApp! 🇸🇻\n${t}\nPrecio: $${p}\nLugar: ${m}`;
-    if(navigator.share) navigator.share({title:'CheroMarket', text:txt, url:window.location.href});
-    else { navigator.clipboard.writeText(txt); alert("Copiado"); }
+// PERFIL VENDEDOR
+async function cargarPerfil() {
+    const snap = await getDoc(doc(db, "vendedores", MI_ID));
+    if(snap.exists()) {
+        const d = snap.data();
+        document.getElementById('perfilNombre').value = d.nombre || "";
+        document.getElementById('perfilTelefono').value = d.telefono || "";
+        if(d.foto) document.getElementById('imgPerfilPrevia').src = d.foto;
+    }
+}
+
+window.guardarPerfil = async () => {
+    await setDoc(doc(db, "vendedores", MI_ID), {
+        nombre: document.getElementById('perfilNombre').value,
+        telefono: document.getElementById('perfilTelefono').value,
+        foto: document.getElementById('imgPerfilPrevia').src
+    }, {merge:true});
+    alert("Datos actualizados");
 };
 
-window.verCatalogo = (id, nombre, foto) => {
-    const filtrados = productos.filter(p => p.duenoId === id);
-    const feed = document.getElementById('feed');
-    feed.innerHTML = `<div class="header-catalogo">
-        <img src="${foto || 'https://via.placeholder.com/80'}" class="foto-perfil">
-        <h2>${nombre}</h2>
-        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Volver al Inicio</button>
-    </div>` + filtrados.map(p => crearCard(p)).join('');
-    window.scrollTo(0,0);
-};
-
-window.verMisAnuncios = () => { if(MI_ID) { cerrarPerfil(); verCatalogo(MI_ID, perfilNombreInput.value, fotoPerfilBase64); } };
-
-window.setCat = (c, b) => {
-    state.categoria = c;
-    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    filtrar();
-};
-
-window.filtrar = () => {
-    const txt = document.getElementById('buscar').value.toLowerCase();
-    const dep = document.getElementById('filtroDepto').value;
-    const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
-    const filtrados = productos.filter(p => {
-        const cTxt = p.titulo.toLowerCase().includes(txt);
-        const cDep = dep === "" || p.depto === dep;
-        const cPre = parseFloat(p.precio) <= pMax;
-        const cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
-        return cTxt && cDep && cPre && cCat;
-    });
-    render(filtrados);
+// DEPARTAMENTOS
+window.actualizarMunicipios = () => {
+    const d = document.getElementById('depto').value;
+    const m = document.getElementById('muni');
+    m.innerHTML = '<option value="">Municipio</option>';
+    if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
 
 const dSelect = document.getElementById('depto');
@@ -569,17 +397,7 @@ Object.keys(svData).forEach(d => {
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
 
-document.getElementById('btnVincular').onclick = async () => {
-    const email = document.getElementById('emailVincular').value;
-    const pass = document.getElementById('passwordVincular').value;
-    try {
-        await signInWithEmailAndPassword(auth, email, pass);
-        cerrarPerfil();
-    } catch (e) {
-        try { await createUserWithEmailAndPassword(auth, email, pass); cerrarPerfil(); } catch(err) { alert(err.message); }
-    }
-};
-
+window.eliminar = async (id) => { if(confirm("¿Eliminar este anuncio permanentemente?")) { await updateDoc(doc(db, "productos", id), {oculto:true}); cargar(); } };
 </script>
 </body>
 </html>
