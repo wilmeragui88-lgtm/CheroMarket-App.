@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -91,6 +90,11 @@
         .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
         .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.7); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
         .seccion-titulo{grid-column: 1 / -1; font-size: 14px; font-weight: bold; color: var(--mut); margin-top: 15px; border-bottom: 1px solid var(--b); padding-bottom: 5px;}
+        
+        /* Estilos nuevos para Auth */
+        .auth-container { position: relative; width: 100%; }
+        .toggle-eye { position: absolute; right: 12px; top: 12px; cursor: pointer; color: var(--mut); z-index: 5;}
+        .link-estudio { text-align: center; color: var(--azul); font-size: 13px; text-decoration: underline; cursor: pointer; margin-top: 5px; display: block;}
     </style>
 </head>
 <body data-theme="light">
@@ -254,45 +258,72 @@
         <select id="muni"><option value="">Municipio</option></select>
         <button id="btnPublicar" onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
         <button onclick="cerrar()" style="background:none; color:var(--mut); border:none">Cancelar</button>
+    </div>
 </div>
 
 <div id="modalPerfil">
     <div class="modal-content">
-        <h3>Mi Perfil de Vendedor</h3>
         
-        <div id="areaPerfilLogueado" style="display:none">
-            <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
-                <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
-                <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+        <div id="v-login">
+            <h3 style="text-align:center">Entrar a CheroMarket</h3>
+            <input id="emailAuth" type="email" placeholder="Correo electrónico">
+            <div class="auth-container">
+                <input id="passAuth" type="password" placeholder="Contraseña">
+                <i class="fa-solid fa-eye toggle-eye" onclick="verPassword('passAuth', this)"></i>
             </div>
-            <input id="perfilNombre" placeholder="Nombre o Negocio">
-            <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
-            <button onclick="guardarPerfil()" class="btn-auth" style="background:var(--verde); color:white">Actualizar Datos</button>
-            <button onclick="verMisAnuncios()" class="btn-auth" style="background:var(--azul); color:white">Mis Anuncios</button>
-            <hr>
-            <p id="txtSesion" style="font-size:12px; text-align:center; color:var(--mut)"></p>
-            <button onclick="cerrarSesion()" class="btn-auth" style="background:var(--rojo); color:white">Cerrar Sesión</button>
+            <button id="btnVincular" onclick="manejarAuth('login')" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; width:100%; margin-top:10px">
+              INICIAR SESIÓN
+            </button>
+            <button onclick="irSeccion('registro')" style="background:var(--naranja); color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; width:100%; margin-top:8px">
+                CREAR CUENTA NUEVA
+            </button>
+            <span class="link-estudio" onclick="irSeccion('recuperar')">¿Olvidaste tu contraseña?</span>
         </div>
 
-        <div id="areaLogin">
-            <p style="text-align:center; font-size:14px">Ingresa para gestionar tus ventas.</p>
-            <input id="emailAuth" type="email" placeholder="Correo electrónico">
-            <input id="passAuth" type="password" placeholder="Contraseña">
-            <div class="auth-box">
-                <button onclick="manejarAuth('login')" class="btn-auth" style="background:var(--azul); color:white">ENTRAR A MI CUENTA</button>
-                <button onclick="manejarAuth('registro')" class="btn-auth" style="background:var(--naranja); color:white">CREAR CUENTA NUEVA</button>
+        <div id="v-registro" style="display:none">
+            <h3 style="text-align:center; color:var(--naranja)">Crear Cuenta</h3>
+            <input id="emailReg" type="email" placeholder="Correo electrónico">
+            <div class="auth-container">
+                <input id="passReg" type="password" placeholder="Crea tu contraseña (mín. 6)">
+                <i class="fa-solid fa-eye toggle-eye" onclick="verPassword('passReg', this)"></i>
             </div>
-            <span class="link-pass" onclick="recuperarClave()">¿Olvidaste tu contraseña? Toca aquí</span>
+            <button onclick="manejarAuth('registro')" style="background:var(--naranja); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; width:100%; margin-top:10px">
+              REGISTRARME
+            </button>
+            <button onclick="irSeccion('login')" style="background:none; border:1px solid var(--b); color:var(--mut); padding:10px; border-radius:8px; width:100%; margin-top:8px">Volver</button>
         </div>
-        
-        <button onclick="cerrarPerfil()" style="background:none; border:none; color:var(--mut); margin-top:10px">Cerrar</button>
+
+        <div id="v-recuperar" style="display:none">
+            <h3 style="text-align:center">Recuperar Clave</h3>
+            <p style="text-align:center; font-size:12px; color:var(--mut)">Te enviaremos un correo para restablecer tu acceso.</p>
+            <input id="emailRecu" type="email" placeholder="Escribe tu correo">
+            <button onclick="recuperarClave()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; width:100%; margin-top:10px">ENVIAR ENLACE</button>
+            <button onclick="irSeccion('login')" style="background:none; border:none; color:var(--mut); width:100%; margin-top:10px">Cancelar</button>
+        </div>
+
+        <div id="v-perfil" style="display:none">
+            <h3 style="text-align:center">Mi Perfil</h3>
+            <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
+                <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80" alt="Foto de perfil">
+                <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+            </div>
+            <input id="perfilNombre" placeholder="Tu nombre o negocio">
+            <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
+            <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; width:100%">Actualizar Datos</button>
+            <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px; width:100%; margin-top:10px">Mis Anuncios</button>
+            <hr style="margin: 15px 0; border-color: var(--b);">
+            <button id="btnCerrarSesion" style="background:var(--rojo); color:white; padding:10px; border:none; border-radius:8px; width:100%" onclick="cerrarSesion()">CERRAR SESIÓN</button>
+        </div>
+
+        <div id="msgVincular" style="font-size:12px; text-align:center; margin-top:10px"></div>
+        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none; width:100%; margin-top:10px">Cerrar Ventana</button>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -338,26 +369,75 @@ const perfilTelefonoInput = document.getElementById('perfilTelefono');
 const imgPerfilPrevia = document.getElementById('imgPerfilPrevia');
 const bannerPerfil = document.getElementById('bannerPerfil');
 
+// NAVEGACIÓN DE SECCIONES EN PERFIL
+window.irSeccion = (s) => {
+    document.getElementById('v-login').style.display = s === 'login' ? 'block' : 'none';
+    document.getElementById('v-registro').style.display = s === 'registro' ? 'block' : 'none';
+    document.getElementById('v-recuperar').style.display = s === 'recuperar' ? 'block' : 'none';
+    document.getElementById('v-perfil').style.display = s === 'perfil' ? 'block' : 'none';
+    document.getElementById('msgVincular').textContent = "";
+};
+
+// VER CONTRASEÑA
+window.verPassword = (id, icon) => {
+    const input = document.getElementById(id);
+    if(input.type === "password"){
+        input.type = "text";
+        icon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+};
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     MI_ID = user.uid;
-    document.getElementById('emailVincular').style.display = "none";
-    document.getElementById('passwordVincular').style.display = "none";
-    document.getElementById('btnVincular').style.display = "none";
-    document.getElementById('btnCerrarSesion').style.display = "block";
-    document.getElementById('authTitulo').textContent = "Sesión activa: " + user.email;
+    irSeccion('perfil');
     await cargarPerfil();
   } else {
     MI_ID = null;
-    document.getElementById('emailVincular').style.display = "block";
-    document.getElementById('passwordVincular').style.display = "block";
-    document.getElementById('btnVincular').style.display = "block";
-    document.getElementById('btnCerrarSesion').style.display = "none";
-    document.getElementById('authTitulo').textContent = "Acceso a la Cuenta";
+    irSeccion('login');
     bannerPerfil.style.display = "block";
   }
   await cargar();
 });
+
+// MANEJO AUTH MEJORADO
+window.manejarAuth = async (tipo) => {
+    const email = tipo === 'login' ? document.getElementById('emailAuth').value.trim() : document.getElementById('emailReg').value.trim();
+    const pass = tipo === 'login' ? document.getElementById('passAuth').value : document.getElementById('passReg').value;
+    const msg = document.getElementById('msgVincular');
+
+    if(!email || !pass || pass.length < 6) {
+        msg.textContent = "Datos incompletos o clave muy corta.";
+        msg.style.color = "var(--rojo)";
+        return;
+    }
+
+    try {
+        if(tipo === 'login') {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } else {
+            const res = await createUserWithEmailAndPassword(auth, email, pass);
+            await setDoc(doc(db, "vendedores", res.user.uid), { nombre: "Nuevo Chero", telefono: "", foto: "" });
+        }
+    } catch(e) {
+        msg.textContent = "Error: " + e.message;
+        msg.style.color = "var(--rojo)";
+    }
+};
+
+// RECUPERAR CLAVE
+window.recuperarClave = async () => {
+    const email = document.getElementById('emailRecu').value.trim();
+    if(!email) return alert("Ingresa tu correo.");
+    try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Enlace de recuperación enviado. Revisa tu correo.");
+        irSeccion('login');
+    } catch(e) { alert(e.message); }
+};
 
 window.cerrarSesion = () => { if(confirm("¿Cerrar sesión?")) signOut(auth); };
 
@@ -573,8 +653,8 @@ window.publicar = async () => {
             alert("¡Anuncio publicado!");
         }
         cerrar();
-document.getElementById('sidebar').classList.remove('active');
-await cargar();
+        document.getElementById('sidebar').classList.remove('active');
+        await cargar();
     } catch (error) {
         alert("Error: " + error.message);
         btn.disabled = false;
@@ -752,39 +832,6 @@ Object.keys(svData).forEach(d => {
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
 
-function mostrarMensajeVincular(texto, esError = false) {
-  const msg = document.getElementById('msgVincular');
-  msg.textContent = texto;
-  msg.style.color = esError ? 'var(--rojo)' : 'var(--verde)';
-}
-
-document.getElementById('btnVincular').addEventListener('click', async () => {
-  const email = document.getElementById('emailVincular').value.trim();
-  const password = document.getElementById('passwordVincular').value;
-  if (!email || !password || password.length < 6) {
-    mostrarMensajeVincular("Ingresa un correo válido y contraseña (mín 6 caracteres)", true);
-    return;
-  }
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    mostrarMensajeVincular("¡Bienvenido de nuevo!");
-    setTimeout(() => cerrarPerfil(), 1000);
-  } catch (error) {
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-      try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        await sendEmailVerification(userCred.user);
-        mostrarMensajeVincular("Cuenta creada. ¡Verifica tu correo!");
-        setTimeout(() => cerrarPerfil(), 2000);
-      } catch (regError) {
-        mostrarMensajeVincular("Error: " + regError.message, true);
-      }
-    } else {
-      mostrarMensajeVincular("Error: " + error.message, true);
-    }
-  }
-});
-    
 </script>
 
 <script>
