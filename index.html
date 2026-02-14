@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,6 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CheroMarket">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <style>
         :root{
@@ -38,117 +40,188 @@
         .categorias{display:flex; gap:8px; overflow-x:auto; padding:10px; max-width:500px; margin:auto; scrollbar-width: none;}
         .cat{padding:8px 14px; border:none; border-radius:20px; font-weight:600; background:var(--b); color: var(--txt); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px}
         .cat.active{background:var(--azul); color:white}
+        .cat-fav{background: #ffeaa7 !important; color: #d63031 !important;}
 
         .perfil-img-cont{text-align:center; position:relative; width:80px; margin:auto}
         .foto-perfil{width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--azul); background:#eee; cursor:pointer}
+        .header-catalogo{grid-column: 1 / -1; background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 1px solid var(--azul); margin-bottom: 10px;}
 
         .feed{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; padding:12px; max-width:900px; margin:auto}
-        .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative;}
+        .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
         .foto-principal{height:160px; width:100%; object-fit:cover; background:#eee; cursor: pointer;}
         
-        .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b); overflow-x: auto;}
-        .mini-foto{width: 35px; height: 35px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer; flex-shrink: 0;}
+        .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b);}
+        .mini-foto{width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer;}
+
+        .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
+        .btn-fav.active {color: #ff4757;}
+        .btn-share-post {position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--azul);}
 
         .info{padding:10px; display:flex; flex-direction:column; gap:4px; flex:1}
+        .tags-cont{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px}
+        .tag{font-size:9px; border:1px solid var(--azul); color:var(--azul); padding:1px 6px; border-radius:4px; font-weight: bold;}
+        .tag-envio{font-size:9px; background:var(--azul); color:white; padding:1px 6px; border-radius:4px; font-weight: bold;}
         .tag-stock{font-size:10px; color:var(--verde); font-weight:bold; margin-top:2px}
+        
+        .titulo{font-weight:600; font-size:15px; line-height: 1.2; margin-top: 4px;}
         .precio{color:var(--naranja); font-size:18px; font-weight:800}
-        .titulo{font-weight:600; font-size:14px; line-height: 1.2;}
+        .loc{font-size:10px; color:var(--mut); margin-top: 5px;}
+        .vendedor-link {font-size: 11px; color: var(--azul); text-decoration: underline; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 4px;}
 
         .btn-wa{margin-top:auto; background:var(--verde); color:white; text-decoration:none; text-align:center; padding:10px; border-radius:8px; font-weight:700; font-size: 13px; display:flex; align-items:center; justify-content:center; gap:5px}
+        .btn-vendido-accion{background:var(--azul); color:white; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:8px}
+        .btn-eliminar-accion{background:none; color:var(--rojo); border:none; padding:5px; font-size:11px; font-weight:bold; cursor:pointer; margin-top:5px}
         .btn-add{position:fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:var(--naranja); color:white; font-size:28px; border:none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index:10; cursor:pointer}
         
-        /* MODALES */
-        #modal, #modalPerfil, #visorFotoInterno{position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:99; overflow-y:auto; padding:20px}
+        #modal, #modalPerfil{position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:99; overflow-y:auto; padding:20px}
         .modal-content{background:var(--card); max-width:450px; margin:auto; padding:20px; border-radius:15px; display:flex; flex-direction:column; gap:12px}
+        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--fondo); color:var(--txt); font-family:inherit}
         
-        /* VISOR MULTIPLE */
-        #visorFotoInterno{ display:none; align-items:center; justify-content:center; padding:0; background:#000}
-        .visor-container{ position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center }
-        #fotoGrande{ max-width:100%; max-height:80vh; object-fit:contain }
-        .nav-visor{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.2); color:white; border:none; padding:15px; cursor:pointer; border-radius:50%; font-size:20px }
-        .btn-prev{ left:10px }
-        .btn-next{ right:10px }
-        .btn-cerrar-v{ position:absolute; top:20px; right:20px; color:white; font-size:30px; background:none; border:none }
+        #visorFotoInterno{position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; display:none; justify-content:center; align-items:center; flex-direction:column}
+        #fotoGrande{max-width:95%; max-height:80%; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5)}
+        .btn-cerrar-visor{position:absolute; top:30px; right:20px; color:white; font-size:30px; cursor:pointer; background:none; border:none}
 
-        /* AUTH ESTILOS */
-        .auth-box{ border: 1px solid var(--b); padding: 15px; border-radius: 10px; margin-top: 10px; background: var(--fondo) }
-        .btn-auth{ padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; width: 100% }
-        .link-pass{ text-align:center; font-size:12px; color:var(--azul); cursor:pointer; margin-top:10px; display:block; text-decoration: underline; }
-
-        input, select, textarea{padding:12px; border-radius:8px; border:1px solid var(--b); background:var(--card); color:var(--txt); font-family:inherit}
-        .subir-fotos-grid{display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;}
-        .foto-input-box{border: 2px dashed var(--azul); border-radius: 8px; height: 70px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--fondo);}
+        .subir-fotos-grid{display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px;}
+        .foto-input-box{border: 2px dashed var(--azul); border-radius: 8px; height: 80px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--fondo);}
         .foto-input-box input{opacity: 0; position: absolute; inset: 0; z-index: 2; cursor: pointer;}
-        .foto-input-box img{width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; display:none}
+        .foto-input-box img{width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; display:none}
+
+        .sidebar{position:fixed; top:0; right:-280px; width:280px; height:100%; background:var(--card); box-shadow:-5px 0 15px rgba(0,0,0,0.3); z-index:100; transition:0.3s; padding:20px; box-sizing:border-box}
+        .sidebar.active{right:0}
+        .btn-menu{position:absolute; right:15px; top:18px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--azul)}
+        .sold-overlay{position:absolute; top:0; left:0; width:100%; height:160px; background:rgba(0,0,0,0.7); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1}
+        .seccion-titulo{grid-column: 1 / -1; font-size: 14px; font-weight: bold; color: var(--mut); margin-top: 15px; border-bottom: 1px solid var(--b); padding-bottom: 5px;}
     </style>
 </head>
 <body data-theme="light">
 
 <div id="bannerPerfil" class="alerta-perfil">
-    ⚠️ <strong>¡Bienvenido!</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Inicia sesión o regístrate</a> para vender.
+    ⚠️ <strong>Acceso Restringido:</strong> <a href="#" onclick="abrirPerfil()" style="color:#856404; text-decoration: underline;">Inicia sesión o regístrate</a> para vender y crear tu perfil.
 </div>
 
 <header>
+    <button class="btn-menu" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     <h1>🇸🇻 CheroMarketApp</h1>
+    <div class="sub">Compra y vende entre salvadoreños</div>
+
     <div class="buscador-cont">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input id="buscar" class="buscador" placeholder="¿Qué buscas?" oninput="filtrar()">
         <input id="precioMax" class="input-precio" type="number" placeholder="$ Máx" oninput="filtrar()">
+        <button class="btn-theme" style="background:none; border:none; cursor:pointer; color:var(--azul)" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
     </div>
+
     <div class="filtro-depto-cont">
-        <select id="filtroDepto" onchange="filtrar()"><option value="">📍 Todo El Salvador</option></select>
+        <select id="filtroDepto" onchange="filtrar()">
+            <option value="">📍 Todo El Salvador</option>
+        </select>
     </div>
+
     <div class="categorias">
-        <button class="cat active" onclick="setCat('Todos',this)">Todos</button>
-        <button class="cat" onclick="setCat('Tecnología',this)">Tecnología</button>
-        <button class="cat" onclick="setCat('Ropa',this)">Ropa</button>
-        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()">Mi Perfil</button>
+        <button class="cat active" onclick="setCat('Todos',this)"><i class="fa-solid fa-border-all"></i> Todos</button>
+        <button class="cat" onclick="setCat('Tecnología',this)"><i class="fa-solid fa-laptop"></i> Tecnología</button>
+        <button class="cat" onclick="setCat('Ropa',this)"><i class="fa-solid fa-shirt"></i> Ropa</button>
+        <button class="cat" onclick="setCat('Comida',this)"><i class="fa-solid fa-utensils"></i> Comida</button>
+        <button class="cat cat-fav" onclick="verFavoritos(this)"><i class="fa-solid fa-heart"></i> Favoritos</button>
+        <button class="cat" style="background:var(--azul);color:white" onclick="abrirPerfil()"><i class="fa-solid fa-user-circle"></i> Mi Perfil</button>
     </div>
 </header>
+
+<div id="sidebar" class="sidebar">
+    <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
+    <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #ffffff;">
+  
+  <div style="max-height: 450px; overflow-y: auto; scrollbar-width: thin;">
+    
+    <details style="border-bottom: 1px solid #eee;" open>
+      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
+        <span style="margin-right: 12px; font-size: 1.2em;">📜</span> Términos y Condiciones de CheroMarketApp
+      </summary>
+      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
+        <h4 style="margin-top: 0;">1. Aceptación de los Términos</h4>
+        <p>Al descargar, instalar o usar CheroMarketApp, el usuario acepta cumplir con estos términos. Si no está de acuerdo, debe abstenerse de utilizar la plataforma.</p>
+        
+        <h4>2. Descripción del Servicio</h4>
+        <p>CheroMarketApp es una plataforma intermediaria que permite a los usuarios publicar anuncios de productos o servicios para su compra y venta en el territorio de El Salvador. La aplicación no es dueña, no vende, ni garantiza los artículos publicados por terceros.</p>
+        
+        <h4>3. Registro y Seguridad</h4>
+        <ul>
+          <li>Solo podrán registrarse personas mayores de 18 años.</li>
+          <li>El usuario es responsable de mantener la confidencialidad de sus credenciales de acceso.</li>
+          <li>Cualquier actividad realizada bajo la cuenta del usuario será su responsabilidad exclusiva.</li>
+        </ul>
+        
+        <h4>4. Reglas de Publicación y Uso</h4>
+        <p>Queda estrictamente prohibido publicar artículos ilegales según las leyes de la República de El Salvador, contenido ofensivo o productos falsificados.</p>
+        
+        <h4>5. Responsabilidad en las Transacciones</h4>
+        <p>CheroMarketApp no participa en la negociación ni entrega. El contacto y la transacción financiera ocurren exclusivamente entre comprador y vendedor.</p>
+        
+        <h4>6. Privacidad de Datos</h4>
+        <p>El uso de datos personales se rige por nuestra Política de Privacidad, cumpliendo con los estándares de protección de datos en el país.</p>
+        
+        <h4>7. Suspensión y Terminación</h4>
+        <p>Nos reservamos el derecho de suspender cuentas que infrinjan estos términos sin previo aviso.</p>
+        
+        <h4>8. Modificaciones</h4>
+        <p>Podemos actualizar estos términos en cualquier momento notificando cambios significativos.</p>
+        
+        <h4>9. Jurisdicción y Ley Aplicable</h4>
+        <p>Leyes de la República de El Salvador. Disputas ante tribunales de San Salvador.</p>
+      </div>
+    </details>
+
+    <details style="border-bottom: 1px solid #eee;">
+      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #f8f9fa; color: #333; display: flex; align-items: center; list-style: none;">
+        <span style="margin-right: 12px; font-size: 1.2em;">⚖️</span> Política de Privacidad
+      </summary>
+      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; border-top: 1px solid #eee;">
+        <p><em>Última actualización: 22 de enero de 2026</em></p>
+        <h4>1. Información que Recopilamos</h4>
+        <p>Recolectamos información de registro (nombre, email, teléfono), contenido del usuario (fotos, mensajes), datos de ubicación y del dispositivo.</p>
+        
+        <h4>2. Uso de la Información</h4>
+        <p>Para facilitar anuncios, personalizar tu experiencia en El Salvador, enviar notificaciones y mantener la seguridad.</p>
+        
+        <h4>3. Cómo Compartimos tu Información</h4>
+        <p>Tu nombre y teléfono pueden ser visibles en anuncios. No vendemos tus datos a terceros con fines publicitarios.</p>
+        
+        <h4>4. Tus Derechos</h4>
+        <p>Puedes editar tu perfil, solicitar la eliminación de tu cuenta o gestionar permisos de ubicación y cámara desde tu dispositivo.</p>
+      </div>
+    </details>
+
+    <details style="border-bottom: 1px solid #eee;">
+      <summary style="padding: 18px; cursor: pointer; font-weight: bold; background-color: #e8f4fd; color: #0056b3; display: flex; align-items: center; list-style: none;">
+        <span style="margin-right: 12px; font-size: 1.2em;">🛡️</span> Guía de Seguridad para Cheros
+      </summary>
+      <div style="padding: 20px; color: #444; font-size: 14px; line-height: 1.6; background-color: #fafcfe;">
+        <p><strong>🤝 Negocios Seguros:</strong> Reúnete en centros comerciales o gasolineras con cámaras. Ve acompañado y de día.</p>
+        <p><strong>💰 Pagos:</strong> <strong>NUNCA</strong> envíes dinero por adelantado. Verifica el saldo disponible en tu banco antes de entregar el producto.</p>
+        <p><strong>📦 Verificación:</strong> Prueba los electrónicos y revisa documentos de vehículos en el VMT antes de pagar.</p>
+      </div>
+    </details>
+
+  </div>
+
+  <div style="padding: 20px; text-align: center; background-color: #ffffff; border-top: 1px solid #eee;">
+    <button type="button" onclick="alert('Gracias por aceptar los términos de CheroMarketApp')"  style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); transition: background 0.3s;">
+      Acepto todos los Términos y Condiciones
+    </button>
+    <p style="font-size: 11px; color: #999; margin-top: 10px;">Al hacer clic, confirmas que has leído y comprendido los documentos legales de CheroMarketApp.</p>
+  </div>
+
+</div>
+        <p>Versión 2.0 Pro · 2026</p>
+    </div>
+</div>
 
 <div id="feed" class="feed"></div>
 <button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
 
-<div id="visorFotoInterno">
-    <button class="btn-cerrar-v" onclick="cerrarVisor()"><i class="fa-solid fa-xmark"></i></button>
-    <div class="visor-container">
-        <button class="nav-visor btn-prev" onclick="cambiarFotoVisor(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-        <img id="fotoGrande" src="">
-        <button class="nav-visor btn-next" onclick="cambiarFotoVisor(1)"><i class="fa-solid fa-chevron-right"></i></button>
-    </div>
-</div>
-
-<div id="modalPerfil">
-    <div class="modal-content">
-        <h3>Mi Perfil de Vendedor</h3>
-        
-        <div id="areaPerfilLogueado" style="display:none">
-            <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
-                <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80">
-                <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
-            </div>
-            <input id="perfilNombre" placeholder="Nombre o Negocio">
-            <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
-            <button onclick="guardarPerfil()" class="btn-auth" style="background:var(--verde); color:white">Actualizar Datos</button>
-            <button onclick="verMisAnuncios()" class="btn-auth" style="background:var(--azul); color:white">Mis Anuncios</button>
-            <hr>
-            <p id="txtSesion" style="font-size:12px; text-align:center; color:var(--mut)"></p>
-            <button onclick="cerrarSesion()" class="btn-auth" style="background:var(--rojo); color:white">Cerrar Sesión</button>
-        </div>
-
-        <div id="areaLogin">
-            <p style="text-align:center; font-size:14px">Ingresa para gestionar tus ventas.</p>
-            <input id="emailAuth" type="email" placeholder="Correo electrónico">
-            <input id="passAuth" type="password" placeholder="Contraseña">
-            <div class="auth-box">
-                <button onclick="manejarAuth('login')" class="btn-auth" style="background:var(--azul); color:white">ENTRAR A MI CUENTA</button>
-                <button onclick="manejarAuth('registro')" class="btn-auth" style="background:var(--naranja); color:white">CREAR CUENTA NUEVA</button>
-            </div>
-            <span class="link-pass" onclick="recuperarClave()">¿Olvidaste tu contraseña? Toca aquí</span>
-        </div>
-        
-        <button onclick="cerrarPerfil()" style="background:none; border:none; color:var(--mut); margin-top:10px">Cerrar</button>
-    </div>
+<div id="visorFotoInterno" onclick="cerrarVisor()">
+    <button class="btn-cerrar-visor"><i class="fa-solid fa-xmark"></i></button>
+    <img id="fotoGrande" src="" alt="Imagen ampliada" onclick="event.stopPropagation()">
 </div>
 
 <div id="modal">
@@ -158,14 +231,25 @@
         <textarea id="descripcion" placeholder="Detalles del producto..."></textarea>
         <div style="display:flex;gap:10px">
             <input id="precio" type="number" placeholder="Precio $" style="flex:1">
-            <input id="cantidad" type="number" placeholder="Stock" value="1" style="width:60px">
+            <input id="cantidad" type="number" placeholder="Stock" value="1" style="width: 50px; text-align: center;">
+            <select id="estado" style="flex:1">
+                <option value="Nuevo">Nuevo</option>
+                <option value="Usado">Usado</option>
+                <option value="Otros Productos">Otros Productos</option>
+            </select>
         </div>
+        <select id="opcionEnvio">
+            <option value="Solo entrega local">Solo entrega local</option>
+            <option value="Envíos a todo el país">Envíos a todo el país</option>
+        </select>
         <div class="subir-fotos-grid">
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0"><i class="fa-solid fa-camera"></i></div>
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1"><i class="fa-solid fa-camera"></i></div>
-            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="0" accept="image/*"><img id="p-0" alt="Foto 1"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="1" accept="image/*"><img id="p-1" alt="Foto 2"><i class="fa-solid fa-camera"></i></div>
+            <div class="foto-input-box"><input type="file" class="foto-item" data-idx="2" accept="image/*"><img id="p-2" alt="Foto 3"><i class="fa-solid fa-camera"></i></div>
         </div>
-        <select id="categoria"><option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option></select>
+        <select id="categoria">
+            <option>Tecnología</option><option>Ropa</option><option>Comida</option><option>Otros</option>
+        </select>
         <select id="depto" onchange="actualizarMunicipios()"><option value="">Departamento</option></select>
         <select id="muni"><option value="">Municipio</option></select>
         <button id="btnPublicar" onclick="publicar()" style="background:var(--azul); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Publicar Ahora</button>
@@ -173,10 +257,34 @@
     </div>
 </div>
 
+<div id="modalPerfil">
+    <div class="modal-content">
+        <h3>Mi Perfil de Vendedor</h3>
+        <div class="perfil-img-cont" onclick="document.getElementById('fotoPerfilFile').click()">
+            <img id="imgPerfilPrevia" class="foto-perfil" src="https://via.placeholder.com/80" alt="Foto de perfil">
+            <input type="file" id="fotoPerfilFile" accept="image/*" style="display:none">
+        </div>
+        <input id="perfilNombre" placeholder="Tu nombre o negocio">
+        <input id="perfilTelefono" type="number" placeholder="WhatsApp (ej: 77771234)">
+        <button onclick="guardarPerfil()" style="background:var(--verde); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold">Actualizar Datos</button>
+        <button onclick="verMisAnuncios()" style="background:var(--azul); color:white; padding:10px; border:none; border-radius:8px;">Mis Anuncios</button>
+        <hr style="margin: 15px 0; border-color: var(--b);">
+        <h4 id="authTitulo" style="text-align:center; color:var(--mut);">Acceso a la Cuenta</h4>
+        <input id="emailVincular" type="email" placeholder="Tu correo electrónico">
+        <input id="passwordVincular" type="password" placeholder="Contraseña (mínimo 6 caracteres)">
+        <button id="btnVincular" style="background:var(--naranja); color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">
+          Iniciar Sesión / Registrarme
+        </button>
+        <button id="btnCerrarSesion" style="background:var(--rojo); color:white; padding:10px; border:none; border-radius:8px; margin-top:5px; display:none" onclick="cerrarSesion()">Cerrar Sesión</button>
+        <div id="msgVincular" style="font-size:13px; color:var(--mut); text-align:center; margin-top:8px;"></div>
+        <button onclick="cerrarPerfil()" style="background:none; color:var(--mut); border:none">Cerrar</button>
+    </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey:"AIzaSyD-QOvro2aOC8GpPfnQWkBxZCWIR3lypdI",
@@ -190,71 +298,67 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
 let MI_ID = null;
 let editandoID = null;
-let productos = [];
-let fotosAnuncio = ["", "", ""];
-let fotosVisorActual = [];
-let indiceVisor = 0;
 
 const svData = {
-    "Ahuachapán": ["Ahuachapán", "Atiquizaya", "Jujutla"],
-    "Santa Ana": ["Santa Ana", "Metapán", "Chalchuapa"],
-    "Sonsonate": ["Sonsonate", "Acajutla", "Izalco"],
-    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Apopa"],
-    "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Colón"],
-    "San Miguel": ["San Miguel", "Chinameca"],
-    "Usulután": ["Usulután", "Jiquilisco"],
-    "La Unión": ["La Unión", "Santa Rosa de Lima"]
+    "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
+    "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
+    "Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
+    "Chalatenango": ["Chalatenango", "Agua Caliente", "Arcatao", "Azacualpa", "Cancasque", "Citalá", "Comalapa", "Concepción Quezaltepeque", "Dulce Nombre de María", "El Carrizal", "El Paraíso", "La Laguna", "La Palma", "La Reina", "Las Vueltas", "Nombre de Jesús", "Nueva Concepción", "Nueva Trinidad", "Ojos de Agua", "Potonico", "San Antonio de la Cruz", "San Antonio Los Ranchos", "San Fernando", "San Francisco Lempa", "San Francisco Morazán", "San Ignacio", "San Isidro Labrador", "San José Cancasque", "San José Las Flores", "San Luis del Carmen", "San Miguel de Mercedes", "San Rafael", "Santa Rita", "Tejutla"],
+    "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Chiltiupán", "Ciudad Arce", "Colón", "Comasagua", "Huizúcar", "Jayaque", "Jicalapa", "La Libertad", "Nuevo Cuscatlán", "Quezaltepeque", "San Juan Opico", "Sacacoyo", "San José Villanueva", "San Matías", "San Pablo Tacachico", "Talnique", "Tamanique", "Teotepeque", "Tepecoyo", "Zaragoza"],
+    "San Salvador": ["San Salvador", "Ayutuxtepeque", "Mejicanos", "Nejapa", "Panchimalco", "Rosario de Mora", "San Marcos", "San Martín", "Santiago Texacuangos", "Santo Tomás", "Soyapango", "Tonacatepeque", "Delgado", "Cuscatancingo", "Ilopango", "Guazapa", "Aguilares", "El Paisnal"],
+    "Cuscatlán": ["Cojutepeque", "Candelaria", "El Carmen", "El Rosario", "Monte San Juan", "Oratorio de Concepción", "San Bartolomé Perulapía", "San Cristóbal", "San José Guayabal", "San Rafael Cedros", "San Ramón", "Santa Cruz Analquito", "Santa Cruz Michapa", "Suchitoto", "Tenancingo", "San Pedro Perulapán"],
+    "La Paz": ["Zacatecoluca", "Cuyultitán", "El Rosario", "Jerusalén", "Mercedes La Ceiba", "Olocuilta", "Paraíso de Osorio", "San Antonio Masahuat", "San Emigdio", "San Francisco Chinameca", "San Juan Nonualco", "San Juan Talpa", "San Juan Tepezontes", "San Luis La Herradura", "San Luis Talpa", "San Marcelino", "San Pedro Masahuat", "San Pedro Nonualco", "San Rafael Obrajuelo", "Santa María Ostuma", "Santiago Nonualco", "Tapalhuacán"],
+    "Cabañas": ["Sensuntepeque", "Cinquera", "Dolores", "Guacotecti", "Ilobasco", "Jutiapa", "San Isidro", "Victoria"],
+    "San Vicente": ["San Vicente", "Apastepeque", "Guadalupe", "San Cayetano Istepeque", "San Esteban Catarina", "San Ildefonso", "San Lorenzo", "San Sebastián", "Santa Clara", "Santo Domingo", "Tecoluca", "Tepetitán", "Verapaz"],
+    "Usulután": ["Usulután", "Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "Santa Elena", "Santa María", "Santiago de María", "Tecapán"],
+    "San Miguel": ["San Miguel", "Carolina", "Chapeltique", "Chinameca", "Chirilagua", "Ciudad Barrios", "Comacarán", "Gualococti", "Guatajiagua", "Lolotique", "Moncagua", "Nueva Guadalupe", "Nuevo Edén de San Juan", "Quelepa", "San Antonio", "San Gerardo", "San Jorge", "San Luis de la Reina", "San Rafael Oriente", "Sesori", "Uluazapa"],
+    "Morazán": ["San Francisco Gotera", "Arambala", "Cacaopera", "Chilanga", "Corinto", "Delicias de Concepción", "El Divisadero", "El Rosario", "Gualococti", "Guatajiagua", "Joateca", "Jocoaitique", "Jocoro", "Loloquique", "Meanguera", "Osicala", "Perquín", "San Carlos", "San Fernando", "San Isidro", "San Simón", "Sensembra", "Sociedad", "Torola", "Yamabal", "Yoloaiquín"],
+    "La Unión": ["La Unión", "Conchagua", "El Carmen", "Intipucá", "Meanguera del Golfo", "Nueva Esparta", "Pasaquina", "Polorós", "San Alejo", "San José", "Santa Rosa de Lima", "Yayantique", "Yucuaiquín", "Lislique", "Anamorós", "Concepción de Oriente", "El Sauce"]
 };
 
-// VIGILANTE DE SESIÓN
+let productos = [];
+let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
+const state = { categoria: "Todos" };
+
+let fotosAnuncio = ["", "", ""];
+let fotoPerfilBase64 = "";
+
+const perfilNombreInput = document.getElementById('perfilNombre');
+const perfilTelefonoInput = document.getElementById('perfilTelefono');
+const imgPerfilPrevia = document.getElementById('imgPerfilPrevia');
+const bannerPerfil = document.getElementById('bannerPerfil');
+
 onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        MI_ID = user.uid;
-        document.getElementById('areaLogin').style.display = "none";
-        document.getElementById('areaPerfilLogueado').style.display = "block";
-        document.getElementById('txtSesion').textContent = "Conectado como: " + user.email;
-        document.getElementById('bannerPerfil').style.display = "none";
-        await cargarPerfil();
-    } else {
-        MI_ID = null;
-        document.getElementById('areaLogin').style.display = "block";
-        document.getElementById('areaPerfilLogueado').style.display = "none";
-        document.getElementById('bannerPerfil').style.display = "block";
-    }
-    cargar();
+  if (user) {
+    MI_ID = user.uid;
+    document.getElementById('emailVincular').style.display = "none";
+    document.getElementById('passwordVincular').style.display = "none";
+    document.getElementById('btnVincular').style.display = "none";
+    document.getElementById('btnCerrarSesion').style.display = "block";
+    document.getElementById('authTitulo').textContent = "Sesión activa: " + user.email;
+    await cargarPerfil();
+  } else {
+    MI_ID = null;
+    document.getElementById('emailVincular').style.display = "block";
+    document.getElementById('passwordVincular').style.display = "block";
+    document.getElementById('btnVincular').style.display = "block";
+    document.getElementById('btnCerrarSesion').style.display = "none";
+    document.getElementById('authTitulo').textContent = "Acceso a la Cuenta";
+    bannerPerfil.style.display = "block";
+  }
+  await cargar();
 });
 
-// FUNCIONES DE ACCESO
-window.manejarAuth = async (tipo) => {
-    const email = document.getElementById('emailAuth').value;
-    const pass = document.getElementById('passAuth').value;
-    if(!email || !pass) return alert("Completa los campos.");
-    try {
-        if(tipo === 'login') {
-            await signInWithEmailAndPassword(auth, email, pass);
-        } else {
-            const res = await createUserWithEmailAndPassword(auth, email, pass);
-            await setDoc(doc(db, "vendedores", res.user.uid), { nombre: "Nuevo Chero", telefono: "", foto: "" });
-        }
-        cerrarPerfil();
-    } catch (e) { alert("Error: " + e.message); }
+window.cerrarSesion = () => { if(confirm("¿Cerrar sesión?")) signOut(auth); };
+
+window.verImagenFull = (src) => {
+    document.getElementById('fotoGrande').src = src;
+    document.getElementById('visorFotoInterno').style.display = 'flex';
 };
+window.cerrarVisor = () => document.getElementById('visorFotoInterno').style.display = 'none';
 
-window.recuperarClave = async () => {
-    const email = document.getElementById('emailAuth').value;
-    if(!email) return alert("Escribe tu correo arriba para enviarte el enlace.");
-    try {
-        await sendPasswordResetEmail(auth, email);
-        alert("Enlace de recuperación enviado a tu correo.");
-    } catch (e) { alert(e.message); }
-};
-
-window.cerrarSesion = () => { signOut(auth); cerrarPerfil(); };
-
-// COMPRESIÓN DE FOTOS (3 FOTOS)
 document.querySelectorAll('.foto-item').forEach(input => {
     input.onchange = e => {
         const file = e.target.files[0];
@@ -265,9 +369,13 @@ document.querySelectorAll('.foto-item').forEach(input => {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                canvas.width = 600; canvas.height = 600;
-                canvas.getContext('2d').drawImage(img, 0, 0, 600, 600);
-                const b64 = canvas.toDataURL('image/jpeg', 0.6);
+                const MAX = 600; 
+                let w = img.width, h = img.height;
+                if (w > MAX) { h *= MAX/w; w = MAX; }
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const b64 = canvas.toDataURL('image/jpeg', 0.4);
                 fotosAnuncio[idx] = b64;
                 const prev = document.getElementById(`p-${idx}`);
                 prev.src = b64; prev.style.display = "block";
@@ -278,117 +386,356 @@ document.querySelectorAll('.foto-item').forEach(input => {
     };
 });
 
-// PUBLICAR E INVENTARIO
-window.abrir = () => { if(!MI_ID) return abrirPerfil(); editandoID = null; document.getElementById('modal').style.display = "block"; };
-window.cerrar = () => document.getElementById('modal').style.display = "none";
-window.abrirPerfil = () => document.getElementById('modalPerfil').style.display = "block";
-window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
-
-window.publicar = async () => {
-    const btn = document.getElementById('btnPublicar');
-    const fFinales = fotosAnuncio.filter(f => f !== "");
-    if (!document.getElementById('titulo').value || fFinales.length === 0) return alert("Faltan datos");
-
-    btn.disabled = true; btn.textContent = "Procesando...";
-    const datos = {
-        titulo: document.getElementById('titulo').value,
-        descripcion: document.getElementById('descripcion').value,
-        precio: document.getElementById('precio').value,
-        cantidad: document.getElementById('cantidad').value,
-        fotos: fFinales,
-        categoria: document.getElementById('categoria').value,
-        depto: document.getElementById('depto').value,
-        muni: document.getElementById('muni').value,
-        vendedor: document.getElementById('perfilNombre').value,
-        telefono: document.getElementById('perfilTelefono').value,
-        duenoId: MI_ID,
-        creado: Date.now(),
-        vendido: false,
-        oculto: false
+document.getElementById('fotoPerfilFile').onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 150; canvas.height = 150;
+            canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
+            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            imgPerfilPrevia.src = fotoPerfilBase64;
+        };
+        img.src = ev.target.result;
     };
-
-    if(editandoID) await updateDoc(doc(db, "productos", editandoID), datos);
-    else await addDoc(collection(db, "productos"), datos);
-
-    cerrar(); cargar();
-    btn.disabled = false; btn.textContent = "Publicar Ahora";
+    reader.readAsDataURL(file);
 };
 
-// CARGA Y RENDER
-async function cargar() {
-    const snap = await getDocs(query(collection(db, "productos"), orderBy("creado", "desc")));
-    productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
-    render(productos);
-}
+window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
+window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
 
-function render(lista) {
-    const feed = document.getElementById('feed');
-    feed.innerHTML = lista.map(p => `
-        <div class="card">
-            <img class="foto-principal" src="${p.fotos[0]}" onclick="verGaleria([${p.fotos.map(f=>`'${f}'`).join(',')}])">
-            <div class="miniaturas-cont">
-                ${p.fotos.map(f => `<img src="${f}" class="mini-foto" onclick="verGaleria([${p.fotos.map(f=>`'${f}'`).join(',')}])">`).join('')}
-            </div>
-            <div class="info">
-                <div class="precio">$${p.precio}</div>
-                <div class="titulo">${p.titulo}</div>
-                <div class="tag-stock">${p.cantidad} disponibles</div>
-                <div style="font-size:10px; color:var(--mut)">📍 ${p.muni}</div>
-                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Me interesa ${p.titulo}"><i class="fa-brands fa-whatsapp"></i> Consultar</a>
-                ${p.duenoId === MI_ID ? `<button onclick="eliminar('${p.id}')" style="color:red; border:none; background:none; margin-top:5px; font-size:11px">Eliminar Mi Anuncio</button>` : ''}
-            </div>
-        </div>
-    `).join('');
-}
-
-// VISOR DE FOTOS LÓGICA
-window.verGaleria = (fotos) => {
-    fotosVisorActual = fotos;
-    indiceVisor = 0;
-    actualizarImagenVisor();
-    document.getElementById('visorFotoInterno').style.display = 'flex';
-};
-
-function actualizarImagenVisor() {
-    document.getElementById('fotoGrande').src = fotosVisorActual[indiceVisor];
-}
-
-window.cambiarFotoVisor = (dir) => {
-    indiceVisor += dir;
-    if(indiceVisor < 0) indiceVisor = fotosVisorActual.length - 1;
-    if(indiceVisor >= fotosVisorActual.length) indiceVisor = 0;
-    actualizarImagenVisor();
-};
-
-window.cerrarVisor = () => document.getElementById('visorFotoInterno').style.display = 'none';
-
-// PERFIL VENDEDOR
-async function cargarPerfil() {
-    const snap = await getDoc(doc(db, "vendedores", MI_ID));
-    if(snap.exists()) {
-        const d = snap.data();
-        document.getElementById('perfilNombre').value = d.nombre || "";
-        document.getElementById('perfilTelefono').value = d.telefono || "";
-        if(d.foto) document.getElementById('imgPerfilPrevia').src = d.foto;
+window.abrir = () => {
+    if (!MI_ID) {
+        alert("Debes iniciar sesión para publicar.");
+        abrirPerfil();
+    } else if (!perfilNombreInput.value || !perfilTelefonoInput.value) {
+        alert("Completa tu nombre y teléfono en 'Mi Perfil' para poder vender.");
+        abrirPerfil();
+    } else {
+        editandoID = null;
+        document.getElementById('modalTitulo').textContent = "Nuevo Anuncio";
+        document.getElementById('btnPublicar').textContent = "Publicar Ahora";
+        limpiarCampos();
+        document.getElementById('modal').style.display = "block";
     }
+};
+
+window.cerrar = () => {
+    document.getElementById('modal').style.display = "none";
+    editandoID = null;
+    limpiarCampos();
+};
+
+function limpiarCampos() {
+    document.getElementById('titulo').value = "";
+    document.getElementById('descripcion').value = "";
+    document.getElementById('precio').value = "";
+    document.getElementById('cantidad').value = "1";
+    fotosAnuncio = ["", "", ""];
+    document.querySelectorAll('.foto-input-box img').forEach(i => i.style.display="none");
 }
+
+window.abrirEditar = (id) => {
+    const p = productos.find(item => item.id === id);
+    if (!p) return;
+
+    editandoID = id;
+    document.getElementById('modalTitulo').textContent = "Editar mi Anuncio";
+    document.getElementById('btnPublicar').textContent = "Guardar Cambios";
+
+    document.getElementById('titulo').value = p.titulo;
+    document.getElementById('descripcion').value = p.descripcion;
+    document.getElementById('precio').value = p.precio;
+    document.getElementById('cantidad').value = p.cantidad || 1;
+    document.getElementById('categoria').value = p.categoria;
+    document.getElementById('opcionEnvio').value = p.entrega;
+    document.getElementById('depto').value = p.depto;
+    
+    actualizarMunicipios();
+    document.getElementById('muni').value = p.muni;
+
+    fotosAnuncio = [...p.fotos, "", ""].slice(0, 3);
+    fotosAnuncio.forEach((src, idx) => {
+        const img = document.getElementById(`p-${idx}`);
+        if (src) { img.src = src; img.style.display = "block"; }
+        else { img.style.display = "none"; }
+    });
+
+    document.getElementById('modal').style.display = "block";
+};
+
+function verificarPerfil() {
+    const n = perfilNombreInput.value;
+    const t = perfilTelefonoInput.value;
+    const ok = !!(MI_ID && n && t);
+    bannerPerfil.style.display = ok ? "none" : "block";
+    return ok;
+}
+
+async function cargarPerfil() {
+  if(!MI_ID) return;
+  try {
+    const ref = doc(db, "vendedores", MI_ID);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const p = snap.data();
+      perfilNombreInput.value = p.nombre || "";
+      perfilTelefonoInput.value = p.telefono || "";
+      fotoPerfilBase64 = p.foto || "";
+      imgPerfilPrevia.src = fotoPerfilBase64 || "https://via.placeholder.com/80";
+      verificarPerfil();
+    }
+  } catch(e) { console.error("Error cargando perfil:", e); }
+}
+
+window.abrirPerfil = () => document.getElementById('modalPerfil').style.display = "block";
 
 window.guardarPerfil = async () => {
+  if (!MI_ID) return alert("Inicia sesión primero para guardar tu perfil.");
+  try {
     await setDoc(doc(db, "vendedores", MI_ID), {
-        nombre: document.getElementById('perfilNombre').value,
-        telefono: document.getElementById('perfilTelefono').value,
-        foto: document.getElementById('imgPerfilPrevia').src
-    }, {merge:true});
-    alert("Datos actualizados");
+      nombre: perfilNombreInput.value,
+      telefono: perfilTelefonoInput.value,
+      foto: fotoPerfilBase64,
+      actualizado: Date.now()
+    }, { merge: true });
+    alert("Perfil actualizado correctamente.");
+    verificarPerfil();
+  } catch(e) { alert("Error al guardar perfil: " + e.message); }
 };
 
-// DEPARTAMENTOS
+window.cerrarPerfil = () => document.getElementById('modalPerfil').style.display = "none";
+
 window.actualizarMunicipios = () => {
     const d = document.getElementById('depto').value;
     const m = document.getElementById('muni');
     m.innerHTML = '<option value="">Municipio</option>';
     if(svData[d]) svData[d].forEach(mun => m.innerHTML += `<option value="${mun}">${mun}</option>`);
 };
+
+window.publicar = async () => {
+    if (!MI_ID) return alert("Inicia sesión.");
+
+    const btn = document.getElementById('btnPublicar');
+    const t = document.getElementById('titulo').value.trim();
+    const p = document.getElementById('precio').value;
+    const cant = parseInt(document.getElementById('cantidad').value) || 1;
+    const fotosFinales = fotosAnuncio.filter(f => f !== "");
+    const dep = document.getElementById('depto').value;
+    const mun = document.getElementById('muni').value;
+
+    if (!t || !p || fotosFinales.length === 0 || !dep || !mun) {
+        return alert("Por favor rellena todos los campos.");
+    }
+
+    try {
+        btn.disabled = true;
+        btn.textContent = "Procesando...";
+
+        const datos = {
+            titulo: t,
+            descripcion: document.getElementById('descripcion').value,
+            precio: parseFloat(p).toFixed(2),
+            cantidad: cant,
+            fotos: fotosFinales,
+            categoria: document.getElementById('categoria').value,
+            entrega: document.getElementById('opcionEnvio').value,
+            depto: dep,
+            muni: mun,
+            vendido: (cant <= 0),
+            actualizado: Date.now()
+        };
+
+        if (editandoID) {
+            await updateDoc(doc(db, "productos", editandoID), datos);
+            alert("¡Anuncio actualizado!");
+        } else {
+            await addDoc(collection(db, "productos"), {
+                ...datos,
+                vendedor: perfilNombreInput.value,
+                telefono: perfilTelefonoInput.value,
+                fotoPerfilVendedor: fotoPerfilBase64,
+                creado: Date.now(),
+                duenoId: MI_ID,
+                oculto: false
+            });
+            alert("¡Anuncio publicado!");
+        }
+        cerrar();
+document.getElementById('sidebar').classList.remove('active');
+await cargar();
+    } catch (error) {
+        alert("Error: " + error.message);
+        btn.disabled = false;
+        btn.textContent = editandoID ? "Guardar Cambios" : "Publicar Ahora";
+    }
+};
+
+window.compartirPost = async (titulo, precio, muni) => {
+    const texto = `¡Mira en CheroMarketApp! 🇸🇻\n📦 ${titulo}\n💰 $${precio}\n📍 ${muni}`;
+    if (navigator.share) {
+        try { await navigator.share({ title: 'CheroMarketApp', text: texto, url: window.location.href }); } catch (err) {}
+    } else {
+        navigator.clipboard.writeText(texto + " " + window.location.href);
+        alert("¡Enlace copiado!");
+    }
+};
+
+window.marcarVendido = async (id) => {
+    const p = productos.find(item => item.id === id);
+    const nuevoEstado = !p.vendido;
+    const m = nuevoEstado ? "¿Marcar como agotado?" : "¿Poner disponible de nuevo?";
+    
+    if(confirm(m)) { 
+        try {
+            await updateDoc(doc(db,"productos",id), {
+                vendido: nuevoEstado, 
+                cantidad: nuevoEstado ? 0 : 1
+            }); 
+            cargar(); 
+        } catch(e) { alert("Error: " + e.message); }
+    }
+};
+
+window.eliminar = async (id) => {
+    if(confirm("¿Eliminar anuncio definitivamente?")) { 
+        try {
+            await updateDoc(doc(db,"productos",id), {oculto:true}); 
+            cargar(); 
+        } catch(e) { alert("Error: " + e.message); }
+    }
+};
+
+window.filtrar = () => {
+    const txt = document.getElementById('buscar').value.toLowerCase();
+    const dep = document.getElementById('filtroDepto').value;
+    const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
+    const filtrados = productos.filter(p => {
+        const cTxt = p.titulo.toLowerCase().includes(txt) || (p.muni && p.muni.toLowerCase().includes(txt));
+        const cDep = dep === "" || p.depto === dep;
+        const cPre = parseFloat(p.precio) <= pMax;
+        const cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
+        return cTxt && cDep && cPre && cCat;
+    });
+    render(filtrados);
+};
+
+window.setCat = (c, b) => {
+    state.categoria = c;
+    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    filtrar();
+};
+
+window.toggleFavorito = (id) => {
+    favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
+    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
+    render(productos);
+};
+
+window.verFavoritos = (b) => setCat("Favoritos", b);
+
+window.verCatalogo = (idVendedor, nombreVendedor, fotoVendedor) => {
+    const filtrados = productos.filter(p => p.duenoId === idVendedor);
+    const feed = document.getElementById('feed');
+    feed.innerHTML = `<div class="header-catalogo">
+        <img src="${fotoVendedor || 'https://via.placeholder.com/80'}" class="foto-perfil" alt="Foto de vendedor">
+        <h2>${nombreVendedor}</h2>
+        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Ver todo el Market</button>
+    </div>`;
+    filtrados.forEach(p => feed.innerHTML += crearCard(p));
+    window.scrollTo(0,0);
+};
+
+window.verMisAnuncios = () => {
+    if(!MI_ID) return alert("Inicia sesión.");
+    cerrarPerfil();
+    verCatalogo(MI_ID, perfilNombreInput.value, fotoPerfilBase64);
+};
+
+async function cargar() {
+    try {
+        const q = query(collection(db, "productos"), orderBy("creado", "desc"));
+        const snap = await getDocs(q);
+        productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
+        render(productos);
+    } catch(e) { console.error("Error cargando productos:", e); }
+}
+
+function render(lista) {
+    const feed = document.getElementById('feed');
+    let html = [];
+    const disp = lista.filter(p => !p.vendido);
+    const vend = lista.filter(p => p.vendido);
+    disp.forEach(p => html.push(crearCard(p)));
+    if(vend.length > 0) {
+        html.push(`<div class="seccion-titulo">AGOTADOS / VENDIDOS (${vend.length})</div>`);
+        vend.forEach(p => html.push(crearCard(p)));
+    }
+    feed.innerHTML = html.join('') || '<p style="text-align:center; padding:20px;">No hay productos para mostrar.</p>';
+}
+
+function crearCard(p) {
+    const esFav = favoritos.includes(p.id);
+    const esMio = p.duenoId === MI_ID;
+    const esEnvio = p.entrega === "Envíos a todo el país";
+    const fotos = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [p.foto] : []);
+    const cantDisp = p.cantidad || (p.vendido ? 0 : 1);
+    
+    let miniHTML = "";
+    if(fotos.length > 1) {
+        miniHTML = `<div class="miniaturas-cont">
+            ${fotos.map(f => `<img src="${f}" class="mini-foto" alt="Miniatura" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
+        </div>`;
+    }
+
+    return `
+        <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
+            <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
+            ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
+            
+            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" alt="${p.titulo}" onclick="verImagenFull(this.src)">
+            ${miniHTML}
+
+            <div class="info">
+                <div class="tags-cont">
+                    <span class="tag">${p.categoria}</span>
+                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">
+                        <i class="fa-solid ${esEnvio?'fa-truck-fast':'fa-handshake'}"></i> ${p.entrega || 'Local'}
+                    </span>
+                </div>
+                <div class="titulo">${p.titulo}</div>
+                <div class="precio">$${p.precio}</div>
+                <div class="tag-stock">${p.vendido ? 'No disponible' : cantDisp + ' disponibles'}</div>
+                <div class="loc">${p.muni || ''}, ${p.depto || ''}</div>
+                <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
+                    <i class="fa-solid fa-store"></i> Ver tienda
+                </div>
+                
+                ${!p.vendido ? `
+                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=${encodeURIComponent(`Hola, buen día. Me interesa su artículo. ¿Podrían brindarme más información y fotografías, por favor?`)}">
+                    <i class="fa-brands fa-whatsapp"></i> Consultar
+                </a>` : ''}
+
+                ${esMio ? `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px">
+                    <button class="btn-vendido-accion" style="background:#555; margin-top:0" onclick="abrirEditar('${p.id}')">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    <button class="btn-vendido-accion" style="background:${p.vendido ? 'var(--verde)' : 'var(--azul)'}; margin-top:0" onclick="marcarVendido('${p.id}')">
+                        ${p.vendido ? 'Activar' : 'Agotado'}
+                    </button>
+                    <button class="btn-eliminar-accion" style="grid-column: span 2; border: 1px solid var(--rojo); padding:5px" onclick="eliminar('${p.id}')">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </button>
+                </div>` : ''}
+            </div>
+        </div>`;
+}
 
 const dSelect = document.getElementById('depto');
 const fDepto = document.getElementById('filtroDepto');
@@ -397,7 +744,54 @@ Object.keys(svData).forEach(d => {
     fDepto.innerHTML += `<option value="${d}">${d}</option>`;
 });
 
-window.eliminar = async (id) => { if(confirm("¿Eliminar este anuncio permanentemente?")) { await updateDoc(doc(db, "productos", id), {oculto:true}); cargar(); } };
+function mostrarMensajeVincular(texto, esError = false) {
+  const msg = document.getElementById('msgVincular');
+  msg.textContent = texto;
+  msg.style.color = esError ? 'var(--rojo)' : 'var(--verde)';
+}
+
+document.getElementById('btnVincular').addEventListener('click', async () => {
+  const email = document.getElementById('emailVincular').value.trim();
+  const password = document.getElementById('passwordVincular').value;
+  if (!email || !password || password.length < 6) {
+    mostrarMensajeVincular("Ingresa un correo válido y contraseña (mín 6 caracteres)", true);
+    return;
+  }
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    mostrarMensajeVincular("¡Bienvenido de nuevo!");
+    setTimeout(() => cerrarPerfil(), 1000);
+  } catch (error) {
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        await sendEmailVerification(userCred.user);
+        mostrarMensajeVincular("Cuenta creada. ¡Verifica tu correo!");
+        setTimeout(() => cerrarPerfil(), 2000);
+      } catch (regError) {
+        mostrarMensajeVincular("Error: " + regError.message, true);
+      }
+    } else {
+      mostrarMensajeVincular("Error: " + error.message, true);
+    }
+  }
+});
+    
+</script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./sw.js")
+        .then((reg) => {
+          console.log("CheroMarket: PWA Activa", reg.scope);
+        })
+        .catch((err) => {
+          console.error("CheroMarket: Error en SW", err);
+        });
+    });
+  }
 </script>
 </body>
 </html>
