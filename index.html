@@ -743,8 +743,13 @@ window.verMisAnuncios = () => {
 
 async function cargar() {
     try {
-        const q = query(collection(db, "productos"), orderBy("creado", "desc"));
-        const snap = await getDocs(q);
+        const q = query(
+    collection(db, "productos"),
+    where("oculto", "==", false),
+    orderBy("creado", "desc"),
+    limit(30)
+);
+const snap = await getDocs(q);
         productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
         render(productos);
     } catch(e) { console.error("Error cargando productos:", e); }
