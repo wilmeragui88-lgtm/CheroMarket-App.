@@ -128,9 +128,10 @@
 
 <div id="sidebar" class="sidebar">
     <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
-    <div style="font-size:12px; color:var(--mut)">
-        <p><strong>CheroMarketApp 2026</strong></p>
-        <p>Al usar esta app aceptas los términos de seguridad y comercio de El Salvador.</p>
+    <div style="font-size: 13px; color: var(--mut);">
+        <h4>Información</h4>
+        <p>Versión 2.0 Pro · 2026</p>
+        <p>CheroMarketApp es una plataforma segura para salvadoreños.</p>
     </div>
 </div>
 
@@ -217,18 +218,26 @@ let MI_ID = null;
 let editandoID = null;
 
 const svData = {
-    "Ahuachapán": ["Ahuachapán", "Atiquizaya", "Concepción de Ataco"],
+    "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya"],
     "Santa Ana": ["Santa Ana", "Metapán", "Chalchuapa"],
     "Sonsonate": ["Sonsonate", "Acajutla", "Izalco"],
+    "Chalatenango": ["Chalatenango", "La Palma"],
     "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Colón"],
     "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Apopa", "Ilopango"],
+    "Cuscatlán": ["Cojutepeque", "Suchitoto"],
+    "La Paz": ["Zacatecoluca", "Olocuilta"],
+    "Cabañas": ["Sensuntepeque", "Ilobasco"],
+    "San Vicente": ["San Vicente", "Tecoluca"],
+    "Usulután": ["Usulután", "Jiquilisco"],
     "San Miguel": ["San Miguel", "Chinameca"],
-    "Usulután": ["Usulután", "Jiquilisco"]
+    "Morazán": ["San Francisco Gotera", "Perquín"],
+    "La Unión": ["La Unión", "Santa Rosa de Lima"]
 };
 
 let productos = [];
 let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
+
 let fotosAnuncio = ["", "", ""];
 let fotoPerfilBase64 = "";
 
@@ -240,7 +249,11 @@ const bannerPerfil = document.getElementById('bannerPerfil');
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     MI_ID = user.uid;
+    document.getElementById('emailVincular').style.display = "none";
+    document.getElementById('passwordVincular').style.display = "none";
+    document.getElementById('btnVincular').style.display = "none";
     document.getElementById('btnCerrarSesion').style.display = "block";
+    document.getElementById('authTitulo').textContent = "Sesión activa: " + user.email;
     await cargarPerfil();
   } else {
     MI_ID = null;
@@ -248,6 +261,8 @@ onAuthStateChanged(auth, async (user) => {
   }
   await cargar();
 });
+
+window.cerrarSesion = () => { if(confirm("¿Cerrar sesión?")) signOut(auth); };
 
 // COMPRESIÓN DE FOTOS
 document.querySelectorAll('.foto-item').forEach(input => {
@@ -277,12 +292,31 @@ document.querySelectorAll('.foto-item').forEach(input => {
     };
 });
 
+document.getElementById('fotoPerfilFile').onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 120; canvas.height = 120;
+            canvas.getContext('2d').drawImage(img, 0, 0, 120, 120);
+            fotoPerfilBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            imgPerfilPrevia.src = fotoPerfilBase64;
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
 window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('active');
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
 
 window.abrir = () => {
     if (!MI_ID) return abrirPerfil();
     editandoID = null;
+    document.getElementById('modalTitulo').textContent = "Nuevo Anuncio";
     limpiarCampos();
     document.getElementById('modal').style.display = "block";
 };
@@ -293,9 +327,34 @@ function limpiarCampos() {
     document.getElementById('titulo').value = "";
     document.getElementById('descripcion').value = "";
     document.getElementById('precio').value = "";
+    document.getElementById('cantidad').value = "1";
     fotosAnuncio = ["", "", ""];
     document.querySelectorAll('.foto-input-box img').forEach(i => i.style.display="none");
 }
+
+window.abrirEditar = (id) => {
+    const p = productos.find(item => item.id === id);
+    if (!p) return;
+    editandoID = id;
+    document.getElementById('modalTitulo').textContent = "Editar mi Anuncio";
+    document.getElementById('titulo').value = p.titulo;
+    document.getElementById('descripcion').value = p.descripcion;
+    document.getElementById('precio').value = p.precio;
+    document.getElementById('cantidad').value = p.cantidad || 1;
+    document.getElementById('categoria').value = p.categoria;
+    document.getElementById('depto').value = p.depto;
+    actualizarMunicipios();
+    document.getElementById('muni').value = p.muni;
+
+    fotosAnuncio = [...p.fotos, "", ""].slice(0,3);
+    fotosAnuncio.forEach((f,i) => {
+        if(f) {
+            document.getElementById(`p-${i}`).src = f;
+            document.getElementById(`p-${i}`).style.display = "block";
+        }
+    });
+    document.getElementById('modal').style.display = "block";
+};
 
 async function cargarPerfil() {
   if(!MI_ID) return;
@@ -333,46 +392,79 @@ window.actualizarMunicipios = () => {
 window.publicar = async () => {
     const btn = document.getElementById('btnPublicar');
     const fotosFinales = fotosAnuncio.filter(f => f !== "");
-    if (!document.getElementById('titulo').value || fotosFinales.length === 0) return alert("Faltan datos o fotos.");
+    const tit = document.getElementById('titulo').value.trim();
+    if (!tit || fotosFinales.length === 0) return alert("Faltan datos.");
 
-    btn.disabled = true; btn.textContent = "Cargando...";
+    btn.disabled = true; btn.textContent = "Procesando...";
     try {
         const datos = {
-            titulo: document.getElementById('titulo').value,
+            titulo: tit,
+            descripcion: document.getElementById('descripcion').value,
             precio: document.getElementById('precio').value,
+            cantidad: parseInt(document.getElementById('cantidad').value) || 1,
             fotos: fotosFinales,
             categoria: document.getElementById('categoria').value,
+            entrega: document.getElementById('opcionEnvio').value,
             depto: document.getElementById('depto').value,
             muni: document.getElementById('muni').value,
             vendedor: perfilNombreInput.value,
             telefono: perfilTelefonoInput.value,
             fotoPerfilVendedor: fotoPerfilBase64,
             duenoId: MI_ID,
-            creado: Date.now(),
-            vendido: false
+            actualizado: Date.now(),
+            vendido: false,
+            oculto: false
         };
-        await addDoc(collection(db, "productos"), datos);
+
+        if(editandoID) {
+            await updateDoc(doc(db, "productos", editandoID), datos);
+        } else {
+            datos.creado = Date.now();
+            await addDoc(collection(db, "productos"), datos);
+        }
         cerrar(); await cargar();
     } catch (e) { alert(e.message); }
-    btn.disabled = false;
+    btn.disabled = false; btn.textContent = "Publicar Ahora";
+};
+
+window.marcarVendido = async (id) => {
+    const p = productos.find(item => item.id === id);
+    await updateDoc(doc(db, "productos", id), { vendido: !p.vendido });
+    cargar();
+};
+
+window.eliminar = async (id) => {
+    if(confirm("¿Eliminar?")) {
+        await updateDoc(doc(db, "productos", id), { oculto: true });
+        cargar();
+    }
 };
 
 async function cargar() {
     const snap = await getDocs(query(collection(db, "productos"), orderBy("creado", "desc")));
-    productos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    productos = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => !p.oculto);
     render(productos);
 }
 
 function render(lista) {
     const feed = document.getElementById('feed');
-    feed.innerHTML = lista.map(p => crearCard(p)).join('') || '<p>No hay productos.</p>';
+    const disp = lista.filter(p => !p.vendido);
+    const vend = lista.filter(p => p.vendido);
+    
+    let html = disp.map(p => crearCard(p));
+    if(vend.length > 0) {
+        html.push(`<div class="seccion-titulo">AGOTADOS (${vend.length})</div>`);
+        html.push(...vend.map(p => crearCard(p)));
+    }
+    feed.innerHTML = html.join('') || '<p>No hay productos.</p>';
 }
 
-// ESTA ES LA FUNCIÓN CORREGIDA Y LIVIANA
 function crearCard(p) {
     const esFav = favoritos.includes(p.id);
     const esMio = p.duenoId === MI_ID;
+    const esEnvio = p.entrega === "Envíos a todo el país";
     const fotos = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [p.foto] : []);
+    const cantDisp = p.cantidad || 1;
     
     let miniHTML = "";
     if(fotos.length > 1) {
@@ -384,14 +476,39 @@ function crearCard(p) {
     return `
         <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
             <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-share-post" onclick="compartirPost('${p.titulo}', '${p.precio}', '${p.muni}')"><i class="fa-solid fa-share-nodes"></i></button>
+            ${p.vendido ? '<div class="sold-overlay">AGOTADO</div>' : ''}
+            
             <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" loading="lazy" onclick="verImagenFull(this.src)">
             ${miniHTML}
+
             <div class="info">
-                <div class="tag">${p.categoria}</div>
+                <div class="tags-cont">
+                    <span class="tag">${p.categoria}</span>
+                    <span class="tag-envio" style="background:${esEnvio?'var(--azul)':'var(--mut)'}">
+                        <i class="fa-solid ${esEnvio?'fa-truck-fast':'fa-handshake'}"></i> ${esEnvio?'Envío':'Local'}
+                    </span>
+                </div>
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
+                <div class="tag-stock">${p.vendido ? 'Agotado' : cantDisp + ' disponibles'}</div>
                 <div class="loc">📍 ${p.muni}, ${p.depto}</div>
-                <a class="btn-wa" href="https://wa.me/503${p.telefono}?text=Me interesa ${p.titulo}">WhatsApp</a>
+                
+                <div class="vendedor-link" onclick="verCatalogo('${p.duenoId}', '${p.vendedor}', '${p.fotoPerfilVendedor}')">
+                    <i class="fa-solid fa-store"></i> Tienda de ${p.vendedor || 'Chero'}
+                </div>
+                
+                ${!p.vendido ? `
+                <a class="btn-wa" target="_blank" href="https://wa.me/503${p.telefono}?text=Hola, me interesa: ${p.titulo}">
+                    <i class="fa-brands fa-whatsapp"></i> Consultar
+                </a>` : ''}
+
+                ${esMio ? `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px">
+                    <button class="btn-vendido-accion" style="background:#555; margin-top:0" onclick="abrirEditar('${p.id}')">Editar</button>
+                    <button class="btn-vendido-accion" style="background:var(--azul); margin-top:0" onclick="marcarVendido('${p.id}')">${p.vendido?'Activar':'Agotado'}</button>
+                    <button class="btn-eliminar-accion" style="grid-column: span 2" onclick="eliminar('${p.id}')">Eliminar anuncio</button>
+                </div>` : ''}
             </div>
         </div>`;
 }
@@ -405,9 +522,52 @@ window.toggleFavorito = (id) => {
 window.verImagenFull = (src) => { document.getElementById('fotoGrande').src = src; document.getElementById('visorFotoInterno').style.display = 'flex'; };
 window.cerrarVisor = () => document.getElementById('visorFotoInterno').style.display = 'none';
 
-// Deptos
+window.compartirPost = (t, p, m) => {
+    const txt = `¡Mira este anuncio en CheroMarketApp! 🇸🇻\n${t}\nPrecio: $${p}\nLugar: ${m}`;
+    if(navigator.share) navigator.share({title:'CheroMarket', text:txt, url:window.location.href});
+    else { navigator.clipboard.writeText(txt); alert("Copiado"); }
+};
+
+window.verCatalogo = (id, nombre, foto) => {
+    const filtrados = productos.filter(p => p.duenoId === id);
+    const feed = document.getElementById('feed');
+    feed.innerHTML = `<div class="header-catalogo">
+        <img src="${foto || 'https://via.placeholder.com/80'}" class="foto-perfil">
+        <h2>${nombre}</h2>
+        <button onclick="cargar()" style="background:var(--azul); color:white; border:none; padding:8px 15px; border-radius:20px;">Volver al Inicio</button>
+    </div>` + filtrados.map(p => crearCard(p)).join('');
+    window.scrollTo(0,0);
+};
+
+window.verMisAnuncios = () => { if(MI_ID) { cerrarPerfil(); verCatalogo(MI_ID, perfilNombreInput.value, fotoPerfilBase64); } };
+
+window.setCat = (c, b) => {
+    state.categoria = c;
+    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    filtrar();
+};
+
+window.filtrar = () => {
+    const txt = document.getElementById('buscar').value.toLowerCase();
+    const dep = document.getElementById('filtroDepto').value;
+    const pMax = parseFloat(document.getElementById('precioMax').value) || Infinity;
+    const filtrados = productos.filter(p => {
+        const cTxt = p.titulo.toLowerCase().includes(txt);
+        const cDep = dep === "" || p.depto === dep;
+        const cPre = parseFloat(p.precio) <= pMax;
+        const cCat = state.categoria === "Todos" ? true : (state.categoria === "Favoritos" ? favoritos.includes(p.id) : p.categoria === state.categoria);
+        return cTxt && cDep && cPre && cCat;
+    });
+    render(filtrados);
+};
+
 const dSelect = document.getElementById('depto');
-Object.keys(svData).forEach(d => dSelect.innerHTML += `<option value="${d}">${d}</option>`);
+const fDepto = document.getElementById('filtroDepto');
+Object.keys(svData).forEach(d => {
+    dSelect.innerHTML += `<option value="${d}">${d}</option>`;
+    fDepto.innerHTML += `<option value="${d}">${d}</option>`;
+});
 
 document.getElementById('btnVincular').onclick = async () => {
     const email = document.getElementById('emailVincular').value;
@@ -420,18 +580,6 @@ document.getElementById('btnVincular').onclick = async () => {
     }
 };
 
-window.setCat = (c, b) => {
-    state.categoria = c;
-    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    filtrar();
-};
-
-window.filtrar = () => {
-    const txt = document.getElementById('buscar').value.toLowerCase();
-    const filtrados = productos.filter(p => p.titulo.toLowerCase().includes(txt) && (state.categoria === "Todos" || p.categoria === state.categoria));
-    render(filtrados);
-};
 </script>
 </body>
 </html>
