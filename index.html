@@ -49,8 +49,8 @@
         .card{background:var(--card); border-radius:12px; border:1px solid var(--b); overflow:hidden; display:flex; flex-direction:column; position:relative; transition: 0.2s;}
         .foto-principal{height:160px; width:100%; object-fit:cover; background:#eee; cursor: pointer;}
         
-        .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b);}
-        .mini-foto{width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer;}
+        .miniaturas-cont{display: flex; gap: 4px; padding: 6px; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--b); overflow-x: auto;}
+        .mini-foto{width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--b); cursor: pointer; flex-shrink: 0;}
 
         .btn-fav {position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; color: var(--mut);}
         .btn-fav.active {color: #ff4757;}
@@ -129,14 +129,12 @@
 <div id="sidebar" class="sidebar">
     <button style="width:100%; padding:10px; margin-bottom:20px" onclick="toggleMenu()">Cerrar Menú</button>
     <div style="font-size:12px; color:var(--mut)">
-        <p>Términos y Condiciones v2.0</p>
-        <p>Al usar la app aceptas nuestras políticas de seguridad.</p>
+        <p><strong>CheroMarketApp 2026</strong></p>
+        <p>Al usar esta app aceptas los términos de seguridad y comercio de El Salvador.</p>
     </div>
 </div>
 
 <div id="feed" class="feed"></div>
-<div id="loader" style="text-align:center; padding:20px; display:none;"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</div>
-
 <button class="btn-add" onclick="abrir()"><i class="fa-solid fa-plus"></i></button>
 
 <div id="visorFotoInterno" onclick="cerrarVisor()">
@@ -200,7 +198,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, limit, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, orderBy, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -219,26 +217,18 @@ let MI_ID = null;
 let editandoID = null;
 
 const svData = {
-    "Ahuachapán": ["Ahuachapán", "Jujutla", "Atiquizaya", "Concepción de Ataco", "El Refugio", "Guaymango", "Apaneca", "San Francisco Menéndez", "San Lorenzo", "San Pedro Puxtla", "Turín"],
-    "Santa Ana": ["Santa Ana", "Candelaria de la Frontera", "Chalchuapa", "Coatepeque", "El Congo", "El Porvenir", "Metapán", "San Antonio Pajonal", "San Sebastián Salitrillo", "Santa Rosa Guachipilín", "Santiago de la Frontera", "Texistepeque"],
-    "Sonsonate": ["Sonsonate", "Acajutla", "Armenia", "Caluco", "Cuisnahuat", "Izalco", "Juayúa", "Nahuizalco", "Nahulingo", "Salcoatitán", "San Antonio del Monte", "San Julián", "Santa Catarina Masahuat", "Santa Isabel Ishuatán", "Santo Domingo de Guzmán", "Sonzacate"],
-    "Chalatenango": ["Chalatenango", "Agua Caliente", "Nueva Concepción", "La Palma", "Tejutla"], // Cortado para brevedad
-    "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Ciudad Arce", "Colón", "Quezaltepeque", "San Juan Opico", "Zaragoza"],
-    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Ilopango", "Santa Tecla", "San Marcos", "Apopa", "Nejapa"],
-    "Cuscatlán": ["Cojutepeque", "Suchitoto"],
-    "La Paz": ["Zacatecoluca", "Olocuilta"],
-    "Cabañas": ["Sensuntepeque", "Ilobasco"],
-    "San Vicente": ["San Vicente"],
-    "Usulután": ["Usulután", "Santiago de María", "Jiquilisco"],
+    "Ahuachapán": ["Ahuachapán", "Atiquizaya", "Concepción de Ataco"],
+    "Santa Ana": ["Santa Ana", "Metapán", "Chalchuapa"],
+    "Sonsonate": ["Sonsonate", "Acajutla", "Izalco"],
+    "La Libertad": ["Santa Tecla", "Antiguo Cuscatlán", "Colón"],
+    "San Salvador": ["San Salvador", "Mejicanos", "Soyapango", "Apopa", "Ilopango"],
     "San Miguel": ["San Miguel", "Chinameca"],
-    "Morazán": ["San Francisco Gotera", "Perquín"],
-    "La Unión": ["La Unión", "Santa Rosa de Lima"]
+    "Usulután": ["Usulután", "Jiquilisco"]
 };
 
 let productos = [];
 let favoritos = JSON.parse(localStorage.getItem("mis_favoritos")) || [];
 const state = { categoria: "Todos" };
-
 let fotosAnuncio = ["", "", ""];
 let fotoPerfilBase64 = "";
 
@@ -250,24 +240,16 @@ const bannerPerfil = document.getElementById('bannerPerfil');
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     MI_ID = user.uid;
-    document.getElementById('emailVincular').style.display = "none";
-    document.getElementById('passwordVincular').style.display = "none";
-    document.getElementById('btnVincular').style.display = "none";
     document.getElementById('btnCerrarSesion').style.display = "block";
-    document.getElementById('authTitulo').textContent = "Sesión activa: " + user.email;
     await cargarPerfil();
   } else {
     MI_ID = null;
-    document.getElementById('emailVincular').style.display = "block";
-    document.getElementById('passwordVincular').style.display = "block";
-    document.getElementById('btnVincular').style.display = "block";
-    document.getElementById('btnCerrarSesion').style.display = "none";
     bannerPerfil.style.display = "block";
   }
   await cargar();
 });
 
-// MEJORA: Compresión agresiva para Base64
+// COMPRESIÓN DE FOTOS
 document.querySelectorAll('.foto-item').forEach(input => {
     input.onchange = e => {
         const file = e.target.files[0];
@@ -278,13 +260,13 @@ document.querySelectorAll('.foto-item').forEach(input => {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX = 500; // Bajado de 600 a 500
+                const MAX = 500; 
                 let w = img.width, h = img.height;
                 if (w > MAX) { h *= MAX/w; w = MAX; }
                 canvas.width = w; canvas.height = h;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, w, h);
-                const b64 = canvas.toDataURL('image/jpeg', 0.3); // Calidad bajada a 0.3
+                const b64 = canvas.toDataURL('image/jpeg', 0.4);
                 fotosAnuncio[idx] = b64;
                 const prev = document.getElementById(`p-${idx}`);
                 prev.src = b64; prev.style.display = "block";
@@ -299,12 +281,13 @@ window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('a
 window.toggleTheme = () => document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
 
 window.abrir = () => {
-    if (!MI_ID) { alert("Inicia sesión para publicar."); abrirPerfil(); }
-    else if (!perfilNombreInput.value || !perfilTelefonoInput.value) { alert("Completa tu perfil primero."); abrirPerfil(); }
-    else { editandoID = null; limpiarCampos(); document.getElementById('modal').style.display = "block"; }
+    if (!MI_ID) return abrirPerfil();
+    editandoID = null;
+    limpiarCampos();
+    document.getElementById('modal').style.display = "block";
 };
 
-window.cerrar = () => { document.getElementById('modal').style.display = "none"; editandoID = null; };
+window.cerrar = () => document.getElementById('modal').style.display = "none";
 
 function limpiarCampos() {
     document.getElementById('titulo').value = "";
@@ -363,6 +346,7 @@ window.publicar = async () => {
             muni: document.getElementById('muni').value,
             vendedor: perfilNombreInput.value,
             telefono: perfilTelefonoInput.value,
+            fotoPerfilVendedor: fotoPerfilBase64,
             duenoId: MI_ID,
             creado: Date.now(),
             vendido: false
@@ -370,20 +354,13 @@ window.publicar = async () => {
         await addDoc(collection(db, "productos"), datos);
         cerrar(); await cargar();
     } catch (e) { alert(e.message); }
-    btn.disabled = false; btn.textContent = "Publicar Ahora";
+    btn.disabled = false;
 };
 
-// MEJORA: Paginación (Solo carga los últimos 12)
 async function cargar() {
-    const loader = document.getElementById('loader');
-    loader.style.display = "block";
-    try {
-        const q = query(collection(db, "productos"), orderBy("creado", "desc"), limit(12));
-        const snap = await getDocs(q);
-        productos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        render(productos);
-    } catch(e) { console.error(e); }
-    loader.style.display = "none";
+    const snap = await getDocs(query(collection(db, "productos"), orderBy("creado", "desc")));
+    productos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    render(productos);
 }
 
 function render(lista) {
@@ -391,42 +368,57 @@ function render(lista) {
     feed.innerHTML = lista.map(p => crearCard(p)).join('') || '<p>No hay productos.</p>';
 }
 
+// ESTA ES LA FUNCIÓN CORREGIDA Y LIVIANA
 function crearCard(p) {
-    // MEJORA: lazy loading en img
+    const esFav = favoritos.includes(p.id);
+    const esMio = p.duenoId === MI_ID;
+    const fotos = Array.isArray(p.fotos) ? p.fotos : (p.foto ? [p.foto] : []);
+    
+    let miniHTML = "";
+    if(fotos.length > 1) {
+        miniHTML = `<div class="miniaturas-cont">
+            ${fotos.map(f => `<img src="${f}" class="mini-foto" loading="lazy" onclick="this.closest('.card').querySelector('.foto-principal').src='${f}'">`).join('')}
+        </div>`;
+    }
+
     return `
-        <div class="card">
-            <img class="foto-principal" src="${p.fotos[0]}" loading="lazy" onclick="verImagenFull(this.src)">
+        <div class="card" style="${p.vendido ? 'opacity:0.6' : ''}">
+            <button class="btn-fav ${esFav?'active':''}" onclick="toggleFavorito('${p.id}')"><i class="fa-solid fa-heart"></i></button>
+            <img class="foto-principal" src="${fotos[0] || 'https://via.placeholder.com/160'}" loading="lazy" onclick="verImagenFull(this.src)">
+            ${miniHTML}
             <div class="info">
+                <div class="tag">${p.categoria}</div>
                 <div class="titulo">${p.titulo}</div>
                 <div class="precio">$${p.precio}</div>
-                <div class="loc">${p.muni}, ${p.depto}</div>
+                <div class="loc">📍 ${p.muni}, ${p.depto}</div>
                 <a class="btn-wa" href="https://wa.me/503${p.telefono}?text=Me interesa ${p.titulo}">WhatsApp</a>
             </div>
         </div>`;
 }
 
-// Botón de acceso
-document.getElementById('btnVincular').onclick = async () => {
-    const email = document.getElementById('emailVincular').value;
-    const pass = document.getElementById('passwordVincular').value;
-    try {
-        await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) {
-        await createUserWithEmailAndPassword(auth, email, pass);
-    }
-    cerrarPerfil();
+window.toggleFavorito = (id) => {
+    favoritos.includes(id) ? favoritos = favoritos.filter(f => f !== id) : favoritos.push(id);
+    localStorage.setItem("mis_favoritos", JSON.stringify(favoritos));
+    render(productos);
 };
 
 window.verImagenFull = (src) => { document.getElementById('fotoGrande').src = src; document.getElementById('visorFotoInterno').style.display = 'flex'; };
 window.cerrarVisor = () => document.getElementById('visorFotoInterno').style.display = 'none';
 
-// Llenar deptos
-const fDepto = document.getElementById('filtroDepto');
+// Deptos
 const dSelect = document.getElementById('depto');
-Object.keys(svData).forEach(d => {
-    fDepto.innerHTML += `<option value="${d}">${d}</option>`;
-    dSelect.innerHTML += `<option value="${d}">${d}</option>`;
-});
+Object.keys(svData).forEach(d => dSelect.innerHTML += `<option value="${d}">${d}</option>`);
+
+document.getElementById('btnVincular').onclick = async () => {
+    const email = document.getElementById('emailVincular').value;
+    const pass = document.getElementById('passwordVincular').value;
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        cerrarPerfil();
+    } catch (e) {
+        try { await createUserWithEmailAndPassword(auth, email, pass); cerrarPerfil(); } catch(err) { alert(err.message); }
+    }
+};
 
 window.setCat = (c, b) => {
     state.categoria = c;
@@ -440,7 +432,6 @@ window.filtrar = () => {
     const filtrados = productos.filter(p => p.titulo.toLowerCase().includes(txt) && (state.categoria === "Todos" || p.categoria === state.categoria));
     render(filtrados);
 };
-
 </script>
 </body>
 </html>
